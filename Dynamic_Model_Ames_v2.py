@@ -4,7 +4,7 @@ Created on Tue Jun  9 17:16:00 2020
 
 @author: Jasmine Rimani
 Actuator Model and GNC for the rover
-Main Ref
+Main Ref: Development of a Mobile Robot Test Platform and Methods forValidation of Prognostics-Enabled Decision Making Algorithms, E. Balabam et al
 
 """
 
@@ -31,6 +31,23 @@ class Dynamics():
          p,q,r: rover angular rate in body ref frame [rad/s]
          i_motor : current in the motor A]
          omega_motor: motor speed [m/s]
+         
+        inputs:
+         F = Force on the Body
+         M = Moment on the Body
+         M_wheels = Total torque on the wheels
+         I = Body Inertia matrix
+         m = Body Mass
+         L_motor = Motor Indutance
+         V_motor = Motor entry voltage - evaluated with a PID as f(velocity) or f(position)
+         R_motor = Motor Resistence
+         i_motor = Motor Current (evaluated step by step)
+         K_e = Eletromagnetic costant of the motor.
+         omega_motor = velocity of the motor/wheel
+         Jm_motor = moment of inertia motor 
+         K_t = Torque Costant of the motor
+         b_motor = Viscous torque
+         eps_motor = efficiency of the motor 
 
         """
         
@@ -99,17 +116,8 @@ class Dynamics():
 
 class Rover_Properties():
     def __init__(self):
-        #  Effective area in x-axis
-        self.Ax = 0.0316 #m^2
-        #  Effective area in y-axis
-        self.Ay = 0.0448 #m^2
-        # Drag coefficient
-        self.Cd = 0.89
         # Mass
         self.mass = 2.148 # kg
-        # Weight
-        x_planet = Earth()
-        self.weight = self.mass*(x_planet.g)
         # Moment of inertia about x-axis
         self.Ix = 0.0140 #kg*m^2
         # Moment of inertia about y-axis
@@ -118,6 +126,21 @@ class Rover_Properties():
         self.Iz = 0.0334 #kg*m^2
         # Radius of wheel
         self.radius_wheel = 0.0635 #m
+        # Distance between the center of the two short side wheels
+        self.b = 0.249
+        # Distance between the center of two long side wheels
+        self.l =0.446
+        
+        
+        #  Effective area in x-axis
+        self.Ax = 0.0316 #m^2
+        #  Effective area in y-axis
+        self.Ay = 0.0448 #m^2
+        # Drag coefficient
+        self.Cd = 0.89
+        # Weight
+        x_planet = Earth()
+        self.weight = self.mass*(x_planet.g)
         # Moment arm of wheel
         self.moment_arm_wheel = 0.1245 # m --> look at the figure
         # Coefficient of friction in x
@@ -211,12 +234,9 @@ if __name__ == '__main__':
     
     
 
-    # PID integral gains
-    integral_error_u = 0
-    integral_error_psi = 0
     # Vector with the position goals are stored
-    x_goal_v = np.array([2,4]) # [m]
-    y_goal_v = np.array([2,0]) # [m]
+    x_goal_v = np.array([3,4]) # [m]
+    y_goal_v = np.array([5,0]) # [m]
     # Initial Goals [m]
     x_goal = x_goal_v[0]
     y_goal = y_goal_v[0]
@@ -227,36 +247,28 @@ if __name__ == '__main__':
 
     V_motor = np.zeros(4)
     M_wheels = np.zeros(4)
+    e_theta_v =[]
+    
+    v_target = 0.3 # Velocity we want to reach - target velocity
+    Kp = 0.1 # Gain on the turn
+    Kp_vel = 7.3 # Gain Voltage
+    mu_s = 0.6 # longitudinal coeff of slip
+    mu_gr = 0.1 #lateral/side coeff of slip
     
     while exit_loop == 1:
         
         
         Rover_properties= Rover_Properties()
         #  From Rover_Properties Class: --> All comments are in the relative class
-        Ax = Rover_properties.Ax #[m^2]
-        Ay = Rover_properties.Ay #[m^2]
+
         m = Rover_properties.mass #[kg]
         Ix = Rover_properties.Ix #[kg m^2]
         Iy = Rover_properties.Iy #[kg m^2]
         Iz = Rover_properties.Iz #[kg m^2]
         I = np.array([[Ix, 0, 0], [0,Iy,0], [0,0,Iz]]) #[kg m^2]
         R_wheel = Rover_properties.radius_wheel #[m]
-        planet = Earth()
-        g = planet.g #[m/ss]
-        rho = planet.rho #[kg/m^3]
-        Cd = Rover_properties.Cd #[adim]
-        sigma_x = Rover_properties.sigma_x #[adim]
-        sigma_y = Rover_properties.sigma_y #[adim]
-        sigma_z = Rover_properties.sigma_z #[adim]
-        sigma_v = np.array([[sigma_x, 0, 0], [0,sigma_y,0], [0,0,sigma_z]]) #[adim]
-        sigma_p = Rover_properties.sigma_p #[adim]
-        sigma_y_rot = Rover_properties.sigma_y_rot #[adim]
-        sigma_r = Rover_properties.sigma_r #[adim]
-        sigma_w = np.array([[sigma_p, 0, 0], [0,sigma_y_rot,0], [0,0,sigma_r]]) #[adim]
-        r_mom_w_x =Rover_properties.moment_arm_wheel #[adim]
-        b = r_mom_w_x*2 # body width
-        r_mom_w_y =0.223 #[adim]
-        l = r_mom_w_y *2  # body length
+        b = Rover_properties.b # body width
+        l = Rover_properties.l  # body length
         d = np.sqrt(b**2+l**2) # distance between body center and wheel center
         
         #  Motor Proprieties
@@ -278,25 +290,25 @@ if __name__ == '__main__':
         # linear velocities in body reference system --> \base_footprint in ROS [m/s]
         v_body = np.array([u_rover_v[-1],v_rover_v[-1],w_rover_v[-1]])
         
-        # Velocity we want to reach
-        v_target = 0.3
-        theta_target = atan2((y_goal-y_rover_v[-1]),(x_goal-x_rover_v[-1]))
-        
-        omega_target = (theta_target - psi_rover_v[-1] )/h_step
-        
-        Kp = 2 # Gain on the turn
+        # EVALUATE THE VOLTAGE AT THE MOTOR
+        # Heading angle between the actual and desired direction
+        theta_target = np.arctan2((y_goal-y_rover_v[-1]),(x_goal-x_rover_v[-1]))
+        # Error in heading between the actual and desired direction
         e_theta = theta_target - (psi_rover_v[-1])
+        e_theta_v.append(e_theta) # just a vector to plot th error
+        # Desired velocities of the wheels
         v_desired_left = v_target - Kp*e_theta
         v_desired_right = v_target + Kp*e_theta
         v_desired = np.array([v_desired_left,v_desired_left,v_desired_right,v_desired_right])
         
         
         
-        Kp_vel = 10
+        # Voltage to get those desired velocities - Maximum voltage per motor 12 V
         for ii in range (0,4):
-            V_motor[ii] = Kp_vel*(v_desired[ii]-R_wheel*omega_motor[ii])  
-            if V_motor[ii] > 5:
-                V_motor[ii] = 5
+            V_motor[ii] = Kp_vel*(v_desired[ii]+(v_desired[ii]-R_wheel*omega_motor[ii]))
+            V_motor[ii] = Kp_vel*(v_desired[ii]+(v_desired[ii]-R_wheel*omega_motor[ii]))
+            if V_motor[ii] > 12:
+                V_motor[ii] = 12
             if V_motor[ii] < 0:
                 V_motor[ii] = 0 
         
@@ -308,17 +320,7 @@ if __name__ == '__main__':
 
         # Angular velocities in body ref. frame [rad/s]
         omega_body = np.array([p_rover_v[-1], q_rover_v[-1], r_rover_v[-1]])
-        # slip angle beta --> determined by the direction of the velocity vector v in the body frame
-        # if u_rover_v[-1] == 0.0:
-        #     beta = 0            
-        # else:
-        #     beta = atan2(v_rover_v[-1],u_rover_v[-1])
 
-        
-      
-        
-        mu_s = 0.6
-        mu_gr = 0.1
         #  F_FL = 0 ; F_BL = 1;  F_BR = 2; F_FR = 3
         F_prop_s = np.zeros(4) # Initialize force - Longitudinal Slip Force
         F_prop_g = np.zeros(4) # Initialize force - Rotation Frinction Force
@@ -329,6 +331,7 @@ if __name__ == '__main__':
             F_prop_s[ii] = mu_s*(R_wheel*omega_motor[ii]-u_rover_v[-1])
             F_prop_g[ii] = mu_gr*d*(r_rover_v[-1])
         
+        # Angle between the direction of the main movement and the lateral slip
         gamma = atan2(b,l)
         
         # Force and Moment acting on the overall body
@@ -411,8 +414,11 @@ if __name__ == '__main__':
         if sqrt((x_rover_v[-1]-x_goal)**2+(y_rover_v[-1]-y_goal)**2)<10**-1:
             break
 
-        if i == 1000:
+        if i == 2000:
             exit_loop = 2
+            
+    
+    # PLOTS
 
     r_dot = np.diff(r_rover_v)/h_step
     v_dot = np.diff(u_rover_v)/h_step
@@ -569,3 +575,10 @@ if __name__ == '__main__':
     ax.set_ylabel('Voltage [V]')
     ax.set_xlabel('time [s]')
     ax.grid(True)  
+    
+    e_theta_v
+    fig, ax = plt.subplots()
+    ax.plot(time[1::], np.rad2deg(e_theta_v))
+    ax.set_ylabel('error in heading[deg/s]')
+    ax.set_xlabel('time [s]')
+    ax.grid(True) 
