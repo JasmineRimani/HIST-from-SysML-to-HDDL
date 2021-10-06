@@ -346,18 +346,26 @@ if __name__ == '__main__':
         
 
         if i == 0:
-            M_prop_v = M_body[2]
-            F_prop_v_x = F_body[0]
-            F_prop_v_y= F_body[1]
+            M_slip_v = M_body[2]
+            F_slip_v_x = F_body[0]
+            F_slip_v_y= F_body[1]
             V_motor_l_v =  V_motor [0]
             V_motor_r_v = V_motor [2]
+            M_prop_v_FL = M_wheels[0]
+            M_prop_v_BL = M_wheels[1]
+            M_prop_v_BR = M_wheels[2]
+            M_prop_v_FR = M_wheels[3]
             # beta_v = np.array([beta])
         else:
-            M_prop_v=np.append(M_prop_v,M_body[2])
-            F_prop_v_x=np.append(F_prop_v_x,F_body[0])
-            F_prop_v_y=np.append(F_prop_v_y,F_body[1])
+            M_slip_v=np.append(M_slip_v,M_body[2])
+            F_slip_v_x=np.append(F_slip_v_x,F_body[0])
+            F_slip_v_y=np.append(F_slip_v_y,F_body[1])
             V_motor_l_v =np.append(V_motor_l_v, V_motor [0])
             V_motor_r_v =np.append(V_motor_r_v,V_motor [2])
+            M_prop_v_FL = np.append(M_prop_v_FL,M_wheels[0])
+            M_prop_v_BL = np.append(M_prop_v_BL,M_wheels[1])
+            M_prop_v_BR = np.append(M_prop_v_BR,M_wheels[2])
+            M_prop_v_FR = np.append(M_prop_v_FR,M_wheels[3])
             # beta_v = np.append(beta_v,(beta))  
             
         y_out=Utilities.rk4_integrator_one_step(Dynamics.Rover_Kinodynamics,h_step,y_init,ti,args=(F_body,M_body,M_wheels, I, m, 
@@ -501,6 +509,16 @@ if __name__ == '__main__':
     ax.set_xlabel('time [s]')
     ax.grid(True)   
     
+    fig, ax = plt.subplots()
+    ax.plot(time[1::], M_prop_v_FL,  label='1 motor')
+    ax.plot(time[1::], M_prop_v_BL,  label='2 motor')
+    ax.plot(time[1::], M_prop_v_BR,  label='3 motor')
+    ax.plot(time[1::], M_prop_v_FR,  label='4 motor')
+    ax.legend()
+    ax.set_ylabel('Torque on the motor [N*m]')
+    ax.set_xlabel('time [s]')
+    ax.grid(True)
+    
 
 
     # Plots
@@ -549,22 +567,22 @@ if __name__ == '__main__':
     ax.grid(True) 
     # Plots
     fig, ax = plt.subplots()
-    ax.plot(np.linspace(0, ti, num=len(v_body_norm)), M_prop_v)
-    ax.set_ylabel('M_prop [Nm]')
+    ax.plot(np.linspace(0, ti, num=len(v_body_norm)), M_slip_v)
+    ax.set_ylabel('M_slip [Nm]')
     ax.set_xlabel('time [s]')
     ax.grid(True) 
     
     # Plots
     fig, ax = plt.subplots()
-    ax.plot(np.linspace(0, ti, num=len(v_body_norm)), F_prop_v_x)
-    ax.set_ylabel('Fx_prop [N]')
+    ax.plot(np.linspace(0, ti, num=len(v_body_norm)), F_slip_v_x)
+    ax.set_ylabel('Fx_slip [N]')
     ax.set_xlabel('time [s]')
     ax.grid(True) 
     
     # Plots
     fig, ax = plt.subplots()
-    ax.plot(np.linspace(0, ti, num=len(v_body_norm)),F_prop_v_y)
-    ax.set_ylabel('Fy_prop [N]')
+    ax.plot(np.linspace(0, ti, num=len(v_body_norm)),F_slip_v_y)
+    ax.set_ylabel('Fy_slip [N]')
     ax.set_xlabel('time [s]')
     ax.grid(True) 
     
