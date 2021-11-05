@@ -7,10 +7,13 @@ Created on Tue Nov  2 09:03:32 2021
 
 Useful links:
     https://www.geeksforgeeks.org/reading-and-writing-xml-files-in-python/
+    https://towardsdatascience.com/python-dictionaries-651acb069f94
+    https://beautiful-soup-4.readthedocs.io/en/latest/#navigating-the-tree
 
 """
 
 from bs4 import BeautifulSoup
+import xml.etree.ElementTree as ET
  
  
 
@@ -50,9 +53,9 @@ extend = when a UseCase can be explained by other sub-UseCases it extends the Us
 
 Maybe_useful_later_Tags = ['upperBound'] 
 
-NotUsed_Tags = ['ownedComment', 'body', 'generalization', '']
+NotUsed_Tags = ['ownedComment', 'body', 'generalization']
 
-Used_Tags = ['packagedElement', 'ownedEnd', 'ownedUseCase', 'ownedBehavior', 'edge', 'node', 'inputValue', 'outputValue', 'extend ']
+Used_Tags = ['packagedElement', 'ownedEnd', 'ownedUseCase', 'ownedBehavior', 'edge', 'node', 'inputValue', 'outputValue', 'extend']
 
 """
 
@@ -143,6 +146,22 @@ extensionLocation = indicates the extension point
 
 Others = ['visibility', 'name', 'general', 'memberEnd', 'node', 'target', 'source']
 
+# List SysML
+
+# Packages list 
+package_list = []
+# Type list
+hddl_type_list = []
+# Predicates list
+hddl_predicate_list = []
+# Requirements domain files
+requirements_list = [] # <-- To implement!!
+# HighLevel UseCase list - Tasks
+Task_list = []
+# UseCase parameter list
+UseCase_list_parameter = []
+# Methods UseCase list - Tasks
+Method_list = []
 
 
 # Reading the data inside the xml
@@ -157,12 +176,63 @@ with open('xml_sample.uml', 'r') as f:
 # the returned object
 Bs_data = BeautifulSoup(data, "xml")
  
-# Finding all instances of tag
-# `unique`
+# # Finding all instances of tag - You get a list with all the instances with that tag
 b_node = Bs_data.find_all('node')
+# If the tags are nested - you get each tag one after the other from the order of the file
+b_packagedElement = Bs_data.find_all('packagedElement') 
+# Isolate the "xmi:type="uml:Package" " --> e.g. b_packagedElement[0]['xmi:type']
+for index,ii in enumerate(b_packagedElement):
+    
+    if ii['xmi:type'] == 'uml:Package':
+        package_list.append(ii['name'])    
+    
+    
+    if ii['xmi:type'] == 'uml:Class':
+        hddl_type_list.append(ii['name'])
+    # Isolate Actors:
+    
+    # Isolate Usecases that are packegedElements --> You get your tasks name, however you still need your parameters
+    # Parameters --> Take the minumum parameters from the method
+    if ii['xmi:type'] == 'uml:UseCase':
+        Task_list.append({"name": ii['name'], "xmi:id":ii['xmi:id'], "general_xml_index": index})   
+        
+        # Access any instance of the dictionary use case with UseCase_list[n] and any key of the dictionary with get() UseCase_list[1].get('name')
+        
+"""
+For each useCase, we  can access to the sub-tags with: 
+    a = b_packagedElement[10].children  # --> where the 10 comes from "general_xml_index": index in the soup
+    for i in a: print(i) # --> you will see all the subtags
+
+
+"""
+
+for index,ii in enumerate(b_packagedElement[10].children):
+    # Find the methods
+    try: 
+        # Check the sub-UseCases that can be methods: double check on the type(considered as attribute) and the tag name
+        if ii['xmi:type'] == 'uml:UseCase' and ii.name == 'ownedUseCase':
+            Method_list.append({"name": ii['name'], "xmi:id":ii['xmi:id'], "general_xml_index": index, "task":b_packagedElement[10].get('name')})  
+    except:
+        pass
+
+"""
+Define the parameters in the method and start building the predicate list
+"""
+
+
+
+
+
+
+print('Packages:', package_list)
+print('HDDL Types:', hddl_type_list)
+print('Use Cases - Task Level:',Task_list)
+print('Use Cases - Method Level:',Method_list)
+
+
 
 
 
 # Using find() to extract attributes
 # of the first instance of the tag
-b_name = Bs_data.find_all('node', {'name':'evaluateavailableresources'})
+# b_packagedElement = Bs_data.find_all('packagedElement', {'xmi:type="uml:UseCase"'})
