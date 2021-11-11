@@ -133,7 +133,11 @@ class XML_parsing():
                                     if jj['xmi:type'] == 'uml:ActivityParameterNode':
                                         
                                         # Create a temporary dictionary with the paramters characteristics
-                                        temp_dict = {"name": jj['name'], "xmi:id":jj['xmi:id'], "type":jj['type'], "method": ii['xmi:id'], "task":uu.get('xmi:id')} 
+                                        if jj.has_attr('type'):
+                                            temp_dict = {"name": jj['name'], "xmi:id":jj['xmi:id'], "type":jj['type'], "method": ii['xmi:id'], "task":uu.get('xmi:id')} 
+                                        
+                                        else:
+                                            temp_dict = {"name": jj['name'], "xmi:id":jj['xmi:id'], "type":" ", "type_name": " ","method": ii['xmi:id'], "task":uu.get('xmi:id')} 
                                         
                                         # Assign to each ActivityParameter a Type
                                         for kk in self.hddl_type_list:
@@ -141,7 +145,7 @@ class XML_parsing():
                                                 temp_dict["type_name"] = kk["name"]    
                                                 
                                         # Check if the attribute has a type! - if it doesn't just assign the name as type!
-                                        if not(temp_dict['type_name']) and len(temp_dict["type_name"].split()) <= 1:
+                                        if temp_dict['type_name'] == " " and len(temp_dict["name"].split()) <= 1:
                                             temp_dict["type_name"] = jj['name']
                                             self.hddl_type_list.append({"name": jj['name'], "xmi:id":''})
                                             
@@ -152,8 +156,8 @@ class XML_parsing():
                                             
                                             print('No predefined type for {} \n Add it on Papyrus!'.format(temp_dict.get('name')))
                                             
-                                        if not(temp_dict['type_name']) and len(temp_dict["type_name"].split()) > 1:
-                                            temp_dict["type_name"] == 'predicate'
+                                        if temp_dict['type_name'] == " " and len(temp_dict["name"].split()) > 1:
+                                            temp_dict["type_name"] = 'predicate'
                                             
                                             """ 
                                             TO DO - FEEDBACK TO PAPYRUS
@@ -171,14 +175,14 @@ class XML_parsing():
                                             temp_dict["outgoing"] = jj["outgoing"] 
                                         
                                         # Chek if the attribute is a parameters - if yes save it in the method inputs list
-                                        x = 1
+
                                         if temp_dict["type_name"] != 'predicate' or len(temp_dict["name"].split()) <= 1:
                                             self.method_input_types_list.append(temp_dict)
                                             method_input_types_list_names.append(temp_dict["name"]+'-'+temp_dict["type_name"])
                                         
                                         # The preconditions are ActivityParameters that have on outgoing edge but no incoming one 
                                         # (if the have an incoming one then they are activated by one on the Opaque Actions)
-                                        if 'outgoing' in temp_dict and  not('incoming' in temp_dict) and len(temp_dict["name"].split()) > 1:
+                                        if 'outgoing' in temp_dict and not('incoming' in temp_dict) and len(temp_dict["name"].split()) > 1:
                                             self.method_input_predicate_list.append(temp_dict)
                                             method_input_predicate_list_names.append(temp_dict["name"])
                                             # Save all the predicates name to a list 
@@ -191,7 +195,9 @@ class XML_parsing():
                                             self.all_predicates_list.append(temp_dict["name"])
 
                                 except:
-                                    pass
+                                    if jj != '\n' and jj.name != 'body' and not(isinstance(jj, str)):
+                                        print('Something Wrong! Check lines before 194')                             
+                                
                                 
                                 try:
                                     
@@ -223,14 +229,16 @@ class XML_parsing():
                                                
                                             
                                             except:
-                                                pass
+                                                if kk != '\n':
+                                                    print('Something Wrong! Check lines before 228')
                                     
                                         self.method_Actions.append(jj['xmi:id'])
 
 
                                     
                                 except:
-                                    pass
+                                    if jj != '\n' and jj.name != 'body' and not(isinstance(jj, str)):
+                                        print('Something Wrong! Check lines before 235')
                                 
      
                             self.method_list[-1]['parameters'] = set(method_input_types_list_names)
@@ -243,81 +251,94 @@ class XML_parsing():
                             self.method_Actions.clear()
                                 
                     except:
-                        pass
+                        if ii != '\n' and ii.name != 'body' and not(isinstance(ii, str)):
+                            print('Something Wrong! Check lines before 248')
             
+        # For each method go back to the opaque action and associate the inputs/outputs and the parameters as well as the types
+        temporary_input_list = []
+        temporary_output_list = []
+        temporary_parameter_list = []
         
-        
-        x = 1 
-        # # For each method go back to the opaque action and associate the inputs/outputs and the parameters as well as the types
-        # temporary_input_list = []
-        # temporary_output_list = []
-        # temporary_parameter_list = []
-        
-        # # Look at all the Actions
-        # for ii in OpaqueAction_list:
+        # Look at all the Actions
+        for ii in self.opaqueAction_list:
             
-        #     # Look at the inputs' and paramaters predicate to the actions
-        #     for jj in OpaqueAction_input_list:
-        #         # check the action id
-        #         if jj.get('action') == ii.get('xmi:id'):
-        #             # Get the incoming edge ID
-        #             get_Edge_id = jj.get('incoming_edge')
-        #             for kk in edge_list:
-        #                 # check the edges id
-        #                 if kk.get('xmi:id') == get_Edge_id:
-        #                     # get the source of the edge
-        #                     input_edge = kk.get('input')
+            # Look at the inputs' and paramaters predicate to the actions
+            for jj in self.opaqueAction_input_list:
+                # check the action id
+                if jj.get('action') == ii.get('xmi:id'):
+                    # Get the incoming edge ID
+                    get_Edge_id = jj.get('incoming_edge')
+                    for kk in self.edge_list:
+                        # check the edges id
+                        if kk.get('xmi:id') == get_Edge_id:
+                            # get the source of the edge
+                            input_edge = kk.get('input')
                             
-        #                     for gg in method_input_predicate_list :
-        #                         # in the method predicate list get the name of the predicate
-        #                         if ii.get('method') == method_input_predicate_list.get('method'):
-        #                             # Inputs
-        #                             temporary_input_list.append(gg.get('name'))
+                            for gg in self.method_input_predicate_list :
+                                # in the method predicate list get the name of the predicate
+                                if ii['method'] == gg['method'] and gg['xmi:id'] == input_edge:
+                                    # Inputs
+                                    temporary_input_list.append(gg['name'])
                                     
-        #                     for gg in method_input_types_list :
-        #                         # in the method predicate list get the name of the predicate
-        #                         if ii.get('method') == method_input_types_list.get('method'):
-        #                             # Inputs
-        #                             temporary_parameter_list.append(gg.get('name')+'-'+gg.get('type_name'))
+                            for gg in self.method_input_types_list :
+                                # in the method predicate list get the name of the predicate
+                                if ii['method'] == gg['method'] and gg['xmi:id'] == input_edge:
+                                    # Inputs
+                                    temporary_parameter_list.append(gg.get('name')+'-'+gg.get('type_name'))
                     
                     
-        #     # Look at the outputs' predicate to the actions
-        #     for jj in OpaqueAction_output_list:
-        #         # check the action id
-        #         if jj.get('action') == ii.get('xmi:id'):
-        #             # Get the incoming edge ID
-        #             get_Edge_id = jj.get('incoming_edge')
-        #             for kk in edge_list:
-        #                 # check the edges id
-        #                 if kk.get('xmi:id') == get_Edge_id:
-        #                     # get the source of the edge
-        #                     input_edge = kk.get('output')
-        #                     for gg in method_input_predicate_list :
-        #                         # in the method predicate list get the name of the predicate
-        #                         if ii.get('method') == method_output_predicate_list.get('method'):
-        #                             # Inputs
-        #                             temporary_output_list.append(gg.get('name'))           
+            # Look at the outputs' predicate to the actions
+            for jj in self.opaqueAction_output_list:
+                # check the action id
+                if jj.get('action') == ii.get('xmi:id'):
+                    # Get the incoming edge ID
+                    get_Edge_id = jj.get('outgoing_edge')
+                    for kk in self.edge_list:
+                        # check the edges id
+                        if kk.get('xmi:id') == get_Edge_id:
+                            # get the source of the edge
+                            output_edge = kk.get('output')
+                            
+                            for gg in self.method_output_predicate_list :
+                                # in the method predicate list get the name of the predicate
+                                if ii['method'] == gg['method'] and gg['xmi:id'] == output_edge:
+                                    # Inputs
+                                    temporary_output_list.append(gg.get('name'))           
             
-        #     # Associate inputs and outputs to the action 
-        #     ii["preconditions"] = temporary_input_list
-        #     ii["effects"] = temporary_output_list
-        #     ii["parameters"] = temporary_parameter_list
-        #     # Clear the lists
-        #     temporary_input_list.clear() 
-        #     temporary_output_list.clear()
-        #     temporary_parameter_list.clear()
+            # Associate inputs and outputs to the action 
+            ii["preconditions"] = set(temporary_input_list)
+            ii["effects"] = set(temporary_output_list)
+            ii["parameters"] = set(temporary_parameter_list)
+            # Clear the lists
+            temporary_input_list.clear() 
+            temporary_output_list.clear()
+            temporary_parameter_list.clear()
         
+        # x = 1
+        # Check the tasks - if they all have the initial name and the same parameters, inputs and effects then they are one function
+        final_opaque_action = []
+        # Look at all the Actions
+        for ii in self.opaqueAction_list:
+            
+            # Split the name of the action
+            name = ii['name'].split('_')[0]
+            final_opaque_action.append(name)
+            
         
-        # # Check the tasks - if they all have the initial name and the same parameters, inputs and effects then they are one function
-        # Final_Opaque_Action_List = OpaqueAction_list
-        # # Look at all the Actions
-        # for ii in OpaqueAction_list:
-        #     for jj in OpaqueAction_list:
-        #         if ii['name'] in jj['name'] and ii['name']!=jj['name']:
-        #             # OpaqueAction_list.remove(jj)
-        #             # or you can do it with a dummy list 
-        #             Final_Opaque_Action_List.remove(jj)
+        final_opaque_action_set = set(final_opaque_action)  
         
+        final_opaque_action_list = []
+        
+        for ii in self.opaqueAction_list:
+            for jj in final_opaque_action_set:
+                if ii['name'] == jj:
+                    final_opaque_action_list.append(ii)
+                
+            
+            
+
+        
+
         # # Among the methods of the task take the one with the least input paramters - those are the parameter of the task unless the task is used in another task
         # # then take the parameter of that task as minumum parameters.
         
@@ -339,10 +360,10 @@ class XML_parsing():
         #     # write the predicate on the predicate list
         #     # always check for duplicates
         
-        # temporary_predicate = []
-        # predicate_list = []
+        temporary_predicate = []
+        predicate_list = []
         
-        # for ii in all_predicates_list:
+        # for ii in self.all_predicates_list:
         #     # first take the predicate and open it:
         #     cleaned_predicate = ii.split()
         #     #remove the branket 
@@ -354,7 +375,7 @@ class XML_parsing():
         #     # analyse all other words
         #     for jj in cleaned_predicate[1::]:
         #         counter_arg = 0 
-        #         for kk in method_input_types_list:
+        #         for kk in self.method_input_types_list:
         #             if jj == kk.get('name'):
         #                 temporary_predicate.append('?arg{} - {}'.format(counter_arg,kk.get('type_name')))
         #                 counter_arg  = counter_arg + 1
@@ -366,7 +387,7 @@ class XML_parsing():
         #         predicate_list.append(({}).format(final_predicate))
         #         temporary_predicate.clear()
                         
-                    
+        x = 1                  
         # xmi:id https://stackoverflow.com/questions/58839091/how-to-generate-uuid-in-python-withing-given-range
         
         
