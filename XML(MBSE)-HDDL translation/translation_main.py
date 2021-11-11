@@ -48,7 +48,6 @@ upperBound = Used in the input pin if we have a numerical input --> maybe useful
 extend = when a UseCase can be explained by other sub-UseCases it extends the UseCase --> Used to define the method of a task
 
 
-"""
 # List of Tags in the XML file
 
 Maybe_useful_later_Tags = ['upperBound'] 
@@ -56,6 +55,9 @@ Maybe_useful_later_Tags = ['upperBound']
 NotUsed_Tags = ['ownedComment', 'body', 'generalization']
 
 Used_Tags = ['packagedElement', 'ownedEnd', 'ownedUseCase', 'ownedBehavior', 'edge', 'node', 'inputValue', 'outputValue', 'extend']
+
+"""
+
 
 """
 
@@ -117,9 +119,17 @@ xmi:type="uml:Extend" ---> Define the extension of a UseCase - one usecase exten
 
 xmi:type="uml:Class" --> the types in the HDDL have been classified as classes
 
+
+# List of Tags in the XML file
+
+Maybe_useful_later_Tags = ['upperBound'] 
+
+NotUsed_Tags = ['ownedComment', 'body', 'generalization']
+
+Used_Tags = ['packagedElement', 'ownedEnd', 'ownedUseCase', 'ownedBehavior', 'edge', 'node', 'inputValue', 'outputValue', 'extend']
+
 """
-#xmi:type
-Type = ['uml:Package', 'uml:Actor', 'uml:Generalization','uml:Association','uml:Property','uml:UseCase', 'uml:Activity' ]
+
 
 """
 visibility = if the class if public/private or accessible only by subclasses
@@ -142,9 +152,11 @@ extendedCase = useCase that has been extended
 
 extensionLocation = indicates the extension point
 
+Others = ['visibility', 'name', 'general', 'memberEnd', 'node', 'target', 'source']
+
 """
 
-Others = ['visibility', 'name', 'general', 'memberEnd', 'node', 'target', 'source']
+
 
 # List SysML
 
@@ -464,7 +476,7 @@ for ii in all_predicates_list:
         temporary_predicate.clear()
                 
             
-
+# xmi:id https://stackoverflow.com/questions/58839091/how-to-generate-uuid-in-python-withing-given-range
 
 
 # print('Packages:', package_list)
