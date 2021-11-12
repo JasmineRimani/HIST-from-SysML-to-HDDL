@@ -5,6 +5,7 @@ Created on Thu Nov  4 16:19:39 2021
 @author: Jasmine Rimani
 """
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 class XML_parsing():
     
@@ -46,12 +47,14 @@ class XML_parsing():
         self.opaqueAction_input_list = []
         #Action Outputs 
         self.opaqueAction_output_list = []
+        # Domain File Name based on the domain name and date
+        self.name_string = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p") + '_'+ self.file +'_domain.hddl' 
         # # Only the name inputs
         # self.method_input_types_list_names = []
         # # Only the name of predicates
         # self.method_input_predicate_list_names = []
         
-    def DomainFileList(self):
+    def XML_ActiveParsing(self):
 
         # Passing the stored data inside
         # the beautifulsoup parser, storing
@@ -193,6 +196,18 @@ class XML_parsing():
                                             self.method_output_predicate_list.append(temp_dict)
                                             # Save all the predicates name to a list 
                                             self.all_predicates_list.append(temp_dict["name"])
+                                        
+                                        # If a method has nothing inside however to be realized it needs some parameters! 
+                                        # E.g. when you call navigate to a waypoint action but you are already at that waypoint! Look at the example method2
+                                        if not('incoming' in temp_dict) and not('outgoing' in temp_dict):
+                                            if len(temp_dict["name"].split()) > 1:
+                                                 self.method_input_predicate_list.append(temp_dict)
+                                                 method_input_predicate_list_names.append(temp_dict["name"])
+                                                 self.all_predicates_list.append(temp_dict["name"])
+                                            if len(temp_dict["name"].split()) <= 1:
+                                                self.method_input_types_list.append(temp_dict)
+                                                method_input_types_list_names.append(temp_dict["name"]+'-'+temp_dict["type_name"])
+                                            
 
                                 except:
                                     if jj != '\n' and jj.name != 'body' and not(isinstance(jj, str)):
@@ -205,10 +220,10 @@ class XML_parsing():
                                     # Initialize the ordered tasks in the Method
                                     self.method_list[-1]['ordered_tasks'] = []
                                     
-                                    # Find the tasks 
-                                    if jj['xmi:type'] == 'uml:OpaqueAction' :
+                                    # Find the atomic actions and Find the tasks in the main task
+                                    if jj['xmi:type'] == 'uml:OpaqueAction' or jj['xmi:type'] == 'uml:CallBehaviorAction' :
                                         # An Opaque action should always have an input and an output! 
-                                        self.opaqueAction_list.append({"name": jj['name'], "xmi:id":jj['xmi:id'], "incoming_link": jj['incoming'],  "outcoming_link": jj['outgoing'], "method": ii['xmi:id'], "task":uu.get('xmi:id')})  
+                                        self.opaqueAction_list.append({"name": jj['name'], "xmi:type": jj['xmi:type'], "xmi:id":jj['xmi:id'], "incoming_link": jj['incoming'],  "outcoming_link": jj['outgoing'], "method": ii['xmi:id'], "task":uu.get('xmi:id')})  
                                         for kk in jj.children:
                                             # Each Opaque Action has input and outputs defined by xmi:type="uml:InputPin" or xmi:type="uml:OutputPin"
                                             try:
@@ -226,7 +241,6 @@ class XML_parsing():
                                                         # the number of the output is the end value of the string
                                                         self.opaqueAction_output_list[-1]["number"] = ''.join((filter(str.isdigit, self.opaqueAction_output_list[-1].get('name')))) 
                                                 
-                                               
                                             
                                             except:
                                                 if kk != '\n':
@@ -234,6 +248,11 @@ class XML_parsing():
                                     
                                         self.method_Actions.append(jj['xmi:id'])
 
+                                    # 
+                                    # if jj['xmi:type'] == 'uml:OpaqueAction' :
+                                    #     # An Opaque action should always have an input and an output! 
+                                    #     self.opaqueAction_list.append({"name": jj['name'], "xmi:id":jj['xmi:id'], "incoming_link": jj['incoming'],  "outcoming_link": jj['outgoing'], "method": ii['xmi:id'], "task":uu.get('xmi:id')})                                      
+      
 
                                     
                                 except:
@@ -331,7 +350,7 @@ class XML_parsing():
         
         for ii in self.opaqueAction_list:
             for jj in final_opaque_action_set:
-                if ii['name'] == jj:
+                if ii['name'] == jj and ii['xmi:type'] != 'uml:OpaqueAction':
                     final_opaque_action_list.append(ii)
                 
             
@@ -346,13 +365,31 @@ class XML_parsing():
         # # Search in all tasks
         
         # # For each task search the method
-        # for jj in Method_list:
-            
-        #     if b_packagedElement[10].get('xmi:id') == jj.get('task'):
-        #         # for each method check the length of the parameters list - if it longer than the one of the task, leave it like that - if not replace the list
-        #         if len(b_packagedElement[10]["parameters"]) >= len(jj.get('parameters')):
-        #             b_packagedElement[10]["parameters"] = jj.get('parameters')
         
+        # Missing - when a Task is an action of another task - xmi:type="uml:CallBehaviorAction (should be ok - still to test - look at method1 of TakePicture)
+        # Missing - when a Method don't have incoming or outcoming edges (should be ok - still to test - look at method2 of NavigateToGoal)
+        """START TESTING FROM HERE!!!!!!!!!"""
+        # First Look if the task is in another task with its parameters.
+        for ii in self.opaqueAction_list:
+            if ii['xmi:type'] == 'uml:CallBehaviorAction':
+                for jj in self.task_list:
+                    if jj.get('name') == ii.get('name'): 
+                        jj["parameters"] = ii.get('parameters')
+
+
+        for ii in self.task_list:
+            for jj in self.method_list:
+                
+                if ii.get('xmi:id') == jj.get('task'):
+                    # for each method check the length of the parameters list - if it longer than the one of the task, leave it like that - if not replace the list
+                    if ii["parameters"] != []:
+                        if len(ii["parameters"]) >= len(jj.get('parameters')):
+                            ii["parameters"] = jj.get('parameters')
+                    else:
+                        ii["parameters"] = jj.get('parameters')
+        
+        
+        # x = 1 # the random x=1 that you find around are my debug point - just ignore them
         
         
         # # Take the overall predicate list and:
@@ -363,29 +400,35 @@ class XML_parsing():
         temporary_predicate = []
         predicate_list = []
         
-        # for ii in self.all_predicates_list:
-        #     # first take the predicate and open it:
-        #     cleaned_predicate = ii.split()
-        #     #remove the branket 
-        #     cleaned_predicate.remove('(')
-        #     #remove negations
-        #     cleaned_predicate.remove('not')
-        #     #get the first word of the predicate
-        #     temporary_predicate.append(cleaned_predicate[0])
-        #     # analyse all other words
-        #     for jj in cleaned_predicate[1::]:
-        #         counter_arg = 0 
-        #         for kk in self.method_input_types_list:
-        #             if jj == kk.get('name'):
-        #                 temporary_predicate.append('?arg{} - {}'.format(counter_arg,kk.get('type_name')))
-        #                 counter_arg  = counter_arg + 1
+        for ii in self.all_predicates_list:
+            # First remove brankets 
+            cleaned_predicate = ii.replace('(',' ')
+            cleaned_predicate = cleaned_predicate.replace(')',' ')
+            # Remove negations  
+            cleaned_predicate = cleaned_predicate.replace('not',' ')   
+            # Take the predicate and open it:
+            cleaned_predicate = cleaned_predicate.split()
+            #get the first word of the predicate
+            temporary_predicate.append(cleaned_predicate[0])
+            # analyse all other words
+            for index,jj in enumerate(cleaned_predicate[1::]):
+                jj = jj.replace('?',' ').strip()
+                flag = 0
+                
+                for kk in self.method_input_types_list:
+                    # if you found a match - break free. Try to find a better way to define this 
+                    if jj == kk.get('name') and flag == 0:
+                        temporary_predicate.append('?arg{} - {}'.format(index,kk.get('type_name')))
+                        flag = 1
             
-        #     #create the predicate final version
-        #     final_predicate= ' '.join(temporary_predicate)
+            #create the predicate final version
+            final_predicate= ' '.join(temporary_predicate)
             
-        #     if not(final_predicate in predicate_list):
-        #         predicate_list.append(({}).format(final_predicate))
-        #         temporary_predicate.clear()
+            
+            if not(final_predicate in predicate_list):
+                predicate_list.append(('{}').format(final_predicate))
+                
+            temporary_predicate.clear()
                         
         x = 1                  
         # xmi:id https://stackoverflow.com/questions/58839091/how-to-generate-uuid-in-python-withing-given-range
@@ -398,17 +441,52 @@ class XML_parsing():
         
 
         
-    def GeneralParsing(self):
+    def FileWriting (self):
+        ###################################################################
+        # Open/Create the File
+        file = open(self.name_string,'w')
+        # Start writing on the file
+        file.write('(define (domain {}) \n'.format(self.domain_name))
+        """
+        Maybe consider the different type or requirement - define on papyrus a way to define the requirements 
+        of the domain file --> maybe as comment to the packages.
+        """
+        file.write('(:requirements :typing :hierachie) \n')
+        # #Object Type
+        # file.write('(:types \n')
+        # for ii in self.list_types:
+        #     file.write('{}'.format(ii))
+        # # End of object type
+        # file.write(') \n')  
         
-        # Functions
+        # # Predicates
+        # file.write('(:predicates \n')
+        # #Writes Predicates
+        # for ii in self.predicate_list_hddl:
+        #     file.write('{}'.format(ii))
+        # # End of predicates
+        # file.write(') \n')   
+            
+        # #Tasks!
+        # file.write('\n')  #space!
+        # for ii in self.task_list_hddl:
+        #     file.write('{}'.format(ii))
+        #     file.write('\n  \n') 
+            
+        # #Methods!
+        # file.write('\n')  #space!
+        # for ii in self.method_list_hddl:
+        #     file.write('{}'.format(ii))
+        #     file.write('\n  \n') 
+
+        # #Actions
+        # file.write('\n')  #space!
+        # for ii in self.action_list_hddl:
+        #     file.write('{}'.format(ii))
+        #     file.write('\n  \n')  
         
-        # Parameters
-        
-        # Actors
-        
-        # C
-        
-        pass
+        # # end of the file
+        # file.write(')')
     
     
     
@@ -418,7 +496,9 @@ def main():
         data = f.read()
     
     file_final = XML_parsing(data)
-    file_final.DomainFileList()
+    # Actively Parse the XML
+    file_final.XML_ActiveParsing()
+    # Create the file that you need/want
 
 
 
