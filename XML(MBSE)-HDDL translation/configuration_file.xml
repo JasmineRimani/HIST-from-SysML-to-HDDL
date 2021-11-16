@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<root>
+  <name_file>xml_sample_3.uml</name_file>
+  <hddl_requirements>
+['typing', 'hierachie', 'fluents', 'STRIPS', 'Disjunctive Preconditions', 'Equality'
+            'Existential Preconditions','Universal Preconditions', 'Quantified Preconditions', 'Conditional Effects',
+             'Action Expansions','Foreach Expansions', 'DAG Expansions', 'Domain Axioms', 'Subgoals Through Axioms', 'Safety Constraints'
+             'Expression Evaluation', 'Fluents', 'Open World', 'True Negation', 'ADL', 'UCPOP']
+</hddl_requirements>
+</root>

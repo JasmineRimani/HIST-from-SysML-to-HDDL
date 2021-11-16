@@ -6,15 +6,21 @@ Created on Thu Nov  4 16:19:39 2021
 """
 from bs4 import BeautifulSoup
 from datetime import datetime
+import re
 
 class XML_parsing():
     
-    def __init__(self, file):
+    def __init__(self, file, hddl_requirements):
         # File that we need to parse
         self.file = file
+        # File hddl domain file requirements
+        self.hddl_requirements_list = hddl_requirements
         # Put an adaptable domain file name
-        self.domain_name = 'domain'
-        
+        self.domain_name = ' '
+        # Put an adaptable domain file name
+        self.problem_name = ' '
+        # Requirement list for the specific domain file
+        self.requirement_list_domain_file = []
         # Packages list 
         self.package_list = []
         # Type list
@@ -49,6 +55,8 @@ class XML_parsing():
         self.opaqueAction_input_list = []
         #Action Outputs 
         self.opaqueAction_output_list = []
+        # Final list of action without doubles
+        self.final_opaque_action_list = []
         # Domain File Name based on the domain name and date
         self.name_string = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p") + '_' +'_domain.hddl' 
         # Problem_file_Name
@@ -64,6 +72,8 @@ class XML_parsing():
         # the beautifulsoup parser, storing
         # the returned object in a variable - that is the main object to unpack
         Bs_data = BeautifulSoup(self.file, "xml")
+        
+
          
         # # # Finding all instances of tag - You get a list with all the instances with that tag
         # b_node = Bs_data.find_all('node')
@@ -73,6 +83,11 @@ class XML_parsing():
         # You can divide the packaged elements per Folder - so that you don't have to parse useless informations like the ones for the Mission
         
         b_packagedElement = Bs_data.find_all('packagedElement') 
+        
+        # Name of the Domain file
+        self.domain_name = b_packagedElement[0].parent['name']
+        self.problem_name = self.domain_name
+        
         # Isolate the "xmi:type="uml:Package" " --> e.g. b_packagedElement[0]['xmi:type']
         for index,ii in enumerate(b_packagedElement):
             
@@ -91,10 +106,21 @@ class XML_parsing():
             if ii['xmi:type'] == 'uml:UseCase':
                 self.task_list.append({"name": ii['name'], "xmi:id":ii['xmi:id'], "parameters": []})   
         
+        # Find all the comments
+        b_comments = Bs_data.find_all('ownedComment') 
         
         # Find all the edges
         b_edges = Bs_data.find_all('edge')      
         
+        for ii in b_comments:
+            # The requirements for the domain file are included as comment in the UseCase
+            if ii.parent['name'] == 'UseCase':
+                comment_body = ii.body.string
+                for jj in self.hddl_requirements_list:
+                    # avoid case-sensitivity 
+                    if jj.lower() in comment_body.lower():
+                        self.requirement_list_domain_file.append(jj)
+
         # Map all the edges
         for index,ii in enumerate(b_edges):
             self.edge_list.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":ii['target']}) 
@@ -123,7 +149,9 @@ class XML_parsing():
         for uu in b_packagedElement:
             
             # If the packagedElement is a UseCase
-            if uu['xmi:type'] == 'uml:UseCase':
+            # Just consider the inputs in the Function Folder (or any folder that is defined by the Requirements)
+            # We are just considering the Domain File entries here! 
+            if uu['xmi:type'] == 'uml:UseCase' and  uu.parent.parent['name'] == 'Functions':
                 
                 # Look at its children and find...
                 for index,ii in enumerate(uu.children):
@@ -275,17 +303,18 @@ class XML_parsing():
                             self.method_list[-1]['preconditions'] = set(method_input_predicate_list_names)
                             method_input_predicate_list_names.clear()
                             # Add the tasks to the method list of ordered tasks 
-                            self.ordered_actions = []
+                            # ordered_actions = []
                             for yy in self.method_Actions:
                                 for bb in self.opaqueAction_list:
-                                    if yy == bb['xmi:type']:
-                                        if bb['incoming_link'] in self.method_Actions:
-                                            a = self.method_Actions.index(yy)
-                                            self.method_Actions.pop(a)
-                                            b = self.method_Actions.index(bb['incoming_link'])
-                                            self.method_Actions.insert(b+1,yy)
-
-                            self.method_list[-1]['ordered_tasks'] = set(self.method_Actions)
+                                    if yy == bb['xmi:id']:
+                                        for kk in self.edge_list:
+                                            if bb['incoming_link'] == kk['xmi:id']:
+                                                if kk['input'] in self.method_Actions:
+                                                    action_to_pop = self.method_Actions.index(yy)
+                                                    self.method_Actions.pop(action_to_pop)
+                                                    action_before = self.method_Actions.index(kk['input'])
+                                                    self.method_Actions.insert(action_before+1,yy)
+                            self.method_list[-1]['ordered_tasks'] = [x for x in self.method_Actions]
                             self.method_Actions.clear()
                                 
                     except:
@@ -344,9 +373,9 @@ class XML_parsing():
                                     temporary_output_list.append(gg.get('name'))           
             
             # Associate inputs and outputs to the action 
-            ii["preconditions"] = set(temporary_input_list)
-            ii["effects"] = set(temporary_output_list)
-            ii["parameters"] = set(temporary_parameter_list)
+            ii["preconditions"] = [x for x in temporary_input_list]
+            ii["effects"] = [x for x in temporary_output_list]
+            ii["parameters"] = [x for x in temporary_parameter_list]
             # Clear the lists
             temporary_input_list.clear() 
             temporary_output_list.clear()
@@ -362,15 +391,15 @@ class XML_parsing():
             name = ii['name'].split('_')[0]
             final_opaque_action.append(name)
             
-        
+        # we want the action to have just one occurance
         final_opaque_action_set = set(final_opaque_action)  
         
-        final_opaque_action_list = []
+        
         
         for ii in self.opaqueAction_list:
             for jj in final_opaque_action_set:
-                if ii['name'] == jj and ii['xmi:type'] != 'uml:OpaqueAction':
-                    final_opaque_action_list.append(ii)
+                if ii['name'] == jj and ii['xmi:type'] == 'uml:OpaqueAction':
+                    self.final_opaque_action_list.append(ii)
                 
             
             
@@ -395,7 +424,6 @@ class XML_parsing():
                     if jj.get('name') == ii.get('name'): 
                         jj["parameters"] = ii.get('parameters')
 
-
         for ii in self.task_list:
             for jj in self.method_list:
                 
@@ -407,9 +435,7 @@ class XML_parsing():
                     else:
                         ii["parameters"] = jj.get('parameters')
         
-        
         # x = 1 # the random x=1 that you find around are my debug point - just ignore them
-        
         
         # # Take the overall predicate list and:
         #     # search for duplicates and associate the type to each predicate
@@ -470,32 +496,32 @@ class XML_parsing():
         Maybe consider the different type or requirement - define on papyrus a way to define the requirements 
         of the domain file --> maybe as comment to the packages.
         """
-        file.write('(:requirements :typing :hierachie) \n')
+        file.write('\t (:requirements :{}) \n'.format(' :'.join(self.requirement_list_domain_file)))
         #Object Type
-        file.write('(:types \n')
+        file.write('\t (:types \n')
         for ii in self.hddl_type_list:
-            file.write('{} - object'.format(ii.get('name')))
+            file.write('\t\t {} - object \n'.format(ii.get('name')))
         # End of object type
-        file.write(') \n')  
+        file.write('\t) \n\n')  
         
         # x = 0
         
         # Predicates
-        file.write('(:predicates \n')
+        file.write('\t (:predicates \n')
         #Writes Predicates
         for ii in self.predicate_list:
-            file.write('({})'.format(ii))
+            file.write('\t\t ({}) \n'.format(ii))
         # End of predicates
-        file.write(') \n')   
+        file.write('\t) \n\n')   
             
         # #Tasks!
-        file.write('\n')  #space!
+
         for ii in self.task_list:
-            file.write('(:task {} \n)'.format(ii.get('name')))            
-            file.write('\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters'))))
-            file.write('\t :precondition ()\n')
-            file.write('\t :effect ()\n')
-            file.write(') \n') 
+            file.write('\t (:task {} \n'.format(ii.get('name')))            
+            file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters'))))
+            file.write('\t\t :precondition ()\n')
+            file.write('\t\t :effect ()\n')
+            file.write('\t ) \n\n') 
             
         #Methods!
         # Introduce the order in the tasks
@@ -504,12 +530,12 @@ class XML_parsing():
         order_vector = []
         file.write('\n')  #space!
         for ii in self.method_list:
-            file.write('(:method {} \n)'.format(ii.get('name')))
-            file.write('\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters'))))
+            file.write('\t (:method {} \n'.format(ii.get('name')))
+            file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters'))))
             if ii.get('preconditions') != '':
-                file.write('\t :precondition (and {})\n'.format(' \n'.join(ii.get('preconditions'))))
+                file.write('\t\t :precondition (and \n\t\t\t{} \n\t\t) \n'.format(' \n\t\t\t'.join(ii.get('preconditions'))))
             else:
-                file.write('\t :precondition ()\n')
+                file.write('\t\t :precondition ()\n')
             counter = 0
                 
             for jj in ii['ordered_tasks']: 
@@ -517,49 +543,53 @@ class XML_parsing():
                     if kk['xmi:id'] == jj:
                         # Task Parameters
                         dummy_string = ' '.join(kk['parameters'])
-                        dummy_vector = dummy_string.split()
+                        dummy_vector = re.split(' |-', dummy_string)
                         # vector[start:end:step]
                         dummy_vector = dummy_vector[0::2]
-                        string_vector.append('task{} ({} ?{}) \n'.format(counter,kk['name'], ' ?'.join(dummy_vector) ))
+                        string_vector.append('task{}({} ?{})'.format(counter,kk['name'], ' ?'.join(dummy_vector) ))
                         counter = counter + 1
-                    if counter != 0:
+                    if counter != 0 and '(< task{} task{})'.format(counter-1, counter) not in order_vector:
                         # For each task check incoming and outcoming links
                         order_vector.append('(< task{} task{})'.format(counter-1, counter))
 
             if counter != 0 and counter != 1:
-                file.write('\t :subtasks (and \n')
-                file.write('\t {}\n'.format(string_vector))
-                file.write('\t ) \n')
-                file.write('\t :ordering (and \n')
-                file.write('\t {}\n'.format(order_vector))
-                file.write('\t ) \n')
+                file.write('\t\t :subtasks (and \n')
+                file.write('\t\t\t{}\n'.format('\n\t\t\t'.join(string_vector)))
+                file.write('\t\t ) \n')
+                file.write('\t\t :ordering (and \n')
+                file.write('\t\t\t{}\n'.format(' \n\t\t\t'.join(order_vector)))
+                file.write('\t\t ) \n')
+                string_vector.clear()
+                order_vector.clear()
             elif counter == 1:
-                file.write('\t :subtasks (and \n')
-                file.write('\t {}\n'.format(string_vector))
-                file.write('\t ) \n')
+                file.write('\t\t :subtasks (and \n')
+                file.write('\t\t\t {}\n'.format(' \n\t\t\t'.join(string_vector)))
+                file.write('\t\t ) \n')
+                string_vector.clear()
+                order_vector.clear()
             else:
-               file.write('\t :subtasks () \n') 
+                file.write('\t\t :subtasks () \n')
+                string_vector.clear()
+                order_vector.clear()
                 
-            file.write(') \n') 
+            file.write('\t ) \n\n') 
 
         #Actions
         file.write('\n')  #space!
-        for ii in self.opaqueAction_list:
-            if ii['xmi:type'] != 'uml:CallBehaviorAction':
-        
-                for ii in self.opaqueAction_list:
-                    file.write('(:action {} \n)'.format(ii.get('name')))            
-                    file.write('\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters'))))
-                    if ii.get('preconditions') != '':
-                        file.write('\t :precondition (and {})\n'.format(' \n'.join(ii.get('preconditions'))))
-                    else:
-                        file.write('\t :precondition ()\n')
-                    if ii.get('preconditions') != '':
-                        file.write('\t :effect (and {})\n'.format(' \n'.join(ii.get('effects'))))
-                    else:
-                        file.write('\t :effect ()\n')
+        for ii in self.final_opaque_action_list:
+
+            file.write('\t(:action {} \n'.format(ii.get('name')))            
+            file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters'))))
+            if ii.get('preconditions') != '':
+                file.write('\t\t :precondition (and \n\t\t\t{})\n'.format(' \n\t\t\t'.join(ii.get('preconditions'))))
+            else:
+                file.write('\t\t :precondition ()\n')
+            if ii.get('effects') != '':
+                file.write('\t\t :effect (and \n\t\t\t{})\n'.format(' \n\t\t\t'.join(ii.get('effects'))))
+            else:
+                file.write('\t\t :effect ()\n')
                         
-                    file.write(') \n') 
+            file.write('\t) \n\n') 
         
         # end of the file
         file.write(')')
@@ -567,7 +597,7 @@ class XML_parsing():
     def Problem_FileWriting (self):
         file = open(self.name_string_pf,'w')
         file.write('(define ')
-        file.write('\t (domain {}) \n'.format(self.domain_name))
+        file.write('\t (domain {}) \n'.format(self.problem_name))
         file.write('\t (:objects')
         # Take the first part of the C++ code
         
@@ -584,10 +614,18 @@ class XML_parsing():
     
 def main():
 
-    with open('xml_sample.uml', 'r') as f:
+    with open('xml_sample_4.uml', 'r') as f:
         data = f.read()
     
-    file_final = XML_parsing(data)
+    # Types of domain requirements considered in the HDDL module
+    # call them from the configuration file - you can even create an executable of python where you ask for them
+    hddl_requirements = ['typing', 'hierachie', 'fluents', 'STRIPS', 'Disjunctive Preconditions', 'Equality'
+                         'Existential Preconditions','Universal Preconditions', 'Quantified Preconditions', 'Conditional Effects',
+                         'Action Expansions','Foreach Expansions', 'DAG Expansions', 'Domain Axioms', 'Subgoals Through Axioms', 'Safety Constraints'
+                         'Expression Evaluation', 'Fluents', 'Open World', 'True Negation', 'ADL', 'UCPOP']
+    
+    
+    file_final = XML_parsing(data, hddl_requirements)
     # Actively Parse the XML
     file_final.XML_ActiveParsing()
     # Create the file that you need/want
