@@ -8,17 +8,174 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import re
 
+
+"""
+packagedElement = Everything that is packaged by the model
+
+ownedComment = comments in the UML/SysML model
+
+body = body of comments or notes in UML/SysML
+
+generalization = in UML Use Case - the generalization extends the capabilities of an element with the capabilities of the parent element
+
+ownedEnd = in the association type we have owned end --> they define the end that are connected by the association as new elements (xmi:type="uml:Property")
+           the end element are defined by a type (type="_Tkl1IC2FEeylqPZKkKN_nQ") that links them to the original ends. So you need to read the type in the association
+           ownedEnd to find which primitive elements are associated.
+
+ownedUseCase = in the UseCase type - if the task is decomposed, we will have this tag! To see if the ownedUseCase is a method you can: (i) check for the word 'method' in the string,
+               (ii) see if the ownedUseCase has an ownedBehavior, (iii) see if the UseCase has an "extend" tag
+
+ownedBehavior = Activity Diagram associated to the ownedUseCase --> It describes the method graphically!
+
+
+edge = connections in the Activity Diagram
+
+
+node = elements in the activity diagrams (e.g starting node, end node, actions)
+
+inputValue/outputValue = Inputs/outputs to an opaque actions --> you can use it to see the edges and
+
+upperBound = Used in the input pin if we have a numerical input --> maybe useful for temporal HDDL planning
+
+extend = when a UseCase can be explained by other sub-UseCases it extends the UseCase --> Used to define the method of a task
+
+ownedRule = Used to define Constrains - used to create automatically the initial conditions in the problem file.
+
+# List of Tags in the XML file
+
+Maybe_useful_later_Tags = ['upperBound'] 
+
+NotUsed_Tags = ['ownedComment', 'body', 'generalization']
+
+Used_Tags = ['packagedElement', 'ownedEnd', 'ownedUseCase', 'ownedBehavior', 'edge', 'node', 'inputValue', 'outputValue', 'extend']
+
+"""
+
+
+"""
+
+xmi:id = unique identifier for each element of the xml
+
+xmi:type="uml:Package"  -->  uml folder/package - in our translation for the domain file we have:
+    - Requirements: e.g.
+        <packagedElement xmi:type="uml:Package" xmi:id="_rfy78C2DEeylqPZKkKN_nQ" name="Requirements"/>
+    - Functions : e.g.
+        <packagedElement xmi:type="uml:Package" xmi:id="_uVrj8C2DEeylqPZKkKN_nQ" name="Functions">
+    - Types: e.g.
+        <packagedElement xmi:type="uml:Package" xmi:id="_wVEBwC2DEeylqPZKkKN_nQ" name="Types">
+        
+xmi:type="uml:Actor" -->  Actor in the UseCase Diagrams:
+    <packagedElement xmi:type="uml:Actor" xmi:id="_rSxXIC2EEeylqPZKkKN_nQ" name="Drone">
+
+xmi:type="uml:Generalization" --> Used with the generalization tab:
+    <generalization xmi:type="uml:Generalization" xmi:id="_IHgGwC2FEeylqPZKkKN_nQ" general="_qErzYC2EEeylqPZKkKN_nQ"/>
+
+xmi:type="uml:Association" --> Link between two elements:
+    <packagedElement xmi:type="uml:Association" xmi:id="_ovqEsC2FEeylqPZKkKN_nQ" memberEnd="_ovsg8C2FEeylqPZKkKN_nQ _ovtvEC2FEeylqPZKkKN_nQ">
+    the starting and ending point are identified in memberEnd separared by a space
+    
+xmi:type="uml:Property" --> used in the association ownedEnd tag to define the ends:
+    <ownedEnd xmi:type="uml:Property" xmi:id="_1ejZMi2FEeylqPZKkKN_nQ" name="goback" type="_Y5doEC2FEeylqPZKkKN_nQ" association="_1eiyIC2FEeylqPZKkKN_nQ"/>
+
+xmi:type="uml:UseCase" --> This is the functions we need for the translation! You have the task that is the high-level UseCase:
+    <packagedElement xmi:type="uml:UseCase" xmi:id="_a2yF0C2EEeylqPZKkKN_nQ" name="NavigateToGoal" visibility="public">
+
+xmi:type="uml:Activity" --> Activity Diagram owned by the ownedBehavior in the ownedUseCase:
+    <ownedBehavior xmi:type="uml:Activity" xmi:id="_zBZsMC2DEeylqPZKkKN_nQ" name="NavigateToGoal_method1" 
+    node="_qEhrQC2YEeylqPZKkKN_nQ _b4pl8C2ZEeylqPZKkKN_nQ _Z4GYkC2bEeylqPZKkKN_nQ _uzdYMC2bEeylqPZKkKN_nQ _2wQPoC2bEeylqPZKkKN_nQ _-6gUQC2bEeylqPZKkKN_nQ _D6FzsC2cEeylqPZKkKN_nQ _FqL4UC2cEeylqPZKkKN_nQ _K3QaIC2cEeylqPZKkKN_nQ _KKOfkC2dEeylqPZKkKN_nQ _Nnha8C2fEeylqPZKkKN_nQ _WfN0YC2fEeylqPZKkKN_nQ _ZDercC2gEeylqPZKkKN_nQ _3c_nkC2gEeylqPZKkKN_nQ">
+    In the Activity node, we the list of the elements included in the activity diagram: actions, connections, inputs, outputs
+
+xmi:type="uml:ObjectFlow" --> the associations in the activity diagram: they have a target and a source - so we can know if a predicate is an input or an output of an action:
+    <edge xmi:type="uml:ObjectFlow" xmi:id="_v6CwUC2cEeylqPZKkKN_nQ" target="_TdB9IC2cEeylqPZKkKN_nQ" source="_2wQPoC2bEeylqPZKkKN_nQ">
+
+xmi:type="uml:ControlFlow" --> same of the ObjectFlow for this translation - however the  xmi:type="uml:ObjectFlow" has more characteristics and it show a flow of data.
+                               However, for this translation they are equal.        
+
+xmi:type="uml:ActivityParameterNode" --> The input/outputs of the Activity Diagram:
+    <node xmi:type="uml:ActivityParameterNode" xmi:id="_b4pl8C2ZEeylqPZKkKN_nQ" name="(at ?system ?from_wp)" outgoing="_9U9dUC2cEeylqPZKkKN_nQ" type="_94GG8C2ZEeylqPZKkKN_nQ">
+    the type sub-tag defines if it is a predicate of HDDL or something different.
+
+xmi:type="uml:OpaqueAction" --> the actions in the HDDL:
+    <node xmi:type="uml:OpaqueAction" xmi:id="_uzdYMC2bEeylqPZKkKN_nQ" name="Visit" incoming="_r8VAwC2gEeylqPZKkKN_nQ" outgoing="_odRf8C2gEeylqPZKkKN_nQ">
+              <inputValue xmi:type="uml:InputPin" xmi:id="_TdB9IC2cEeylqPZKkKN_nQ" name="" incoming="_v6CwUC2cEeylqPZKkKN_nQ">
+              The incoming/outcoming are related to the other actions
+             
+xmi:type="uml:InputPin"/ xmi:type="uml:OutputPin" --> input/output to an opaque action:
+    <inputValue xmi:type="uml:InputPin" xmi:id="_TdB9IC2cEeylqPZKkKN_nQ" name="" incoming="_v6CwUC2cEeylqPZKkKN_nQ">
+                <upperBound xmi:type="uml:LiteralInteger" xmi:id="_TdCkMC2cEeylqPZKkKN_nQ" value="1"/>
+    </inputValue>
+
+xmi:type="uml:ActivityFinalNode"/ --> Initial/Final node of the Activity
+                             
+xmi:type="uml:Extend" ---> Define the extension of a UseCase - one usecase extends the other. Perfect to define methods of a task:
+    <extend xmi:type="uml:Extend" xmi:id="_RP4HEC2yEeyropzrv_OlDA" extendedCase="_a2yF0C2EEeylqPZKkKN_nQ" extensionLocation="_RP4uIC2yEeyropzrv_OlDA"/>
+
+xmi:type="uml:Class" --> the types in the HDDL have been classified as classes
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_JH5wAEZAEeyhYpX6KgufSQ" name="(at rover waypoint(n))" constrainedElement="__GKP0EXzEeyhYpX6KgufSQ">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_JH6XEEZAEeyhYpX6KgufSQ" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+
+
+
+xmi:type="uml:Constraint" --> constrains to the functions in the Mission package (the one that will define the problem file)
+
+# List of Tags in the XML file
+
+Maybe_useful_later_Tags = ['upperBound'] 
+
+NotUsed_Tags = ['ownedComment', 'body', 'generalization']
+
+Used_Tags = ['packagedElement', 'ownedEnd', 'ownedUseCase', 'ownedBehavior', 'edge', 'node', 'inputValue', 'outputValue', 'extend']
+
+"""
+
+
+"""
+visibility = if the class if public/private or accessible only by subclasses
+
+name = name of the element as given from the UML/SySML model
+
+general = used in the generalization tag to show what is being generalized
+
+memberEnd = used in association to define the extremes of the association "start_node end_node" separated by a space
+
+node = all the elements used in an activity diagram
+
+target = end element in an edge in the activity diagram
+
+source = starting element in an edge in the activity diagram
+
+outgoing/incoming = gives you the ID of the edge leaving/entering the ActivityParameterNode 
+
+extendedCase = useCase that has been extended 
+
+extensionLocation = indicates the extension point
+
+Others = ['visibility', 'name', 'general', 'memberEnd', 'node', 'target', 'source']
+
+"""
+
 class XML_parsing():
     
-    def __init__(self, file, hddl_requirements):
+    def __init__(self, file, map_data, hddl_requirements, domain_name, htn_tasks):
         # File that we need to parse
         self.file = file
+        # File with the map data
+        self.map_data = map_data
         # File hddl domain file requirements
         self.hddl_requirements_list = hddl_requirements
         # Put an adaptable domain file name
-        self.domain_name = ' '
-        # Put an adaptable domain file name
+        if domain_name != 'None':
+            self.domain_name = domain_name
+        else:
+           self.domain_name = ' ' 
+        # Put an adaptable problem file name
         self.problem_name = ' '
+        # Initial Task Network
+        self.htn_tasks = htn_tasks
         # Requirement list for the specific domain file
         self.requirement_list_domain_file = []
         # Packages list 
@@ -65,13 +222,15 @@ class XML_parsing():
         # self.method_input_types_list_names = []
         # # Only the name of predicates
         # self.method_input_predicate_list_names = []
+        # Dependencies in the UseCase
+        self.dependencies_list = []
         
     def XML_ActiveParsing(self):
 
         # Passing the stored data inside
         # the beautifulsoup parser, storing
         # the returned object in a variable - that is the main object to unpack
-        Bs_data = BeautifulSoup(self.file, "xml")
+        self.Bs_data = BeautifulSoup(self.file, "xml")
         
 
          
@@ -82,14 +241,14 @@ class XML_parsing():
         # Find all the packaged elements
         # You can divide the packaged elements per Folder - so that you don't have to parse useless informations like the ones for the Mission
         
-        b_packagedElement = Bs_data.find_all('packagedElement') 
+        self.b_packagedElement = self.Bs_data.find_all('packagedElement') 
         
         # Name of the Domain file
-        self.domain_name = b_packagedElement[0].parent['name']
+        self.domain_name = self.b_packagedElement[0].parent['name']
         self.problem_name = self.domain_name
         
         # Isolate the "xmi:type="uml:Package" " --> e.g. b_packagedElement[0]['xmi:type']
-        for index,ii in enumerate(b_packagedElement):
+        for index,ii in enumerate(self.b_packagedElement):
             
             if ii['xmi:type'] == 'uml:Package':
                 self.package_list.append({"name": ii['name'], "xmi:id":ii['xmi:id']})    
@@ -105,14 +264,32 @@ class XML_parsing():
             # Parameters --> Take the minumum parameters from the method --> look lower in the 
             if ii['xmi:type'] == 'uml:UseCase':
                 self.task_list.append({"name": ii['name'], "xmi:id":ii['xmi:id'], "parameters": []})   
+
         
-        # Find all the comments
-        b_comments = Bs_data.find_all('ownedComment') 
+
+        # Find all the constraints tag = ownedRule and xmi:type="uml:Constraint"
+        self.b_ownedRules = self.Bs_data.find_all('ownedRule') 
         
         # Find all the edges
-        b_edges = Bs_data.find_all('edge')      
+        self.b_edges = self.Bs_data.find_all('edge')    
+        # Map all the edges
+        for index,ii in enumerate(self.b_edges):
+            self.edge_list.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":ii['target']}) 
+            
+        #Find the dependencies
+        # Find all the edges
+        for index,ii in enumerate(self.b_packagedElement):
+            if ii['xmi:type'] == 'uml:Dependency':
+                self.dependencies_list.append({"xmi:id":ii['xmi:id'], "input":ii['supplier'], "output":ii['client']})        
         
-        for ii in b_comments:
+        # Find all the comments
+        self.b_comments = self.Bs_data.find_all('ownedComment') 
+        # Find all the nodes
+        self.b_nodes = self.Bs_data.find_all('node')
+        
+        # Domain file instances analysis  
+        
+        for ii in self.b_comments:
             # The requirements for the domain file are included as comment in the UseCase
             if ii.parent['name'] == 'UseCase':
                 comment_body = ii.body.string
@@ -120,11 +297,10 @@ class XML_parsing():
                     # avoid case-sensitivity 
                     if jj.lower() in comment_body.lower():
                         self.requirement_list_domain_file.append(jj)
+                        
 
-        # Map all the edges
-        for index,ii in enumerate(b_edges):
-            self.edge_list.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":ii['target']}) 
-        
+
+    def DomainFileElements(self):        
         # Check your parsing (comment after use):
         # print('Packages list: \n {}'.format(self.package_list))
         # print('Classes list: \n {}'.format(self.hddl_type_list))
@@ -146,7 +322,7 @@ class XML_parsing():
         
         
         # you can check is the packagedElement has the "Functions" package as parent
-        for uu in b_packagedElement:
+        for uu in self.b_packagedElement:
             
             # If the packagedElement is a UseCase
             # Just consider the inputs in the Function Folder (or any folder that is defined by the Requirements)
@@ -283,7 +459,8 @@ class XML_parsing():
                                                 if kk != '\n':
                                                     print('Something Wrong! Check lines before 228')
                                     
-                                        self.method_Actions.append(jj['xmi:id'])
+                                        # self.method_Actions.append(jj['xmi:id'])
+                                        self.method_Actions.append({"name": jj['name'], "xmi:type": jj['xmi:type'], "xmi:id":jj['xmi:id'], "incoming_link": jj['incoming'],  "outcoming_link": jj['outgoing']})
 
                                     # 
                                     # if jj['xmi:type'] == 'uml:OpaqueAction' :
@@ -304,22 +481,80 @@ class XML_parsing():
                             method_input_predicate_list_names.clear()
                             # Add the tasks to the method list of ordered tasks 
                             # ordered_actions = []
-                            for yy in self.method_Actions:
-                                for bb in self.opaqueAction_list:
-                                    if yy == bb['xmi:id']:
-                                        for kk in self.edge_list:
-                                            if bb['incoming_link'] == kk['xmi:id']:
-                                                if kk['input'] in self.method_Actions:
-                                                    action_to_pop = self.method_Actions.index(yy)
-                                                    self.method_Actions.pop(action_to_pop)
-                                                    action_before = self.method_Actions.index(kk['input'])
-                                                    self.method_Actions.insert(action_before+1,yy)
-                            self.method_list[-1]['ordered_tasks'] = [x for x in self.method_Actions]
+                            
+                            if self.method_Actions != []:
+                            
+                                functions_with_incoming_edge = [] 
+                                functions_with_outcoming_edge= []
+                                for bb in self.method_Actions:
+                                    for kk in self.edge_list:
+                                        if 'incoming_link' in bb and bb['incoming_link'] == kk['xmi:id']:
+                                            for uu in self.method_Actions:
+                                                if uu['xmi:id'] == kk['input']:
+                                                    functions_with_incoming_edge.append(bb)
+                                                    bb['previous_action'] = kk['input']
+                                        if 'outcoming_link' in bb and bb['outcoming_link'] == kk['xmi:id']:
+                                            for uu in self.method_Actions:
+                                                if uu['xmi:id'] == kk['output']:
+                                                  functions_with_outcoming_edge.append(bb)
+                                                  bb['following_action'] = kk['output']  
+                                for yy in self.method_Actions:
+                                    if yy not in functions_with_incoming_edge and yy in functions_with_outcoming_edge:
+                                        yy['order'] = 0
+                                    elif yy in functions_with_incoming_edge and yy not in functions_with_outcoming_edge:
+                                        yy['order'] = len(self.method_Actions) - 1
+                                    elif yy not in functions_with_incoming_edge and yy not in functions_with_outcoming_edge:
+                                        yy['order'] = 0
+                                
+                                flag = 0
+                                counter = 0
+                                counter_while = 0
+                                
+                                while flag == 0:
+                                    counter_while = counter_while +1
+                                    for yy in self.method_Actions:
+                                        if 'order' in yy and yy['order'] != len(self.method_Actions):
+                                            # check the next element that should be there
+                                            for uu in self.method_Actions:
+                                                if'previous_action'in uu and uu['previous_action'] == yy['xmi:id']:
+                                                    uu['order'] = yy['order'] + 1 
+                                        elif 'order' in yy and yy['order'] == len(self.method_Actions):
+                                            pass
+                                        
+                                        if 'order' in yy:
+                                            counter = counter + 1
+
+                                    
+                                    if counter == len(self.method_Actions):
+                                        flag = 1
+                                    else:
+                                        counter = 0
+                                    
+                                    if counter_while > 50:
+                                        flag = 1
+                                
+                                # Sort actions based on the ordering 
+                                self.method_Actions.sort(key = XML_parsing.get_order)             
+                                
+                                
+                            # for yy in self.method_Actions:
+                                
+            
+                            #     for bb in self.opaqueAction_list:
+                            #         if yy == bb['xmi:id']:
+                            #             for kk in self.edge_list:
+                            #                 if bb['incoming_link'] == kk['xmi:id']:
+                            #                     if kk['input'] in self.method_Actions:
+                            #                         action_to_pop = self.method_Actions.index(yy)
+                            #                         self.method_Actions.pop(action_to_pop)
+                            #                         action_before = self.method_Actions.index(kk['input'])
+                            #                         self.method_Actions.insert(action_before+1,yy)
+                            self.method_list[-1]['ordered_tasks'] = [x['xmi:id'] for x in self.method_Actions]
                             self.method_Actions.clear()
                                 
                     except:
                         if ii != '\n' and ii.name != 'body' and not(isinstance(ii, str)):
-                            print('Something Wrong! Check lines before 248')
+                            print('Something Wrong! Check lines before 547 - check the while loop!!')
             
         # For each method go back to the opaque action and associate the inputs/outputs and the parameters as well as the types
         temporary_input_list = []
@@ -400,11 +635,6 @@ class XML_parsing():
             for jj in final_opaque_action_set:
                 if ii['name'] == jj and ii['xmi:type'] == 'uml:OpaqueAction':
                     self.final_opaque_action_list.append(ii)
-                
-            
-            
-
-        
 
         # # Among the methods of the task take the one with the least input paramters - those are the parameter of the task unless the task is used in another task
         # # then take the parameter of that task as minumum parameters.
@@ -423,6 +653,43 @@ class XML_parsing():
                 for jj in self.task_list:
                     if jj.get('name') == ii.get('name'): 
                         jj["parameters"] = ii.get('parameters')
+       
+        # Check if the user defined some constraints in the 
+        get_param = []
+        flag_found = 0
+        for ii in self.b_ownedRules:
+            if ii.parent['name'] == 'Functions':
+                # check that the parameters have a known type!
+                dummy_string = ii['name']
+                dummy_vector = re.split(' |-', dummy_string)
+                
+                for uu in self.hddl_type_list:
+                    if uu['name'] == dummy_vector[-1]:
+                        flag_found = 1
+                
+                if flag_found != 1:
+                    self.hddl_type_list.append(dummy_vector[-1])
+                    print('Plese check your constraints in the UseCase - your type extension for {} was not found in the type folder'.format(ii['name']))
+                    print('We added that type - however, please check if that was what you were planning to do!')
+                
+                get_param_dict = { "xmi:type":ii['xmi:type'], "xmi:id":ii['xmi:id'], "name":ii['name']}
+                for jj in self.dependencies_list:
+                    if jj['output'] == ii['xmi:id']:
+                        get_param_dict['task'] = jj['input']
+                get_param.append(get_param_dict)
+            
+        
+        task_parameters = []
+        for ii in self.task_list:
+            if get_param != []:
+                for jj in get_param:
+                    if ('task') in jj:
+                        if jj['task'] == ii['xmi:id']:
+                            task_parameters.append(jj['name'])
+            
+            ii["parameters"] = [x for x in task_parameters]
+            task_parameters.clear()
+                
 
         for ii in self.task_list:
             for jj in self.method_list:
@@ -431,9 +698,11 @@ class XML_parsing():
                     # for each method check the length of the parameters list - if it longer than the one of the task, leave it like that - if not replace the list
                     if ii["parameters"] != []:
                         if len(ii["parameters"]) >= len(jj.get('parameters')):
+                            dummy_parameter = [x for x in jj.get('parameters')]
                             ii["parameters"] = jj.get('parameters')
                     else:
                         ii["parameters"] = jj.get('parameters')
+                        
         
         # x = 1 # the random x=1 that you find around are my debug point - just ignore them
         
@@ -475,7 +744,227 @@ class XML_parsing():
                 
             temporary_predicate.clear()
                         
-        x = 1                  
+        # x = 1    
+        
+    def get_order(task):
+        return task.get('order')
+
+    def ProblemFileElements(self):        
+        
+        # The tasks that have to be defined by the designer in the initial task network
+        self.mission_tasks = []
+        # Initial conditions in the problem file
+        self.initial_conditions_pf = []
+        # Objects in the problem file
+        self.problem_file_object = []
+
+        # b_ownedRules
+        # Problem file instances analysis
+        for uu in self.b_nodes:
+            
+            # If the packagedElement is a UseCase
+            # Just consider the inputs in the Mission Folder 
+            # We are just considering the Problem File entries here! 
+            if uu['xmi:type'] == 'uml:CallBehaviorAction' and  (uu.parent.parent.parent['name'] == 'Mission' or uu.parent.parent.parent.parent['name'] == 'Mission'):
+                # Get hierarchy of the tasks - the tasks
+                
+                # Save all your BehaviorActions and their inputs and outputs pins 
+                temp_dict = {"name": uu['name'], "xmi:id":uu['xmi:id'], "behavior":uu['behavior'], "incoming_edge": uu['incoming'], "outgoing_edge": uu['outgoing']} 
+                self.mission_tasks.append(temp_dict)
+                
+                # Analyse input and output to simplify the task inputs
+                # We are not considering those parameters anymore 
+                # for kk in uu.children:
+                #     # We can analyse the input (xmi:type="uml:InputPin") 
+                #     try:
+                        
+                #         if kk['xmi:type'] == 'uml:InputPin':
+                #             self.mission_tasks_input_parameter.append({"xmi:id":kk['xmi:id'], "mission_task": uu['xmi:id'], "incoming_edge": kk['incoming']})  
+                                                                           
+                #     except:
+                #         if kk != '\n' and not(isinstance(kk, str)) and kk.name != 'argument' and kk.name != 'UpperBound'  :
+                #             print('Something Wrong! Check lines before 669')
+                            
+                            
+        # Hierachie of main tasks
+        functions_with_incoming_edge = []
+        functions_with_outcoming_edge = []
+        for yy in self.mission_tasks:
+            for kk in self.edge_list:
+                if 'incoming_edge' in yy and yy['incoming_edge'] == kk['xmi:id']:
+                    for uu in self.mission_tasks:
+                        if uu['xmi:id'] == kk['input']:
+                            functions_with_incoming_edge.append(yy)
+                            yy['previous_action'] = kk['input']
+                
+                    
+                if 'outgoing_edge' in yy and yy['outgoing_edge'] == kk['xmi:id']:
+                    for uu in self.mission_tasks:
+                        if uu['xmi:id'] == kk['output']:
+                            functions_with_outcoming_edge.append(yy)
+                            yy['following_action'] = kk['output']
+        
+        self.ordered_mission_tasks = []
+        for yy in self.mission_tasks:
+            if yy not in functions_with_incoming_edge and yy in functions_with_outcoming_edge:
+                yy['order'] = 0
+            elif yy in functions_with_incoming_edge and yy not in functions_with_outcoming_edge:
+                yy['order'] = len(self.mission_tasks) - 1
+ 
+        flag = 0 
+        counter = 0
+        
+        while flag == 0:
+            for yy in self.mission_tasks:
+                if 'order' in yy and yy['order'] != len(self.mission_tasks):
+                    # check the next element that should be there
+                    for uu in self.mission_tasks:
+                        if'previous_action'in uu and uu['previous_action'] == yy['xmi:id']:
+                            uu['order'] = yy['order'] + 1 
+                elif 'order' in yy and yy['order'] == len(self.mission_tasks): 
+                    pass
+            
+                if 'order' in yy:
+                    counter = counter + 1
+            
+            if counter == len(self.mission_tasks):
+                flag = 1
+            else:
+                counter = 0
+            
+        # Sort actions based on the ordering    
+        self.mission_tasks.sort(key = XML_parsing.get_order)
+
+
+        # Get initial conditions as constraints 
+        """CHECK THIS!"""
+        for ii in self.b_ownedRules:
+            
+            if ii.parent.parent['name'] == 'MissionToAccomplish':
+                self.initial_conditions_pf.append(ii['name'])
+
+        self.mission_components = []            
+        # Get the components that you need for the papyrus model
+        for uu in self.b_packagedElement:
+             
+            if uu['xmi:type'] == "uml:Component" and uu.parent['name'] == 'Mission':
+                self.mission_components.append({"xmi:id":uu['xmi:id'], "name": uu['name']})
+                for ii in uu.children:
+                    
+                    # Associate the type of the component
+                    if ii.name == 'ownedAttribute':
+                        self.mission_components[-1]['type'] = ii['type']
+                        
+                        
+                    if ii.name == 'packagedElement' and ii['xmi:type'] == "uml:Component":
+                        self.mission_components.append({"xmi:id":ii['xmi:id'], "name": ii['name']})
+                        for jj in ii.children:
+                            if jj.name == 'ownedAttribute' and jj['xmi:type'] == "uml:Property":
+                                self.mission_components[-1]['type'] = jj['type']
+                        for jj in ii.children:
+                            if jj.name == 'ownedAttribute' and jj['xmi:type'] == "uml:Port":
+                                self.mission_components.append({"xmi:id":jj['xmi:id'], "name": jj['name'], "type": jj['type']})
+
+        for uu in self.mission_components:
+
+            for ii in self.hddl_type_list:
+                if 'type' in uu and uu['type'] == ii['xmi:id']:
+                    self.problem_file_object.append('{} - {}'.format(uu['name'], ii['name']))
+                elif 'type' not in uu:
+                    self.problem_file_object.append('{} - {}'.format(uu['name'], uu['name']))
+                    print('{} is missing his type - please define a type for this component!'.format(uu['name']))
+                    print('{} has been appended to the hddl type list!'.format(uu['name']))
+                    self.hddl_type_list.append({"name": uu['name'], "xmi:id":''})
+                    
+        
+        # Let's start with the map data to create the problem file
+        # self.map_data
+        
+        dummy_list = []
+
+        for ii in self.map_data:
+            flag_check = 0
+            if len(ii.split("-")) == 2:
+                dummy_list.append(ii)
+                # take the second part of the vector and check if it exist in the HDDL types
+                dummy_variable = ii.split("-")[-1]
+                dummy_variable = dummy_variable.replace('\n','').strip()
+                for uu in self.hddl_type_list:
+                    if uu['name'] == dummy_variable:
+                        flag_check = 1
+                if flag_check != 1:
+                    print('{} has a wrong type! Please check your types in the map_file!')
+                else:
+                    self.problem_file_object.append('{} - {}'.format(ii.split("-")[0], ii.split("-")[-1].replace('\n','').strip()))
+
+            if ii not in dummy_list:
+                self.initial_conditions_pf.append(ii.replace('\n','').strip())
+        
+        # Analyse the Initial Task network:
+            # get the tasks
+            # check that the tasks exists in your domain
+            # check that the parameters exist in your parameter list
+            # check that the order of the tasks
+        
+        for index,ii in enumerate(self.htn_tasks):
+            
+            task_found = 'no'  
+            object_found = 'no'
+            dummy_string = ii.replace('task{}('.format(index),'')         
+            dummy_string = dummy_string.replace(')'.format(index),'') 
+            dummy_list = dummy_string.split()
+          
+            for kk in self.task_list:
+                if dummy_list[0] == kk['name']:
+                    task_found = 'yes'
+                    for hh in dummy_list[1::]:
+                        object_found = 'no'
+                        for uu in self.problem_file_object:
+                            if hh in uu:
+                                object_found = 'yes'
+                        if object_found == 'no':
+                            print('{} not found in the problem file objects'.format(dummy_list[-1]))
+                            break
+                        
+                
+            if task_found != 'yes' and object_found != 'yes':
+                print('Please check your initial task network! Something is wrong!')
+                break
+        
+        self.ordering_task_network = []
+        for index,ii in enumerate(self.htn_tasks):
+            dummy_string = ii.replace('task{}('.format(index),'')         
+            dummy_string = dummy_string.replace(')'.format(index),'') 
+            dummy_list_1 = dummy_string.split()
+            task_to_compare_1 = dummy_list_1[0]
+            for index,jj in enumerate(self.htn_tasks):
+                dummy_string = jj.replace('task{}('.format(index),'') 
+                dummy_string = dummy_string.replace(')'.format(index),'') 
+                dummy_list_2 = dummy_string.split() 
+                task_to_compare_2 = dummy_list_2[0]
+                for kk in self.mission_tasks:
+                    if task_to_compare_1 == kk['name']:
+                        task_number_1 = kk['order']
+                    if task_to_compare_2 == kk['name']:
+                        task_number_2 = kk['order']
+            if task_number_1 < task_number_2:
+                dummy_string_1 = ii.split('(')
+                dummy_string_2 = jj.split('(')
+                self.ordering_task_network.append('(< {} {})'.format(dummy_string_1[0], dummy_string_2[0]))
+            if task_number_2 < task_number_1:
+                dummy_string_1 = ii.split('(')
+                dummy_string_2 = jj.split('(')
+                self.ordering_task_network.append('(< {} {})'.format(dummy_string_1[0], dummy_string_2[0]))                    
+                        
+                
+
+        # x = 1   
+         
+         # I suggest that the initial task network - therefore, what the system should do if given by the designer as input!
+         # Additional inputs can be encoded in the input file as well! 
+         # If not - I can consider that the tasks for the systems are!
+
+        
         # xmi:id https://stackoverflow.com/questions/58839091/how-to-generate-uuid-in-python-withing-given-range
         
         
@@ -548,9 +1037,9 @@ class XML_parsing():
                         dummy_vector = dummy_vector[0::2]
                         string_vector.append('task{}({} ?{})'.format(counter,kk['name'], ' ?'.join(dummy_vector) ))
                         counter = counter + 1
-                    if counter != 0 and '(< task{} task{})'.format(counter-1, counter) not in order_vector:
+                    if counter > 1 and '(< task{} task{})'.format(counter-2, counter-1) not in order_vector:
                         # For each task check incoming and outcoming links
-                        order_vector.append('(< task{} task{})'.format(counter-1, counter))
+                        order_vector.append('(< task{} task{})'.format(counter-2, counter-1))
 
             if counter != 0 and counter != 1:
                 file.write('\t\t :subtasks (and \n')
@@ -597,8 +1086,38 @@ class XML_parsing():
     def Problem_FileWriting (self):
         file = open(self.name_string_pf,'w')
         file.write('(define ')
-        file.write('\t (domain {}) \n'.format(self.problem_name))
-        file.write('\t (:objects')
+        file.write(' (domain {}) \n'.format(self.domain_name))
+        # Objects
+        file.write('\t (:objects \n')
+        for ii in self.problem_file_object:
+            file.write('\t\t{}\n'.format(ii))
+        file.write('\t )\n\n')
+        # Hierarchical Task Network
+        file.write('\t :htn( \n')
+        file.write('\t\t :parameters () \n')
+        file.write('\t\t :subtasks (and \n')
+        for ii in self.htn_tasks:
+            file.write('\t\t({})\n'.format(ii))
+        
+        file.write('\t\t )\n\n')
+        #Ordering
+        file.write('\t\t :ordering (and \n')
+        for ii in self.ordering_task_network:
+            file.write('\t\t{}\n'.format(ii))
+        
+        file.write('\t\t )\n\n')
+        
+        #close hierarchical task network
+        file.write('\t )\n\n')
+        
+        # Initial Conditions
+        file.write('\t (:init \n')
+        for ii in self.initial_conditions_pf:
+            file.write('\t\t{}\n'.format(ii))        
+        file.write('\t )\n\n')
+        # end of the file
+        file.write(')')        
+        
         # Take the first part of the C++ code
         
         # Add the equipments of the system
@@ -609,28 +1128,77 @@ class XML_parsing():
         
         # Set the problem initial conditions
         
-        file.write(') \n') 
+
         
     
 def main():
-
-    with open('xml_sample_4.uml', 'r') as f:
-        data = f.read()
     
-    # Types of domain requirements considered in the HDDL module
-    # call them from the configuration file - you can even create an executable of python where you ask for them
-    hddl_requirements = ['typing', 'hierachie', 'fluents', 'STRIPS', 'Disjunctive Preconditions', 'Equality'
+    
+    # First Parse de input file to get the information you need
+    with open('configuration_file.xml', 'r') as f:
+        configuration_file = f.read()    
+    
+    configuration_file_soup = BeautifulSoup(configuration_file, 'xml')
+    file_parameters = configuration_file_soup.find_all('file')
+    
+    file_papyrus = file_parameters[0]['file_name']
+    
+    if file_parameters[0].has_attr('domain_name'):
+        domain_name = file_parameters[0]['file_name']
+    else:
+        domain_name = 'None'
+        
+    if file_parameters[0].has_attr('map_file_name'):
+        map_file_name = file_parameters[0]['map_file_name']
+        with open(map_file_name, 'r') as f:
+            map_data = f.readlines() 
+    else:
+        map_file_name = 'None'
+
+    if file_parameters[0].has_attr('generate_problem_file'):
+        generate_problem_file = file_parameters[0]['generate_problem_file']
+    else:
+        generate_problem_file = 'no'    
+        
+    hddl_requirements_soup = configuration_file_soup.find_all('li')
+    list_requirements = []
+    for xx in hddl_requirements_soup:
+        dummy_string = xx.contents[0]
+        list_requirements.append(dummy_string)
+    
+    
+    if list_requirements == [] :
+        # Types of domain requirements considered in the HDDL module
+        # call them from the configuration file - you can even create an executable of python where you ask for them
+        hddl_requirements = ['typing', 'hierachie', 'fluents', 'STRIPS', 'Disjunctive Preconditions', 'Equality'
                          'Existential Preconditions','Universal Preconditions', 'Quantified Preconditions', 'Conditional Effects',
                          'Action Expansions','Foreach Expansions', 'DAG Expansions', 'Domain Axioms', 'Subgoals Through Axioms', 'Safety Constraints'
                          'Expression Evaluation', 'Fluents', 'Open World', 'True Negation', 'ADL', 'UCPOP']
+    else:
+        hddl_requirements = list_requirements
     
-    
-    file_final = XML_parsing(data, hddl_requirements)
+    htn_tasks_soup = configuration_file_soup.find_all('li_htn')
+    htn_tasks = []
+    for xx in htn_tasks_soup:
+        dummy_string = xx.contents[0]
+        htn_tasks.append(dummy_string)    
+
+    with open(file_papyrus, 'r') as f:
+        data = f.read()
+        
+
+    file_final = XML_parsing(data, map_data, hddl_requirements, domain_name, htn_tasks)
     # Actively Parse the XML
     file_final.XML_ActiveParsing()
     # Create the file that you need/want
+    # Take out the element you need for the domain file:
+    file_final.DomainFileElements()
     # Create domain file
     file_final.Domain_FileWriting()
+    # Get the elements to design the problem file:
+    if generate_problem_file == 'yes':
+        file_final.ProblemFileElements()
+        file_final.Problem_FileWriting()
 
 
 
