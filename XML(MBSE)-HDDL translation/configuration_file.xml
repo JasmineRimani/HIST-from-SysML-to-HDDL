@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
-  <file file_name="xml_sample_5.uml" domain_name="igluna_mission" generate_problem_file="yes" map_file_name="plan_final_1m_1_int.txt">
+  <file file_name="xml_sample_5.uml" domain_name="igluna_mission" generate_problem_file="no" generate_domain_file="no" generate_feedback="yes"
+                                                   map_file_name="plan_final_1m_1_int.txt" feedback_file_name="feedback__domain.hddl">
   </file>
   <htn>
  

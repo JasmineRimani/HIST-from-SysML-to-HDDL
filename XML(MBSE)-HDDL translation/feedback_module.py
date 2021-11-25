@@ -7,7 +7,6 @@ Created on Thu Nov  4 16:19:39 2021
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
-import uuid
 
 
 """
@@ -161,7 +160,7 @@ Others = ['visibility', 'name', 'general', 'memberEnd', 'node', 'target', 'sourc
 
 class XML_parsing():
     
-    def __init__(self, file, map_data, hddl_requirements, domain_name, htn_tasks, feedback_name):
+    def __init__(self, file, map_data, hddl_requirements, domain_name, htn_tasks):
         # File that we need to parse
         self.file = file
         # File with the map data
@@ -177,8 +176,6 @@ class XML_parsing():
         self.problem_name = ' '
         # Initial Task Network
         self.htn_tasks = htn_tasks
-        # Feedback file name
-        self.feedback_file_name = feedback_name
         # Requirement list for the specific domain file
         self.requirement_list_domain_file = []
         # Packages list 
@@ -227,8 +224,6 @@ class XML_parsing():
         # self.method_input_predicate_list_names = []
         # Dependencies in the UseCase
         self.dependencies_list = []
-        # feedback vector:
-        self.hddl_type_feedback = []
         
     def XML_ActiveParsing(self):
 
@@ -368,9 +363,7 @@ class XML_parsing():
                                         # Check if the attribute has a type! - if it doesn't just assign the name as type!
                                         if temp_dict['type_name'] == " " and len(temp_dict["name"].split()) <= 1:
                                             temp_dict["type_name"] = jj['name']
-                                            id_uuid = uuid.uuid1()
-                                            self.hddl_type_list.append({"name": jj['name'], "xmi:id": id_uuid})
-                                            self.hddl_type_feedback.append({"name": jj['name'], "xmi:id": id_uuid})
+                                            self.hddl_type_list.append({"name": jj['name'], "xmi:id":''})
                                             
                                             """ 
                                             TO DO - FEEDBACK TO PAPYRUS
@@ -676,7 +669,6 @@ class XML_parsing():
                 
                 if flag_found != 1:
                     self.hddl_type_list.append(dummy_vector[-1])
-                    self.hddl_type_feedback.append(dummy_vector[-1])
                     print('Plese check your constraints in the UseCase - your type extension for {} was not found in the type folder'.format(ii['name']))
                     print('We added that type - however, please check if that was what you were planning to do!')
                 
@@ -1136,122 +1128,7 @@ class XML_parsing():
         
         # Set the problem initial conditions
         
-    def Feedback_file(self): 
-        
-        # self.hddl_type_list --> list of types
-        # self.predicate_list --> list of predicates
-        # self.task_list --> list of tasks
-        # self.method_list --> list of methods
-        # self.opaqueAction_list --> list of tasks
-        # self.feedback_file_name --> file from which we start
-        # self.hddl_type_feedback --> start building memory of the things changed while reading the first xml
-        
-        # Read the lines of the feedback file
-        with open(self.feedback_file_name, 'r') as f:
-            feedback_file_lines = f.readlines()
-            f.seek(0)
-            feedback_file = f.read()
-        
-        x = 0
-        
-        # Patterns that may work with the tasks
-        # pattern = '\(:\w.+\s\s\s\s :\w'
-        # pattern that may work with the types
-        # pattern = '\(:\w.+\s\s\s\s \w'
-        # This may work as well
-        # pattern = '(\(:\w.+) (.*)'
-        
-        # In theory you can use regex - however, now I am not in the mood for it
-        # matches = re.findall('(:types[])', feedback_file_lines.read())
-        
-        # pattern_types = '^(:types ...)$'
-        # https://stackoverflow.com/questions/35888841/how-to-read-a-file-and-extract-data-between-multiline-patterns
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        self.predicate_list_feedback = []
-        self.task_list_feedback = []
-        flag_types = 0
-        type_existing = 'no'
-        flag_predicates = 0
-        flag_tasks = 0
-        task_existing = 'no'
-        
-        
-        #Check the list of types 
-        for ii in feedback_file_lines:
-            
-            dummy_string = ii.replace('\n', '')
-            dummy_string = dummy_string.replace('\t', '')
-            
-            # When we arrive at the types part 
-            if flag_types == 1:
-                for jj in self.hddl_type_list:
-                    if jj['name'] == dummy_string.split('-')[0].strip():
-                        type_existing = 'yes'
-                if type_existing != 'yes':
-                    self.hddl_type_feedback.append({'name':dummy_string.split('-')[0].strip(), 'xmi:id':uuid.uuid1()})
-                    type_existing = 'no'
-            
-            if ':types' in dummy_string:
-                flag_types = 1
 
-            # Found the end of the type section
-            if ')' in dummy_string and flag_types == 1:
-                flag_types = 0
-                
-            # Find the predicates
-            if flag_predicates == 1:
-                dummy_string = dummy_string.replace('(', '')
-                dummy_string = dummy_string.replace(')', '')
-                dummy_string = dummy_string.strip()
-                if not dummy_string in self.predicate_list and dummy_string != '':
-                    self.predicate_list_feedback.append(dummy_string)
-            
-            if ':predicates' in dummy_string:
-                flag_predicates = 1
-
-            # Found the end of the predicate section
-            if ':task' in dummy_string and flag_predicates == 1:
-                flag_predicates = 0 
-                flag_tasks = 1
-            
-            # Find tasks!!!
-            
-            """Still Writing This part - I am thinking: how can I extract portions of file so that I can easily
-            store the information I need for the feedback line?"""
-            
-            if ':task' in dummy_string:
-                dummy_string = dummy_string.replace('(', '')
-                dummy_string = dummy_string.replace(')', '')
-                dummy_list = dummy_string.split()
-                task_name = dummy_list[-1].strip()
-                
-                
-                
-                for jj in self.task_list:
-                    if jj['name'] == task_name and task_name!= '' :
-                        task_existing = 'yes'
-                if task_existing == 'yes':
-                    self.task_list_feedback.append({'name':task_name, 'xmi:id':uuid.uuid1()}) 
-            
-            
-            
-            # Find methods!!!
-            
-            
-            # Find actions!!!
-            
-        
-            
-        
-        
         
     
 def main():
@@ -1267,14 +1144,9 @@ def main():
     file_papyrus = file_parameters[0]['file_name']
     
     if file_parameters[0].has_attr('domain_name'):
-        domain_name = file_parameters[0]['domain_name']
+        domain_name = file_parameters[0]['file_name']
     else:
         domain_name = 'None'
-        
-    if file_parameters[0].has_attr('feedback_file_name'):
-        feedback_name = file_parameters[0]['feedback_file_name']
-    else:
-        feedback_name = 'None'
         
     if file_parameters[0].has_attr('map_file_name'):
         map_file_name = file_parameters[0]['map_file_name']
@@ -1286,17 +1158,7 @@ def main():
     if file_parameters[0].has_attr('generate_problem_file'):
         generate_problem_file = file_parameters[0]['generate_problem_file']
     else:
-        generate_problem_file = 'no' 
-        
-    if file_parameters[0].has_attr('generate_domain_file'):
-        generate_domain_file = file_parameters[0]['generate_domain_file']
-    else:
-        generate_domain_file = 'no'
-        
-    if file_parameters[0].has_attr('generate_feedback'):
-        generate_feedback_file = file_parameters[0]['generate_feedback']
-    else:
-        generate_feedback_file = 'no'
+        generate_problem_file = 'no'    
         
     hddl_requirements_soup = configuration_file_soup.find_all('li')
     list_requirements = []
@@ -1325,22 +1187,18 @@ def main():
         data = f.read()
         
 
-    file_final = XML_parsing(data, map_data, hddl_requirements, domain_name, htn_tasks, feedback_name)
+    file_final = XML_parsing(data, map_data, hddl_requirements, domain_name, htn_tasks)
     # Actively Parse the XML
     file_final.XML_ActiveParsing()
     # Create the file that you need/want
     # Take out the element you need for the domain file:
     file_final.DomainFileElements()
-    # Create domain file
-    if generate_domain_file == 'yes':
-        file_final.Domain_FileWriting()
-    # Get the elements to design the problem file:
-    if generate_problem_file == 'yes':
-        file_final.ProblemFileElements()
-        file_final.Problem_FileWriting()
-    # Create Feedback file
-    if generate_feedback_file == 'yes':
-        file_final.Feedback_file() 
+    # # Create domain file
+    # file_final.Domain_FileWriting()
+    # # Get the elements to design the problem file:
+    # if generate_problem_file == 'yes':
+    #     file_final.ProblemFileElements()
+    #     file_final.Problem_FileWriting()
 
 
 
