@@ -1151,6 +1151,87 @@ class XML_parsing():
             feedback_file_lines = f.readlines()
             f.seek(0)
             feedback_file = f.read()
+
+
+        # Section requirements
+        flag_requirements = 0
+        # Section Types
+        flag_types = 0
+        # Section Predicates
+        flag_predicates = 0
+        # Section tasks
+        flag_task = 0
+        # Section method
+        flag_method = 0
+        # Section  Actions
+        flag_action = 0
+        
+        # Save the requirements
+        data_requirements = []
+        # Save the types
+        data_types = []
+        # Save the predicates
+        data_predicates = []
+        # Save the tasks
+        data_tasks = []
+        temporary_task_list = []
+        # Save the methods
+        data_methods = []
+        temporary_method_list = []
+        # Save the actions
+        data_actions = []
+        temporary_action_list = []
+        
+        
+        
+        with open(self.feedback_file_name, 'r') as f:
+            for ii in f:
+                line = ii.replace("\n", '').replace("\t",'').strip()
+                
+                if ':requirements' in line:
+                    data_requirements.append(line)
+                
+                if ':types' in line:
+                    flag_types = 1 
+                if flag_types == 1 and line != '':
+                    data_types.append(line)
+                    if line == ')':
+                       flag_types = 0 
+                       
+                if ':predicates' in line:
+                    flag_predicates = 1 
+                if flag_predicates == 1 and line != '':
+                    data_predicates.append(line)
+                    if line == ')':
+                       flag_predicates = 0 
+                
+                if ':task' in line:
+                    flag_task = 1 
+                if flag_task == 1 and line != '':
+                    temporary_task_list.append(line)
+                    if line == ')':
+                       flag_task = 0  
+                       data_tasks.append([x for x in temporary_task_list])
+                       temporary_task_list.clear
+                
+                if ':method' in line:
+                    flag_method = 1 
+                if flag_method == 1 and line != '':
+                    temporary_method_list.append(line)
+                    if line == ')':
+                       flag_method = 0  
+                       data_methods.append([x for x in temporary_method_list])
+                       temporary_method_list.clear        
+                       
+                if ':action' in line:
+                    flag_action = 1 
+                if flag_action == 1 and line != '':
+                    temporary_action_list.append(line)
+                    if line == ')':
+                       flag_action = 0  
+                       data_actions.append([x for x in temporary_action_list])
+                       temporary_action_list.clear    
+                    
         
         x = 0
         
@@ -1160,6 +1241,21 @@ class XML_parsing():
         # pattern = '\(:\w.+\s\s\s\s \w'
         # This may work as well
         # pattern = '(\(:\w.+) (.*)'
+        # ['(:requirements :typing :hierachie) ', '(:types ', '(:predicates ', 
+        # '(:task NavigateToGoal ', '(:task EvaluateAvailableResources ', 
+        # '(:task TakePicture ', '(:task GoBack ', '(:task StartMission ', 
+        # '(:task Dummy_Task  ', '(:method Dummy_Task _method1 ', 
+        # '(:method NavigateToGoal_method1 ', '(:method NavigateToGoal_method2 ', 
+        # '(:method NavigateToGoal_method3 ', '(:method EvaluateAvailableResource_method1 ', 
+        # '(:method TakePicture_method1 ', '(:method GoBack_method1 ', 
+        # '(:method StartMission_method1 ', '(:action Dummy_action_1 ', 
+        # '(:action Dummy_action_2', '(:action Visit ', '(:action Navigate ', 
+        # '(:action Unvisit ', '(:action GetDataFromSensors ', '(:action SendSystemState ', 
+        # '(:action ReadArTag ', '(:action CommunicateArTagData ', '(:action TakeImage ', 
+        # '(:action CommunicateImageData ', '(:action MakeAvailable ']
+        
+        # Finds everything thats starts wurg :\w
+        # pattern = '(\(:\w.+)'
         
         # In theory you can use regex - however, now I am not in the mood for it
         # matches = re.findall('(:types[])', feedback_file_lines.read())
@@ -1167,86 +1263,138 @@ class XML_parsing():
         # pattern_types = '^(:types ...)$'
         # https://stackoverflow.com/questions/35888841/how-to-read-a-file-and-extract-data-between-multiline-patterns
         
+        # I love python:
+            # https://www.programiz.com/python-programming/methods/string/startswith
+            # https://www.programiz.com/python-programming/methods/string/endswith
         
-        
-        
-        
-        
-        
-        
-        
-        self.predicate_list_feedback = []
-        self.task_list_feedback = []
-        flag_types = 0
-        type_existing = 'no'
-        flag_predicates = 0
-        flag_tasks = 0
-        task_existing = 'no'
-        
-        
-        #Check the list of types 
-        for ii in feedback_file_lines:
-            
-            dummy_string = ii.replace('\n', '')
-            dummy_string = dummy_string.replace('\t', '')
-            
-            # When we arrive at the types part 
-            if flag_types == 1:
-                for jj in self.hddl_type_list:
-                    if jj['name'] == dummy_string.split('-')[0].strip():
-                        type_existing = 'yes'
-                if type_existing != 'yes':
-                    self.hddl_type_feedback.append({'name':dummy_string.split('-')[0].strip(), 'xmi:id':uuid.uuid1()})
-                    type_existing = 'no'
-            
-            if ':types' in dummy_string:
-                flag_types = 1
+        # Find the beginning of the section -  Pattern - 
+        # pattern = '(\(:\w.+)\s\s\s '
+        # re.findall(pattern, feedback_file)
 
-            # Found the end of the type section
-            if ')' in dummy_string and flag_types == 1:
-                flag_types = 0
-                
-            # Find the predicates
-            if flag_predicates == 1:
-                dummy_string = dummy_string.replace('(', '')
-                dummy_string = dummy_string.replace(')', '')
-                dummy_string = dummy_string.strip()
-                if not dummy_string in self.predicate_list and dummy_string != '':
-                    self.predicate_list_feedback.append(dummy_string)
+        
+        
+        
+        # for ii in feedback_file_lines:
+        #     # Regex Pattern 
+        #     # pattern = '(\(:\w.+)\s\s\s '
             
-            if ':predicates' in dummy_string:
-                flag_predicates = 1
+        #     # Find the pattern: re.findall(pattern, feedback_file)
+        #     # dummy_string = re.findall(pattern, ii)
+        #     # if the dummy string is not activated - then it's a normal line - treat it like that inside the case
+        #     # You have to do some reconfiguration things
+            
+        #     # clean the string
+        #     dummy_string = ii.replace("\n", '').replace("\t",'').strip()
+            
+            
+        #     if dummy_string != '':
+            
+        #         if dummy_string == ':requirements':
+        #             # Activate the flag - 
+        #             pass
+                
+        #         if dummy_string == ':types':
+        #             # activate types
+        #             # deactivate the flag of requirements
+        #             pass
+                
+        #         if dummy_string == ':predicates':
+        #             # activate predicates
+        #             # deactive the flag of types
+        #             pass
+                
+        #         if dummy_string == ':task':
+        #             # activate task
+        #             # deactivate predicates 
+        #             pass
+    
+        #         if dummy_string == ':methods':
+        #             # activate methods
+        #             pass
+                
+        #         if dummy_string == ':action':
+        #             # activate actions
+        #             pass
+                
+        
+        
+        
+        
+        
+        
+        
+        # self.predicate_list_feedback = []
+        # self.task_list_feedback = []
+        # flag_types = 0
+        # type_existing = 'no'
+        # flag_predicates = 0
+        # flag_tasks = 0
+        # task_existing = 'no'
+        
+        
+        # #Check the list of types 
+        # for ii in feedback_file_lines:
+            
+        #     dummy_string = ii.replace('\n', '')
+        #     dummy_string = dummy_string.replace('\t', '')
+            
+        #     # When we arrive at the types part 
+        #     if flag_types == 1:
+        #         for jj in self.hddl_type_list:
+        #             if jj['name'] == dummy_string.split('-')[0].strip():
+        #                 type_existing = 'yes'
+        #         if type_existing != 'yes':
+        #             self.hddl_type_feedback.append({'name':dummy_string.split('-')[0].strip(), 'xmi:id':uuid.uuid1()})
+        #             type_existing = 'no'
+            
+        #     if ':types' in dummy_string:
+        #         flag_types = 1
 
-            # Found the end of the predicate section
-            if ':task' in dummy_string and flag_predicates == 1:
-                flag_predicates = 0 
-                flag_tasks = 1
+        #     # Found the end of the type section
+        #     if ')' in dummy_string and flag_types == 1:
+        #         flag_types = 0
+                
+        #     # Find the predicates
+        #     if flag_predicates == 1:
+        #         dummy_string = dummy_string.replace('(', '')
+        #         dummy_string = dummy_string.replace(')', '')
+        #         dummy_string = dummy_string.strip()
+        #         if not dummy_string in self.predicate_list and dummy_string != '':
+        #             self.predicate_list_feedback.append(dummy_string)
             
-            # Find tasks!!!
+        #     if ':predicates' in dummy_string:
+        #         flag_predicates = 1
+
+        #     # Found the end of the predicate section
+        #     if ':task' in dummy_string and flag_predicates == 1:
+        #         flag_predicates = 0 
+        #         flag_tasks = 1
             
-            """Still Writing This part - I am thinking: how can I extract portions of file so that I can easily
-            store the information I need for the feedback line?"""
+        #     # Find tasks!!!
             
-            if ':task' in dummy_string:
-                dummy_string = dummy_string.replace('(', '')
-                dummy_string = dummy_string.replace(')', '')
-                dummy_list = dummy_string.split()
-                task_name = dummy_list[-1].strip()
+        #     """Still Writing This part - I am thinking: how can I extract portions of file so that I can easily
+        #     store the information I need for the feedback line?"""
+            
+        #     if ':task' in dummy_string:
+        #         dummy_string = dummy_string.replace('(', '')
+        #         dummy_string = dummy_string.replace(')', '')
+        #         dummy_list = dummy_string.split()
+        #         task_name = dummy_list[-1].strip()
                 
                 
                 
-                for jj in self.task_list:
-                    if jj['name'] == task_name and task_name!= '' :
-                        task_existing = 'yes'
-                if task_existing == 'yes':
-                    self.task_list_feedback.append({'name':task_name, 'xmi:id':uuid.uuid1()}) 
+        #         for jj in self.task_list:
+        #             if jj['name'] == task_name and task_name!= '' :
+        #                 task_existing = 'yes'
+        #         if task_existing == 'yes':
+        #             self.task_list_feedback.append({'name':task_name, 'xmi:id':uuid.uuid1()}) 
             
             
             
-            # Find methods!!!
+        #     # Find methods!!!
             
             
-            # Find actions!!!
+        #     # Find actions!!!
             
         
             
