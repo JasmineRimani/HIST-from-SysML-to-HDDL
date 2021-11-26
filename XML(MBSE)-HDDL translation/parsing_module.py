@@ -1182,6 +1182,19 @@ class XML_parsing():
         data_actions = []
         temporary_action_list = []
         
+        # create a feedback lists to get the new requirements, types, predicates, tasks, methods and actions
+        # Requirements
+        self.hddl_requirement_feedback = []
+        # Types --> self.hddl_type_feedback
+        # Predicates
+        self.predicate_list_feedback = []
+        # Tasks
+        self.task_list_feedback =[]
+        # Methods
+        self.method_list_feedback =[]
+        # Actions
+        self.opaqueAction_list_feedback =[]
+        
         
         
         with open(self.feedback_file_name, 'r') as f:
@@ -1212,7 +1225,7 @@ class XML_parsing():
                     if line == ')':
                        flag_task = 0  
                        data_tasks.append([x for x in temporary_task_list])
-                       temporary_task_list.clear
+                       temporary_task_list.clear()
                 
                 if ':method' in line:
                     flag_method = 1 
@@ -1221,7 +1234,7 @@ class XML_parsing():
                     if line == ')':
                        flag_method = 0  
                        data_methods.append([x for x in temporary_method_list])
-                       temporary_method_list.clear        
+                       temporary_method_list.clear()        
                        
                 if ':action' in line:
                     flag_action = 1 
@@ -1230,10 +1243,55 @@ class XML_parsing():
                     if line == ')':
                        flag_action = 0  
                        data_actions.append([x for x in temporary_action_list])
-                       temporary_action_list.clear    
+                       temporary_action_list.clear()    
                     
         
-        x = 0
+        # x = 0
+        flag_type = 0 
+        
+        
+        
+        for ii in data_types:
+            if ii != '(:types' and ii != ')':
+                for jj in self.hddl_type_list:
+                    if ii.split('-')[0].strip() != jj['name'] and flag_type == 0:
+                        flag_type = 0
+                    if ii.split('-')[0].strip() == jj['name']:
+                        flag_type = 1
+                if flag_type != 1:
+                    self.hddl_type_feedback.append({'name': ii.split('-')[0].strip(),'xmi:id': uuid.uuid1()})
+                
+                        
+        for ii in data_predicates:
+            
+            if ii != '(:predicates' and ii != ')':
+                if ii.replace('(','').replace(')','') not in self.predicate_list:
+                    self.predicate_list_feedback.append(ii.replace('(','').replace(')',''))
+                    
+        temp_param_list = []
+        for uu in data_tasks:
+            for ii in uu:
+                if ':task' in ii:
+                    task_name = ii.split()[0].strip()
+                if ':parameters' in ii:
+                    """THIS REGEX DO NOT FIT EVERYTHING: YOU NEED TO SPLIT YOUR PARAMERER LIST!"""
+                    regex_pattern ='\?\w+.*\w+'
+                    parameters = re.findall(regex_pattern, ii, re.S)
+
+                    for jj in parameters:
+                        temp_param_list.append(jj.replace('?','').strip())
+
+            temp_dictionary = {'name': task_name ,'xmi:id': uuid.uuid1(), 'parameters': temp_param_list}
+            temp_param_list = []
+            
+            for jj in self.task_list:
+                
+                
+                
+                
+                self.task_list_feedback.append()
+    
+                    
         
         # Patterns that may work with the tasks
         # pattern = '\(:\w.+\s\s\s\s :\w'
