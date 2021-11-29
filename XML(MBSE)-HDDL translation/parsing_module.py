@@ -368,7 +368,7 @@ class XML_parsing():
                                         # Check if the attribute has a type! - if it doesn't just assign the name as type!
                                         if temp_dict['type_name'] == " " and len(temp_dict["name"].split()) <= 1:
                                             temp_dict["type_name"] = jj['name']
-                                            id_uuid = uuid.uuid1()
+                                            id_uuid = str(uuid.uuid1())
                                             self.hddl_type_list.append({"name": jj['name'], "xmi:id": id_uuid})
                                             self.hddl_type_feedback.append({"name": jj['name'], "xmi:id": id_uuid})
                                             
@@ -1259,7 +1259,7 @@ class XML_parsing():
                     if ii.split('-')[0].strip() == jj['name']:
                         flag_type = 1
                 if flag_type != 1:
-                    self.hddl_type_feedback.append({'name': ii.split('-')[0].strip(),'xmi:id': uuid.uuid1()})
+                    self.hddl_type_feedback.append({'name': ii.split('-')[0].strip(),'xmi:id': str(uuid.uuid1())})
                 
                         
         for ii in data_predicates:
@@ -1268,28 +1268,72 @@ class XML_parsing():
                 if ii.replace('(','').replace(')','') not in self.predicate_list:
                     self.predicate_list_feedback.append(ii.replace('(','').replace(')',''))
                     
+        
+        # Store the parameters of the model
         temp_param_list = []
+        task_name = ''
+        flag_task = 0
+        parameters = []
+        
+        # for all the task in data_task (i) extract name and parameters, (ii) create a xmi:id
         for uu in data_tasks:
             for ii in uu:
                 if ':task' in ii:
-                    task_name = ii.split()[0].strip()
+                    task_name = ii.split()[1].strip()
                 if ':parameters' in ii:
-                    """THIS REGEX DO NOT FIT EVERYTHING: YOU NEED TO SPLIT YOUR PARAMERER LIST!"""
+
                     regex_pattern ='\?\w+.*\w+'
                     parameters = re.findall(regex_pattern, ii, re.S)
 
                     for jj in parameters:
-                        temp_param_list.append(jj.replace('?','').strip())
+                        
+                        temp_param_list.append(jj.strip().split('?')[1::])
+                        # No unwanted white spaces needed!
+                        for index,oo in enumerate(temp_param_list[-1]):
+                            oo = oo.strip()
+                            temp_param_list[-1][index] = oo
+                        
+                    # If you have name and parameters
+                    if task_name != '' and parameters != []:
+                        temp_dictionary = {'name': task_name ,'xmi:id': str(uuid.uuid1()), 'parameters': temp_param_list[-1]}
+                        temp_param_list = []
+                        parameters = []
+                        task_name = ''
+                    # If you don't have parameters
+                    else:
+                        flag_task = 2
+                        print('There is an error in the task definition in the HDDL document. Did you gave the task parameters?')
+        
+                    # Let's search in the tasks - can we add one to the task feedback list?
+                    if flag_task != 2: 
+                        for jj in self.task_list:
+                            if temp_dictionary['name'] == jj['name']:
+                                # flag_task = 1 
+                                counter = 0
+                                for xx in temp_dictionary['parameters']:
+                                    for kk in jj['parameters']:
+                                        if xx == kk:
+                                             flag_task = 1
+                                             counter = counter + 1
 
-            temp_dictionary = {'name': task_name ,'xmi:id': uuid.uuid1(), 'parameters': temp_param_list}
-            temp_param_list = []
+                                if counter == len(jj['parameters']):
+                                    flag_task = 1
+                                    counter = 0
+                                else:
+                                    flag_task = 0
+                        
+                        if flag_task == 0:
+                            self.task_list_feedback.append(temp_dictionary)
+                            flag_task = 0
+                        else:
+                            print("ok: {}".format(temp_dictionary))
+                            flag_task = 0
+                            x = 0
             
-            for jj in self.task_list:
                 
                 
                 
                 
-                self.task_list_feedback.append()
     
                     
         
