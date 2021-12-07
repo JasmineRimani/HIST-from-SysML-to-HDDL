@@ -15,16 +15,25 @@ Commented that link in rover_sensor and created a new launch file rover_sensor_h
 Worst localization than amcl - not usable!!!!!
 
 
-amcl - test3 - fake_localization - to be installed
+amcl - test3 - fake_localization - same results of amcl - we stay on the amcl
 
 Move_base test 1 - leo_rover_parameters
 - launch sensors: roslaunch my_pcl_tutorial rover_sensors.launch
-- launch amcl:  roslaunch leo_navigation amcl.launch
+- launch amcl:  roslaunch leo_navigation amcl.launch (or fake_localization)
 - launch move_base: roslaunch leo_navigation move_base.launch
 
-can the system avoid obstacles?
+can the system avoid obstacles? Yep
 can it free itself?
-can it find paths to move?
+can it find paths to move? Yep
+
+It works with a good map it should be able to move
+
+
+move base+map:
+sensors:roslaunch my_pcl_tutorial rover_sensors.launch
+hector mapping: roslaunch hector_mapping mapping_default.launch odom_frame:=T265_odom_frame base_frame:=base_link
+move_base_mapless: roslaunch leo_navigation move_base_husky_mapless.launch 
+
 
 
 Topic to register
@@ -35,10 +44,7 @@ rosbag record /tf /tf_static /cmd_vel /joint_states /T265/odom/sample /vrpn_clie
 
 with move base:
 
-rosbag record /tf /tf_static /cmd_vel /joint_states /T265/odom/sample /vrpn_client_node/LeoRover/pose /battery /map /amcl_pose /move_base/GlobalPlanner/parameter_descriptions
-/move_base/GlobalPlanner/parameter_updates /move_base/GlobalPlanner/plan /move_base/GlobalPlanner/potential /move_base/TrajectoryPlannerROS/cost_cloud /move_base/TrajectoryPlannerROS/global_plan /move_base/TrajectoryPlannerROS/local_plan /move_base/TrajectoryPlannerROS/parameter_descriptions /move_base/TrajectoryPlannerROS/parameter_updates /move_base/cancel /move_base/current_goal /move_base/feedback /move_base/global_costmap/costmap /move_base/global_costmap/costmap_updates /move_base/global_costmap/footprint /move_base/global_costmap/inflation_layer/parameter_descriptions /move_base/global_costmap/inflation_layer/parameter_updates /move_base/global_costmap/obstacle_layer/parameter_descriptions /move_base/global_costmap/obstacle_layer/parameter_updates /move_base/global_costmap/parameter_descriptions /move_base/global_costmap/parameter_updates
-/move_base/global_costmap/static_layer/parameter_descriptions /move_base/global_costmap/static_layer/parameter_updates /move_base/goal /move_base/local_costmap/costmap
-/move_base/local_costmap/costmap_updates /move_base/local_costmap/footprint /move_base/local_costmap/inflation_layer/parameter_descriptions /move_base/local_costmap/inflation_layer/parameter_updates /move_base/local_costmap/obstacle_layer/parameter_descriptions /move_base/local_costmap/obstacle_layer/parameter_updates /move_base/local_costmap/parameter_descriptions /move_base/local_costmap/parameter_updates /move_base/parameter_descriptions /move_base/parameter_updates /move_base/result /move_base/status /move_base_simple/goal
+rosbag record /tf /tf_static /cmd_vel /joint_states /T265/odom/sample /vrpn_client_node/LeoRover/pose /battery /map /amcl_pose /move_base/GlobalPlanner/parameter_descriptions/move_base/GlobalPlanner/parameter_updates /move_base/GlobalPlanner/plan /move_base/GlobalPlanner/potential /move_base/TrajectoryPlannerROS/cost_cloud /move_base/TrajectoryPlannerROS/global_plan /move_base/TrajectoryPlannerROS/local_plan /move_base/TrajectoryPlannerROS/parameter_descriptions /move_base/TrajectoryPlannerROS/parameter_updates /move_base/cancel /move_base/current_goal /move_base/feedback /move_base/global_costmap/costmap /move_base/global_costmap/costmap_updates /move_base/global_costmap/footprint /move_base/global_costmap/inflation_layer/parameter_descriptions /move_base/global_costmap/inflation_layer/parameter_updates /move_base/global_costmap/obstacle_layer/parameter_descriptions /move_base/global_costmap/obstacle_layer/parameter_updates /move_base/global_costmap/parameter_descriptions /move_base/global_costmap/parameter_updates/move_base/global_costmap/static_layer/parameter_descriptions /move_base/global_costmap/static_layer/parameter_updates /move_base/goal /move_base/local_costmap/costmap/move_base/local_costmap/costmap_updates /move_base/local_costmap/footprint /move_base/local_costmap/inflation_layer/parameter_descriptions /move_base/local_costmap/inflation_layer/parameter_updates /move_base/local_costmap/obstacle_layer/parameter_descriptions /move_base/local_costmap/obstacle_layer/parameter_updates /move_base/local_costmap/parameter_descriptions /move_base/local_costmap/parameter_updates /move_base/parameter_descriptions /move_base/parameter_updates /move_base/result /move_base/status /move_base_simple/goal
 
 
 
@@ -62,4 +68,12 @@ root@leodroid:~# curl -s https://raw.githubusercontent.com/ros/rosdistro/master/
 Update the ros packages:
 root@leodroid:~# apt update
 Install what you need:
+
+asr_navf --> gloabal planner
+navigation --> base_local_planner move_base / cost_map
+
+
+recover bag - scp root@10.255.110.2:/root/*.bag Bureau/test_07_12_2021/
+Change parameters in move_base_husky.launch - change local and global planner
+some parameters need to be changed in planner 
 
