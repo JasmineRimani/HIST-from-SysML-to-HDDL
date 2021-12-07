@@ -4,13 +4,40 @@ roslaunch my_pcl_tutorial rover_sensors.launch
 Hector Mapping - to create a map of the environment
 roslaunch hector_mapping mapping_default.launch odom_frame:=T265_odom_frame base_frame:=base_link
 Save Map
-roslaunch map_server map_saver
+rosrun map_server map_saver -f last_map (after -f put name of the file you want the map to be saved to)
+amcl - test1: pure amcl withe T265_odom_frame. Doesn't like to much turning fast in the same spot.
 
+amcl2_hector_mapping localization: 
+first: roslaunch leo_navigation hector.launch 
+second: roslaunch leo_navigation amcl_hector.launch 
+problem - you have to erase the link between T265 odom sample and base_link- so that you can have a link between scan odom and base link
+Commented that link in rover_sensor and created a new launch file rover_sensor_hector.launch
 
+amcl - test3 - fake_localization - to be installed
+
+Move_base test 1 - leo_rover_parameters
+- launch sensors: roslaunch my_pcl_tutorial rover_sensors.launch
+- launch amcl:  roslaunch leo_navigation amcl.launch
+- launch move_base: roslaunch leo_navigation move_base.launch
+
+can the system avoid obstacles?
+can it free itself?
+can it find paths to move?
 
 
 Topic to register
+no move base:
+
 rosbag record /tf /tf_static /cmd_vel /joint_states /T265/odom/sample /vrpn_client_node/LeoRover/pose /battery
+
+
+with move base:
+
+rosbag record /tf /tf_static /cmd_vel /joint_states /T265/odom/sample /vrpn_client_node/LeoRover/pose /battery /map /amcl_pose /move_base/GlobalPlanner/parameter_descriptions
+/move_base/GlobalPlanner/parameter_updates /move_base/GlobalPlanner/plan /move_base/GlobalPlanner/potential /move_base/TrajectoryPlannerROS/cost_cloud /move_base/TrajectoryPlannerROS/global_plan /move_base/TrajectoryPlannerROS/local_plan /move_base/TrajectoryPlannerROS/parameter_descriptions /move_base/TrajectoryPlannerROS/parameter_updates /move_base/cancel /move_base/current_goal /move_base/feedback /move_base/global_costmap/costmap /move_base/global_costmap/costmap_updates /move_base/global_costmap/footprint /move_base/global_costmap/inflation_layer/parameter_descriptions /move_base/global_costmap/inflation_layer/parameter_updates /move_base/global_costmap/obstacle_layer/parameter_descriptions /move_base/global_costmap/obstacle_layer/parameter_updates /move_base/global_costmap/parameter_descriptions /move_base/global_costmap/parameter_updates
+/move_base/global_costmap/static_layer/parameter_descriptions /move_base/global_costmap/static_layer/parameter_updates /move_base/goal /move_base/local_costmap/costmap
+/move_base/local_costmap/costmap_updates /move_base/local_costmap/footprint /move_base/local_costmap/inflation_layer/parameter_descriptions /move_base/local_costmap/inflation_layer/parameter_updates /move_base/local_costmap/obstacle_layer/parameter_descriptions /move_base/local_costmap/obstacle_layer/parameter_updates /move_base/local_costmap/parameter_descriptions /move_base/local_costmap/parameter_updates /move_base/parameter_descriptions /move_base/parameter_updates /move_base/result /move_base/status /move_base_simple/goal
+
 
 
 
@@ -19,3 +46,6 @@ export http_proxy=http://proxy.isae.fr:3128 --> isae network
 sudo -E apt update (-E maintains the environment variables)
 sudo -E  apt install ros-melodic-joy (-E maintains the environment variables, so you don't loose your export)
 
+
+Save the rosbags
+Save the rqt_graph and trees
