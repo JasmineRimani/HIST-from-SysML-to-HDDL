@@ -12,6 +12,8 @@ first: roslaunch leo_navigation hector.launch
 second: roslaunch leo_navigation amcl_hector.launch 
 problem - you have to erase the link between T265 odom sample and base_link- so that you can have a link between scan odom and base link
 Commented that link in rover_sensor and created a new launch file rover_sensor_hector.launch
+Worst localization than amcl - not usable!!!!!
+
 
 amcl - test3 - fake_localization - to be installed
 
@@ -47,5 +49,17 @@ sudo -E apt update (-E maintains the environment variables)
 sudo -E  apt install ros-melodic-joy (-E maintains the environment variables, so you don't loose your export)
 
 
-Save the rosbags
+Save the rosbags (simple movement and movebase)
 Save the rqt_graph and trees
+
+
+
+To install on the rover nex packages:
+export proxy (the http address is the one linked to the computer connected to the rover):
+root@leodroid:~# export https_proxy=http://10.255.100.224:3128
+Set up your keys: (http://wiki.ros.org/melodic/Installation/Ubuntu) --> after a bit the keys on the keys of the system can become obsolete and we may be in need to update them
+root@leodroid:~# curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+Update the ros packages:
+root@leodroid:~# apt update
+Install what you need:
+
