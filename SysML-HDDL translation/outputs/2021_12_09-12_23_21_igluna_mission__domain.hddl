@@ -1,0 +1,11 @@
+(define (domain 2021_12_09-12_23_21_igluna_mission__domain.hddl) 
+	 (:requirements :) 
+	 (:types 
+	) 
+
+	 (:predicates 
+	) 
+
+
+
+)

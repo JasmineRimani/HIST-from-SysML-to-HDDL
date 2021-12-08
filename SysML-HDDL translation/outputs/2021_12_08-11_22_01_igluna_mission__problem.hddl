@@ -1,0 +1,208 @@
+(define  (domain 2021_12_08-11_22_01_igluna_mission__domain.hddl) 
+	 (:objects 
+		Rover - system
+		Camera1 - camera
+		Depth  - mode
+		Camera2 - camera
+		Fisheye - mode
+		Drone - system
+		Camera3 - camera
+		Depth - mode
+		Camera4 - camera
+		Fisheye - mode
+		Control Center - control_center
+		waypoint75  - waypoint
+		waypoint60  - waypoint
+		waypoint93  - waypoint
+		waypoint96  - waypoint
+		waypoint98  - waypoint
+		waypoint118  - waypoint
+		waypoint102  - waypoint
+		waypoint111  - waypoint
+		waypoint139  - waypoint
+		waypoint142  - waypoint
+		waypoint161  - waypoint
+		waypoint0_7_1  - waypoint
+		waypoint0_10_1  - waypoint
+		waypoint1_10_1  - waypoint
+		waypoint4_7_1  - waypoint
+		waypoint7_9_1  - waypoint
+		objective11  - objective
+		objective12  - objective
+		objective10  - objective
+		objective5  - objective
+		objective9  - objective
+		objective8  - objective
+		objective2  - objective
+		objective7  - objective
+		objective6  - objective
+		objective4  - objective
+		objective1  - objective
+	 )
+
+	 :htn( 
+		 :parameters () 
+		 :subtasks (and 
+		(task0(TakePicture objective4))
+		(task1(TakePicture objective2))
+		(task2(TakePicture objective1))
+		(task3(TakePicture objective6))
+		(task4(TakePicture objective5))
+		(task5(EvaluateAvailableResources Rover))
+		 )
+
+		 :ordering (and 
+		(< task0 task5)
+		(< task1 task5)
+		(< task2 task5)
+		(< task3 task5)
+		(< task4 task5)
+		 )
+
+	 )
+
+	 (:init 
+		(is_dependent ?drone ?rover)
+		(channel_free control_center)
+		(at rover waypoint(n))
+		(at drone waypoint(n))
+		(available rover)
+		(equipped_for_imaging rover)
+		(equipped_for_imaging drone)
+		(equipped_for_arTag_reading rover)
+		(equipped_for_arTag_reading drone)
+		(equipped_for_arTag_reading drone)
+		(equipped_for_health_monitoring rover)
+		(on_board camera1 rover)
+		(on_board camera2 rover)
+		(on_board camera3 drone)
+		(on_board camera4 drone)
+		(supports camera1 depth)
+		(supports camera3 depth)
+		(supports camera2 fisheye)
+		(supports camera4 fisheye)
+		
+		
+		(can_traverse rover0 waypoint75 waypoint0_6_1)
+		(can_traverse rover0 waypoint0_6_1 waypoint75)
+		(can_traverse rover0 waypoint0_6_1 waypoint102)
+		(can_traverse rover0 waypoint102 waypoint0_6_1)
+		(can_traverse rover0 waypoint75 waypoint0_7_1)
+		(can_traverse rover0 waypoint0_7_1 waypoint75)
+		(can_traverse rover0 waypoint0_7_1 waypoint111)
+		(can_traverse rover0 waypoint111 waypoint0_7_1)
+		(can_traverse rover0 waypoint75 waypoint0_8_1)
+		(can_traverse rover0 waypoint0_8_1 waypoint75)
+		(can_traverse rover0 waypoint0_8_1 waypoint139)
+		(can_traverse rover0 waypoint139 waypoint0_8_1)
+		(can_traverse rover0 waypoint75 waypoint0_9_1)
+		(can_traverse rover0 waypoint0_9_1 waypoint75)
+		(can_traverse rover0 waypoint0_9_1 waypoint142)
+		(can_traverse rover0 waypoint142 waypoint0_9_1)
+		(can_traverse rover0 waypoint75 waypoint0_10_1)
+		(can_traverse rover0 waypoint0_10_1 waypoint75)
+		(can_traverse rover0 waypoint0_10_1 waypoint161)
+		(can_traverse rover0 waypoint161 waypoint0_10_1)
+		(can_traverse rover0 waypoint60 waypoint1_8_1)
+		(can_traverse rover0 waypoint1_8_1 waypoint60)
+		(can_traverse rover0 waypoint1_8_1 waypoint139)
+		(can_traverse rover0 waypoint139 waypoint1_8_1)
+		(can_traverse rover0 waypoint60 waypoint1_9_1)
+		(can_traverse rover0 waypoint1_9_1 waypoint60)
+		(can_traverse rover0 waypoint1_9_1 waypoint142)
+		(can_traverse rover0 waypoint142 waypoint1_9_1)
+		(can_traverse rover0 waypoint60 waypoint1_10_1)
+		(can_traverse rover0 waypoint1_10_1 waypoint60)
+		(can_traverse rover0 waypoint1_10_1 waypoint161)
+		(can_traverse rover0 waypoint161 waypoint1_10_1)
+		(can_traverse rover0 waypoint93 waypoint2_10_1)
+		(can_traverse rover0 waypoint2_10_1 waypoint93)
+		(can_traverse rover0 waypoint2_10_1 waypoint161)
+		(can_traverse rover0 waypoint161 waypoint2_10_1)
+		(can_traverse rover0 waypoint96 waypoint3_7_1)
+		(can_traverse rover0 waypoint3_7_1 waypoint96)
+		(can_traverse rover0 waypoint3_7_1 waypoint111)
+		(can_traverse rover0 waypoint111 waypoint3_7_1)
+		(can_traverse rover0 waypoint96 waypoint3_10_1)
+		(can_traverse rover0 waypoint3_10_1 waypoint96)
+		(can_traverse rover0 waypoint3_10_1 waypoint161)
+		(can_traverse rover0 waypoint161 waypoint3_10_1)
+		(can_traverse rover0 waypoint98 waypoint4_6_1)
+		(can_traverse rover0 waypoint4_6_1 waypoint98)
+		(can_traverse rover0 waypoint4_6_1 waypoint102)
+		(can_traverse rover0 waypoint102 waypoint4_6_1)
+		(can_traverse rover0 waypoint98 waypoint4_7_1)
+		(can_traverse rover0 waypoint4_7_1 waypoint98)
+		(can_traverse rover0 waypoint4_7_1 waypoint111)
+		(can_traverse rover0 waypoint111 waypoint4_7_1)
+		(can_traverse rover0 waypoint98 waypoint4_10_1)
+		(can_traverse rover0 waypoint4_10_1 waypoint98)
+		(can_traverse rover0 waypoint4_10_1 waypoint161)
+		(can_traverse rover0 waypoint161 waypoint4_10_1)
+		(can_traverse rover0 waypoint118 waypoint5_7_1)
+		(can_traverse rover0 waypoint5_7_1 waypoint118)
+		(can_traverse rover0 waypoint5_7_1 waypoint111)
+		(can_traverse rover0 waypoint111 waypoint5_7_1)
+		(can_traverse rover0 waypoint102 waypoint6_9_1)
+		(can_traverse rover0 waypoint6_9_1 waypoint102)
+		(can_traverse rover0 waypoint6_9_1 waypoint142)
+		(can_traverse rover0 waypoint142 waypoint6_9_1)
+		(can_traverse rover0 waypoint111 waypoint7_8_1)
+		(can_traverse rover0 waypoint7_8_1 waypoint111)
+		(can_traverse rover0 waypoint7_8_1 waypoint139)
+		(can_traverse rover0 waypoint139 waypoint7_8_1)
+		(can_traverse rover0 waypoint111 waypoint7_9_1)
+		(can_traverse rover0 waypoint7_9_1 waypoint111)
+		(can_traverse rover0 waypoint7_9_1 waypoint142)
+		(can_traverse rover0 waypoint142 waypoint7_9_1)
+		(can_traverse rover0 waypoint111 waypoint7_10_1)
+		(can_traverse rover0 waypoint7_10_1 waypoint111)
+		(can_traverse rover0 waypoint7_10_1 waypoint161)
+		(can_traverse rover0 waypoint161 waypoint7_10_1)
+		
+		(can_traverse drone1 waypoint75 waypoint0_7_1)
+		(can_traverse drone1 waypoint0_7_1 waypoint75)
+		(can_traverse drone1 waypoint0_7_1 waypoint111)
+		(can_traverse drone1 waypoint111 waypoint0_7_1)
+		(can_traverse drone1 waypoint75 waypoint0_10_1)
+		(can_traverse drone1 waypoint0_10_1 waypoint75)
+		(can_traverse drone1 waypoint0_10_1 waypoint161)
+		(can_traverse drone1 waypoint161 waypoint0_10_1)
+		(can_traverse drone1 waypoint60 waypoint1_10_1)
+		(can_traverse drone1 waypoint1_10_1 waypoint60)
+		(can_traverse drone1 waypoint1_10_1 waypoint161)
+		(can_traverse drone1 waypoint161 waypoint1_10_1)
+		(can_traverse drone1 waypoint98 waypoint4_7_1)
+		(can_traverse drone1 waypoint4_7_1 waypoint98)
+		(can_traverse drone1 waypoint4_7_1 waypoint111)
+		(can_traverse drone1 waypoint111 waypoint4_7_1)
+		(can_traverse drone1 waypoint111 waypoint7_9_1)
+		(can_traverse drone1 waypoint7_9_1 waypoint111)
+		(can_traverse drone1 waypoint7_9_1 waypoint142)
+		(can_traverse drone1 waypoint142 waypoint7_9_1)
+		
+		(visible_from objective11 waypoint75 rover0)
+		(visible_from objective12 waypoint60 rover0)
+		(visible_from objective10 waypoint93 rover0)
+		(visible_from objective5 waypoint96 rover0)
+		(visible_from objective9 waypoint98 rover0)
+		(visible_from objective8 waypoint118 rover0)
+		(visible_from objective2 waypoint102 rover0)
+		(visible_from objective7 waypoint111 rover0)
+		(visible_from objective6 waypoint139 rover0)
+		(visible_from objective4 waypoint142 rover0)
+		(visible_from objective1 waypoint161 rover0)
+		(visible_from objective11 waypoint75 drone1)
+		(visible_from objective12 waypoint60 drone1)
+		(visible_from objective10 waypoint93 drone1)
+		(visible_from objective5 waypoint96 drone1)
+		(visible_from objective9 waypoint98 drone1)
+		(visible_from objective8 waypoint118 drone1)
+		(visible_from objective2 waypoint102 drone1)
+		(visible_from objective7 waypoint111 drone1)
+		(visible_from objective6 waypoint139 drone1)
+		(visible_from objective4 waypoint142 drone1)
+		(visible_from objective1 waypoint161 drone1)
+	 )
+
+)

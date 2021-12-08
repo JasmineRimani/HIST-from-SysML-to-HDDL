@@ -1,0 +1,15 @@
+Feedback Log File 
+This file record the discrepancy between the Papyrus model and the feedback HDDL Domain File 
+The following information is missing in the Papyrus module 
+	 Missing or Modified Requirements: 
+		 [] 
+	 Missing or Modified Types: 
+		 [] 
+	 Missing or Modified Predicates: 
+		 ['is_independent ?arg0 - system ?arg1 - system', 'going_back ?arg0 - system ?arg1 - waypoint'] 
+	 Missing or Modified Tasks: 
+		 [{'name': 'Dummy_Task', 'xmi:id': '10ffa545-587e-11ec-809a-c0b6f9b1eb20', 'parameters': ['dummy_system-system', 'dummy_waypoint-waypoint']}] 
+	 Missing or Modified Methods: 
+		 [] 
+	 Missing or Modified Actions: 
+		 [{'name': 'NavigateToGoal_method3', 'xmi:id': '10ffcc32-587e-11ec-8144-c0b6f9b1eb20', 'task': 'NavigateToGoal', 'preconditions': ['(at ?system ?from_wp)', '(notcan_traverse ?system ?from_wp ?to_wp)', '(can_traverse ?system ?mid_wp ?to_wp)', '(can_traverse ?system ?from_wp ?mid_wp)'], 'actions': ['Dummy_action_1', 'Dummy_action_2', 'Visit', 'Navigate', 'Unvisit', 'Visit_mid', 'Navigate_mid', 'Unvisit_mid', 'Visit_last', 'Navigate_last', 'Unvist_last', 'GetDataFromSensors', 'SendSystemState', 'NavigateToGoal', 'ReadArTag', 'CommunicateArTagData', 'TakeImage', 'CommunicateImageData', 'NavigateToGoal', 'MakeAvailable'], 'parameters': ['from_wp-waypoint', 'to_wp-waypoint', 'system-system', 'mid_wp-waypoint']}] 
