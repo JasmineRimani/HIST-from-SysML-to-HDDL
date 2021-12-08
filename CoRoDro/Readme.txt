@@ -77,3 +77,8 @@ recover bag - scp root@10.255.110.2:/root/*.bag Bureau/test_07_12_2021/
 Change parameters in move_base_husky.launch - change local and global planner
 some parameters need to be changed in planner 
 
+
+New Test:
+- Test new navigation stack
+- Test the mapping buddle that Maximilien created for the rover
+
