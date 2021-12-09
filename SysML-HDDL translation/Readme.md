@@ -14,8 +14,11 @@ The need to exctract useful information from SysML/MBSE models and convert them 
 - parsing_module.py --> Python
       - The real code that takes the *.uml file and generates the HDDL file
 - *.hddl --> HDDL 
-      - The generated HDDL files.
-      - They can be found in ..outputs/*.hddl
+      - The generated HDDL files or feedback sample domain.hddl file
+      - The generated HDDL files can be found in ..outputs/*.hddl
+      - The feedback sample domain.hddl file can be found in ../inputs/*.hddl
+- *.txt --> Map generated from the SLAM module (code by Maximilien Dreier of CoRoDro)
+      - the sample file is plan_final_1m_1_int.txt and it can be find in ../inputs/*.txt
 
 # Modules in parsing_module.py
 - ***Class*** : class XML_parsing()
