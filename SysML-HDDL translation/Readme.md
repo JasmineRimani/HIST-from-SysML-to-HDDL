@@ -3,6 +3,8 @@
 # Motivation
 The need to exctract useful information from SysML/MBSE models and convert them in usable entities for other disciplines is raising. This code extracts a Papyrus model of "Functinal Analysis" to automatically generate the HDDL domain file. The code can generate a HDDL problem file as well as a feedback file with the differences between the Papyrus model and the HDDL domain file. 
 
+# Paper to cite if you use this repository - still to write
+
 **Files and their Languages**
 - Papyrus Model --> uml 
      - uml file with all the information stored in the Papyrus SysML model.
@@ -12,13 +14,14 @@ The need to exctract useful information from SysML/MBSE models and convert them 
       - This file in in the initial folder. It is used now to store the needed input parameter for the code. 
       - It will be probably substited with parameters from command line (?)
 - parsing_module.py --> Python
-      - The real code that takes the *.uml file and generates the HDDL file
-- *.hddl --> HDDL 
+      - The real code that takes the *.uml* file and generates the HDDL file
+- *.hddl* --> HDDL 
       - The generated HDDL files or feedback sample domain.hddl file
-      - The generated HDDL files can be found in ..outputs/*.hddl
-      - The feedback sample domain.hddl file can be found in ../inputs/*.hddl
-- *.txt --> Map generated from the SLAM module (code by Maximilien Dreier of CoRoDro)
-      - the sample file is plan_final_1m_1_int.txt and it can be find in ../inputs/*.txt
+      - The generated HDDL files can be found in ..outputs/*.hddl*
+      - The feedback sample domain.hddl file can be found in ../inputs/*.hddl*
+- *.txt* --> Map generated from the SLAM module (code by Maximilien Dreier of CoRoDro)
+      - the sample file is plan_final_1m_1_int.txt and it can be find in ../inputs/*.txt*
+
 
 # Modules in parsing_module.py
 - ***Class*** : class XML_parsing()
@@ -26,10 +29,15 @@ The need to exctract useful information from SysML/MBSE models and convert them 
         - file --> Papyrus file name
         -  map_data --> if we want to generate the HDDL problem file for a robotic exploration we need some information on the environment.  
         -  htn_tasks --> if we want to generate the HDDL problem file for a robotic exploration we need some information on the environment. 
-        -  feedback_name
 - ***Functions***:
-- 
-
+     - **def XML_ActiveParsing(self):**  the function saves all the instances from the Papyrus Model using https://beautiful-soup-4.readthedocs.io/en/latest/#
+     - **def DomainFileElements(self):** the function saves in nested dictionaries all the inputs needed to create the *_domain.hddl* file
+     - **def ProblemFileElements(self):** the function saves in nested dictionaries all the inputs needed to create the *_problem.hddl* file
+     - **def Domain_FileWriting(self):** the function that actively writes the *_domain.hddl* file
+     - **def Feedback_file(self):** the function that parse the *_domain.hddl* file and store the information in nested dictionaries. This dictionaries will then be used to add the Feedback information in the Papyrus modl.
+     - **def Feedback_Log_FileWriting(self):** the function list all the errors/warning from the *def DomainFileElements(self)* and *def ProblemFileElements(self)* in a log file. If a feedback file is requested, it listes all the differences between the UML model classes and the HDDL model classes (***still coding***).
+     - **def Feedback_xml_file(self)**: the function create uml classes for all the discrepancies found in *def Feedback_file(self)* so that those can be directly added to the uml Papyrus model.
+     
 # Still Actively Coding and Polishing:
 - ***Functions***:
      - def Feedback_file(self):
