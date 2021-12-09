@@ -26,7 +26,7 @@ The need to exctract useful information from SysML/MBSE models and convert them 
         - file --> Papyrus file name
         -  map_data --> if we want to generate the HDDL problem file for a robotic exploration we need some information on the environment.  
         -  htn_tasks --> if we want to generate the HDDL problem file for a robotic exploration we need some information on the environment. 
-- ***Functions***:
+- ***Functions in class XML_parsing()***:
      - **def XML_ActiveParsing(self):**  the function saves all the instances from the Papyrus Model using https://beautiful-soup-4.readthedocs.io/en/latest/#
      - **def DomainFileElements(self):** the function saves in nested dictionaries all the inputs needed to create the *_domain.hddl* file
      - **def ProblemFileElements(self):** the function saves in nested dictionaries all the inputs needed to create the *_problem.hddl* file
