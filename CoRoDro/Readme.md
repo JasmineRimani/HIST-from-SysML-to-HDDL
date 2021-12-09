@@ -40,7 +40,9 @@ It works with a good map it should be able to move.
 
 ---------------------------------------------------------------------------------------------------------------
 **Move_base test 2 - asr_navf**
-asr_navf --> gloabal planner
+asr_navf --> gloabal planner --> new package in igluna_ws/src
+folde: igluna_ws/src/nav_asr
+
 * Change Parameters*: navigation --> base_local_planner move_base / cost_map
 
 New Test:
@@ -95,5 +97,8 @@ Save the rqt_graph and trees
 ------------------------------------------------------------------------------------------------------------------------------------------------
 **Recover Bags**
 recover bag - scp root@10.255.110.2:/root/*.bag Bureau/test_07_12_2021/
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+**New package to the src REMEMBER TO COMPILE THE WORKSPACE!!! (catkin_make or catkin build)**
 
 
