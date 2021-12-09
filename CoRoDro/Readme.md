@@ -66,8 +66,8 @@ FTCPlanner.cfg
 * Change Parameters*: navigation --> base_local_planner move_base / cost_map
 
 New Test:
-- Test new navigation stack
-- Move base without the map --> or you can directly explore the environment with the keyboard control (if you are not able to test this!!)
+- Test new navigation stack --> it works!!!!!
+- Move base without the map --> or you can directly explore the environment with the keyboard control (if you are not able to test this!!) --> this work!!!
 - Test the mapping buddle that Maximilien created for the rover
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
