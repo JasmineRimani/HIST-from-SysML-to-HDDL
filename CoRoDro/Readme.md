@@ -84,13 +84,13 @@ Save the rqt_graph and trees
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
 **To install on the rover new packages:**
-export proxy (the http address is the one linked to the computer connected to the rover):
-root@leodroid:~# export https_proxy=http://10.255.100.224:3128
-Set up your keys: (http://wiki.ros.org/melodic/Installation/Ubuntu) --> after a bit the keys on the keys of the system can become obsolete and we may be in need to update them
-root@leodroid:~# curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
-Update the ros packages:
-root@leodroid:~# apt update
-Install what you need:
+- export proxy (the http address is the one linked to the computer connected to the rover):
+- root@leodroid:~# export https_proxy=http://10.255.100.224:3128
+- Set up your keys: (http://wiki.ros.org/melodic/Installation/Ubuntu) --> after a bit the keys on the keys of the system can become obsolete and we may be in need to update them
+- root@leodroid:~# curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+**Update the ros packages:**
+- root@leodroid:~# apt update
+**Install what you need:**
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
 **Recover Bags**
