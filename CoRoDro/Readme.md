@@ -7,7 +7,7 @@ roslaunch my_pcl_tutorial rover_sensors.launch
 **Hector Mapping - to create a map of the environment**
 roslaunch hector_mapping mapping_default.launch odom_frame:=T265_odom_frame base_frame:=base_link
 **Control the system remotely**
-
+rosrun leo_navigation teleop.py
 **Save Map**
 rosrun map_server map_saver -f last_map (after -f put name of the file you want the map to be saved to)
 
