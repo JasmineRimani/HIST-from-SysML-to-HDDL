@@ -39,7 +39,7 @@ It works with a good map it should be able to move.
 **However the planner is not following the right trajectory**
 
 ---------------------------------------------------------------------------------------------------------------
-**Move_base test 2 - asr_navf**
+**Move_base test 2 - asr_navf** <-- This works like a charm!!!!
 asr_navf --> gloabal planner --> new package in igluna_ws/src
 *folder: igluna_ws/src/nav_asr* 
 ```
@@ -55,19 +55,26 @@ FTCPlanner.cfg
 
 ```
 
-**Changed**:
+**Changed**: (indeed it doesn't change that much)
 - BaseLocalPlanner.cfg in ~/igluna_ws/src/nav_asr/navigation/base_local_planner/cfg 
    - From: gen.add("holonomic_robot", bool_t, 0, "Set this to true if the robot being controlled can take y velocities and false otherwise",True)
    - To: gen.add("holonomic_robot", bool_t, 0, "Set this to true if the robot being controlled can take y velocities and false otherwise",False)
 
 
-
-
 * Change Parameters*: navigation --> base_local_planner move_base / cost_map
 
 New Test:
-- Test new navigation stack --> it works!!!!!
-- Move base without the map --> or you can directly explore the environment with the keyboard control (if you are not able to test this!!) --> this work!!!
+**Test new navigation stack --> it works!!!!!**
+Launch:
+1 roslaunch my_pcl_tutorial rover_sensors.launch
+2 amcl or fake localization
+3 roslaunch leo_navigation move_base_asr_navf.launch 
+
+**Move base without the map** --> or you can directly explore the environment with the keyboard control (if you are not able to test this!!) --> this work!!!
+1 roslaunch my_pcl_tutorial rover_sensors.launch
+2 roslaunch hector_mapping mapping_default.launch odom_frame:=T265_odom_frame base_frame:=base_link
+3 roslaunch leo_navigation move_base_asr_navf.launch 
+
 - Test the mapping buddle that Maximilien created for the rover
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
