@@ -3,8 +3,6 @@
 # Motivation
 The need to exctract useful information from SysML/MBSE models and convert them in usable entities for other disciplines is raising. This code extracts a Papyrus model of "Functinal Analysis" to automatically generate the HDDL domain file. The code can generate a HDDL problem file as well as a feedback file with the differences between the Papyrus model and the HDDL domain file. 
 
-# Paper to cite if you use this repository - still to write
-
 **Files and their Languages**
 - Papyrus Model --> uml 
      - uml file with all the information stored in the Papyrus SysML model.
@@ -22,7 +20,6 @@ The need to exctract useful information from SysML/MBSE models and convert them 
 - *.txt* --> Map generated from the SLAM module (code by Maximilien Dreier of CoRoDro)
       - the sample file is plan_final_1m_1_int.txt and it can be find in ../inputs/*.txt*
 
-
 # Modules in parsing_module.py
 - ***Class*** : class XML_parsing()
     - ** Required Class Instance Variable**:  
@@ -37,7 +34,10 @@ The need to exctract useful information from SysML/MBSE models and convert them 
      - **def Feedback_file(self):** the function that parse the *_domain.hddl* file and store the information in nested dictionaries. This dictionaries will then be used to add the Feedback information in the Papyrus modl.
      - **def Feedback_Log_FileWriting(self):** the function list all the errors/warning from the *def DomainFileElements(self)* and *def ProblemFileElements(self)* in a log file. If a feedback file is requested, it listes all the differences between the UML model classes and the HDDL model classes (***still coding***).
      - **def Feedback_xml_file(self)**: the function create uml classes for all the discrepancies found in *def Feedback_file(self)* so that those can be directly added to the uml Papyrus model.
-     
+
+# Paper to cite if you use this repository 
+***still to write***
+
 # Still Actively Coding and Polishing:
 - ***Functions***:
      - def Feedback_file(self):
@@ -53,9 +53,11 @@ The need to exctract useful information from SysML/MBSE models and convert them 
      - In def Domain_FileWriting (self):
         - Code a check to match the task's parameters' names with the method's parameters' name when defining a HDDL method 
 
-# TO CODE:
+# To Code:
 - ***Functions***:
      - def Feedback_xml_file(self):
         - Directly add the information from Feedback_file(self) to the Papyrus model in a folder called Feedback.
            - The feedback entries will be already in the final Papyrus model 
+
+# How to use Papyrus to model domains:
 
