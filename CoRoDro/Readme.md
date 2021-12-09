@@ -41,7 +41,27 @@ It works with a good map it should be able to move.
 ---------------------------------------------------------------------------------------------------------------
 **Move_base test 2 - asr_navf**
 asr_navf --> gloabal planner --> new package in igluna_ws/src
-folde: igluna_ws/src/nav_asr
+*folder: igluna_ws/src/nav_asr* 
+```
+root@leodroid:~/igluna_ws/src/nav_asr# ls
+asr_ftc_local_planner  asr_navfn  navigation
+root@leodroid:~/igluna_ws/src/nav_asr# cd asr_ftc_local_planner/
+root@leodroid:~/igluna_ws/src/nav_asr/asr_ftc_local_planner# ls
+CMakeLists.txt  README.md       cfg      package.xml
+License.txt     blp_plugin.xml  include  src
+root@leodroid:~/igluna_ws/src/nav_asr/asr_ftc_local_planner# cd cfg/
+root@leodroid:~/igluna_ws/src/nav_asr/asr_ftc_local_planner/cfg# ls
+FTCPlanner.cfg
+
+```
+
+**Changed**:
+- BaseLocalPlanner.cfg in ~/igluna_ws/src/nav_asr/navigation/base_local_planner/cfg 
+   - From: gen.add("holonomic_robot", bool_t, 0, "Set this to true if the robot being controlled can take y velocities and false otherwise",True)
+   - To: gen.add("holonomic_robot", bool_t, 0, "Set this to true if the robot being controlled can take y velocities and false otherwise",False)
+
+
+
 
 * Change Parameters*: navigation --> base_local_planner move_base / cost_map
 
