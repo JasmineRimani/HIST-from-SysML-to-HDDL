@@ -1,23 +1,32 @@
-Sensor Launch + static tf + throttles
+# JUST THE LOG OF THE TEST PERFORMED
+-----------------------------------------------------------------------------------------------------------
+**Sensor Launch + static tf + throttles**
 roslaunch my_pcl_tutorial rover_sensors.launch
 
-Hector Mapping - to create a map of the environment
+-----------------------------------------------------------------------------------------------------------
+**Hector Mapping - to create a map of the environment**
 roslaunch hector_mapping mapping_default.launch odom_frame:=T265_odom_frame base_frame:=base_link
-Save Map
+**Control the system remotely**
+
+**Save Map**
 rosrun map_server map_saver -f last_map (after -f put name of the file you want the map to be saved to)
-amcl - test1: pure amcl withe T265_odom_frame. Doesn't like to much turning fast in the same spot.
-
-amcl2_hector_mapping localization: 
-first: roslaunch leo_navigation hector.launch 
-second: roslaunch leo_navigation amcl_hector.launch 
-problem - you have to erase the link between T265 odom sample and base_link- so that you can have a link between scan odom and base link
-Commented that link in rover_sensor and created a new launch file rover_sensor_hector.launch
-Worst localization than amcl - not usable!!!!!
 
 
-amcl - test3 - fake_localization - same results of amcl - we stay on the amcl
+-----------------------------------------------------------------------------------------------------------
+**amcl - test1: pure amcl withe T265_odom_frame. Doesn't like to much turning fast in the same spot.**
 
-Move_base test 1 - leo_rover_parameters
+-----------------------------------------------------------------------------------------------------------
+**amcl2_hector_mapping localization:**
+- first: roslaunch leo_navigation hector.launch 
+- second: roslaunch leo_navigation amcl_hector.launch 
+- problem - you have to erase the link between T265 odom sample and base_link- so that you can have a link between scan odom and base link
+*Commented that link in rover_sensor and created a new launch file rover_sensor_hector.launch
+Worst localization than amcl - not usable!!!!!*
+
+**amcl - test3 - fake_localization - same results of amcl - we stay on the amcl**
+
+-----------------------------------------------------------------------------------------------------------
+**Move_base test 1 - leo_rover_parameters in the husky planner**
 - launch sensors: roslaunch my_pcl_tutorial rover_sensors.launch
 - launch amcl:  roslaunch leo_navigation amcl.launch (or fake_localization)
 - launch move_base: roslaunch leo_navigation move_base.launch
@@ -26,8 +35,20 @@ can the system avoid obstacles? Yep
 can it free itself?
 can it find paths to move? Yep
 
-It works with a good map it should be able to move
+It works with a good map it should be able to move.
+**However the planner is not following the right trajectory**
 
+---------------------------------------------------------------------------------------------------------------
+**Move_base test 2 - asr_navf**
+asr_navf --> gloabal planner
+* Change Parameters*: navigation --> base_local_planner move_base / cost_map
+
+New Test:
+- Test new navigation stack
+- Move base without the map --> or you can directly explore the environment with the keyboard control (if you are not able to test this!!)
+- Test the mapping buddle that Maximilien created for the rover
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
 
 move base+map:
 sensors:roslaunch my_pcl_tutorial rover_sensors.launch
@@ -36,7 +57,7 @@ move_base_mapless: roslaunch leo_navigation move_base_husky_mapless.launch
 
 
 
-Topic to register
+**Topic to register**
 no move base:
 
 rosbag record /tf /tf_static /cmd_vel /joint_states /T265/odom/sample /vrpn_client_node/LeoRover/pose /battery
@@ -49,18 +70,20 @@ rosbag record /tf /tf_static /cmd_vel /joint_states /T265/odom/sample /vrpn_clie
 
 
 
-isae network problems
+**isae network problems fixing**
 export http_proxy=http://proxy.isae.fr:3128 --> isae network
 sudo -E apt update (-E maintains the environment variables)
 sudo -E  apt install ros-melodic-joy (-E maintains the environment variables, so you don't loose your export)
 
+--------------------------------------------------------------------------------------------------------------------------------------------
 
+**To Save**
 Save the rosbags (simple movement and movebase)
 Save the rqt_graph and trees
 
+---------------------------------------------------------------------------------------------------------------------------------------------
 
-
-To install on the rover nex packages:
+**To install on the rover new packages:**
 export proxy (the http address is the one linked to the computer connected to the rover):
 root@leodroid:~# export https_proxy=http://10.255.100.224:3128
 Set up your keys: (http://wiki.ros.org/melodic/Installation/Ubuntu) --> after a bit the keys on the keys of the system can become obsolete and we may be in need to update them
@@ -69,16 +92,8 @@ Update the ros packages:
 root@leodroid:~# apt update
 Install what you need:
 
-asr_navf --> gloabal planner
-navigation --> base_local_planner move_base / cost_map
-
-
+------------------------------------------------------------------------------------------------------------------------------------------------
+**Recover Bags**
 recover bag - scp root@10.255.110.2:/root/*.bag Bureau/test_07_12_2021/
-Change parameters in move_base_husky.launch - change local and global planner
-some parameters need to be changed in planner 
 
-
-New Test:
-- Test new navigation stack
-- Test the mapping buddle that Maximilien created for the rover
 
