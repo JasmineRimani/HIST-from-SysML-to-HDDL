@@ -4,6 +4,7 @@
 roslaunch my_pcl_tutorial rover_sensors.launch
 
 -----------------------------------------------------------------------------------------------------------
+
 **Hector Mapping - to create a map of the environment**
 roslaunch hector_mapping mapping_default.launch odom_frame:=T265_odom_frame base_frame:=base_link
 **Control the system remotely**
@@ -75,7 +76,11 @@ Launch:
 2 roslaunch hector_mapping mapping_default.launch odom_frame:=T265_odom_frame base_frame:=base_link
 3 roslaunch leo_navigation move_base_asr_navf.launch 
 
-- Test the mapping buddle that Maximilien created for the rover
+**Test the mapping buddle that Maximilien created for the rover**
+- rosrun my_pcl_tutorial pointcloud_saver_server
+- roslaunch my_pcl_tutorial dronemappingphase.launch filename_tag:=/root/database/dronedatabase.txt
+- rosrun my_pcl_tutorial pointcloud_saver_client /octomap_point_cloud_centers /root/database/ '3DdemMap.pcd'
+
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -127,5 +132,6 @@ recover bag - scp root@10.255.110.2:/root/*.bag Bureau/test_07_12_2021/
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
 **New package to the src REMEMBER TO COMPILE THE WORKSPACE!!! (catkin_make or catkin build)**
+
 
 
