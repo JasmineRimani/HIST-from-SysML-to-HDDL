@@ -1,4 +1,4 @@
-# JUST THE LOG OF THE TEST PERFORMED
+# JUST THE LOG OF THE TEST PERFORMED AT ISAE for the 15/12 TEST AT CNES
 -----------------------------------------------------------------------------------------------------------
 **Sensor Launch + static tf + throttles**
 roslaunch my_pcl_tutorial rover_sensors.launch
