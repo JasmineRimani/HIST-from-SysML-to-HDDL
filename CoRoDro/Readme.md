@@ -76,18 +76,16 @@ Launch:
 2 roslaunch hector_mapping mapping_default.launch odom_frame:=T265_odom_frame base_frame:=base_link
 3 roslaunch leo_navigation move_base_asr_navf.launch 
 
-**Test the mapping buddle that Maximilien created for the rover**
+**Test the mapping buddle that Maximilien created for the rover** --> NOT DONE
 - rosrun my_pcl_tutorial pointcloud_saver_server
 - roslaunch my_pcl_tutorial dronemappingphase.launch filename_tag:=/root/database/dronedatabase.txt
 - rosrun my_pcl_tutorial pointcloud_saver_client /octomap_point_cloud_centers /root/database/ '3DdemMap.pcd'
 
+**Test the Drone Mapping** 
+1 roslaunch state_machine startdrone.launch
+2 rosrun state_machine MappingStateMachine.py 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
-
-move base+map:
-sensors:roslaunch my_pcl_tutorial rover_sensors.launch
-hector mapping: roslaunch hector_mapping mapping_default.launch odom_frame:=T265_odom_frame base_frame:=base_link
-move_base_mapless: roslaunch leo_navigation move_base_husky_mapless.launch 
 
 
 
@@ -100,6 +98,7 @@ rosbag record /tf /tf_static /cmd_vel /joint_states /T265/odom/sample /vrpn_clie
 with move base:
 
 rosbag record /tf /tf_static /cmd_vel /joint_states /T265/odom/sample /vrpn_client_node/LeoRover/pose /battery /map /amcl_pose /move_base/GlobalPlanner/parameter_descriptions/move_base/GlobalPlanner/parameter_updates /move_base/GlobalPlanner/plan /move_base/GlobalPlanner/potential /move_base/TrajectoryPlannerROS/cost_cloud /move_base/TrajectoryPlannerROS/global_plan /move_base/TrajectoryPlannerROS/local_plan /move_base/TrajectoryPlannerROS/parameter_descriptions /move_base/TrajectoryPlannerROS/parameter_updates /move_base/cancel /move_base/current_goal /move_base/feedback /move_base/global_costmap/costmap /move_base/global_costmap/costmap_updates /move_base/global_costmap/footprint /move_base/global_costmap/inflation_layer/parameter_descriptions /move_base/global_costmap/inflation_layer/parameter_updates /move_base/global_costmap/obstacle_layer/parameter_descriptions /move_base/global_costmap/obstacle_layer/parameter_updates /move_base/global_costmap/parameter_descriptions /move_base/global_costmap/parameter_updates/move_base/global_costmap/static_layer/parameter_descriptions /move_base/global_costmap/static_layer/parameter_updates /move_base/goal /move_base/local_costmap/costmap/move_base/local_costmap/costmap_updates /move_base/local_costmap/footprint /move_base/local_costmap/inflation_layer/parameter_descriptions /move_base/local_costmap/inflation_layer/parameter_updates /move_base/local_costmap/obstacle_layer/parameter_descriptions /move_base/local_costmap/obstacle_layer/parameter_updates /move_base/local_costmap/parameter_descriptions /move_base/local_costmap/parameter_updates /move_base/parameter_descriptions /move_base/parameter_updates /move_base/result /move_base/status /move_base_simple/goal
+
 
 
 
