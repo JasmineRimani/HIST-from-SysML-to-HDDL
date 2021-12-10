@@ -17,7 +17,7 @@ The need to exctract useful information from SysML/MBSE models and convert them 
       - The generated HDDL files or feedback sample domain.hddl file
       - The generated HDDL files can be found in ..outputs/*.hddl*
       - The feedback sample domain.hddl file can be found in ../inputs/*.hddl*
-- *.txt* --> Map generated from the SLAM module (code by Maximilien Dreier of CoRoDro)
+- *.txt* --> Map generated from the SLAM module (code by Maximilien Dreier of CoRoDro: https://github.com/MaxIGL/SLAM_Igluna)
       - the sample file is plan_final_1m_1_int.txt and it can be find in ../inputs/*.txt*
 
 # Modules in parsing_module.py
