@@ -83,7 +83,10 @@ Launch:
 
 **Test the Drone Mapping** 
 1 roslaunch state_machine startdrone.launch
-2 rosrun state_machine MappingStateMachine.py 
+2 rosrun state_machine MappingStateMachine.py  --> change the dimension of the exploration area!!!
+3 rosbag record -o test_drone_ /vrpn_client_node/Quadri_MK_4/pose /tf /tf_static /mavros/vision_pose/pose /mavros/state /mavros/setpoint_position/local /mavros/local_position/pose /mavros/local_position/velocity_local /T265/odom/sample /D435/depth/color/points /D435/color/image_raw/compressed /D435/color/camera_info  /octomap_point_cloud_centers /occupied_cells_vis_array /ar_pose_marker /visualization_marker
+
+
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
 
