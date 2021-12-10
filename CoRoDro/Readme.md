@@ -68,7 +68,7 @@ New Test:
 **Test new navigation stack --> it works!!!!!**
 Launch:
 1 roslaunch my_pcl_tutorial rover_sensors.launch
-2 amcl or fake localization
+2 amcl or fake localization (fake localization works better - however it tendes to drift after a bit) we can regive a position estimate ). amcl makes the system oscillate a bit - because the rate of the position input is not that good.
 3 roslaunch leo_navigation move_base_asr_navf.launch 
 
 **Move base without the map** --> or you can directly explore the environment with the keyboard control (if you are not able to test this!!) --> this work!!!
@@ -85,12 +85,9 @@ Launch:
 1 roslaunch state_machine startdrone.launch
 2 rosrun state_machine MappingStateMachine.py  --> change the dimension of the exploration area!!!
 3 rosbag record -o test_drone_ /vrpn_client_node/Quadri_MK_4/pose /tf /tf_static /mavros/vision_pose/pose /mavros/state /mavros/setpoint_position/local /mavros/local_position/pose /mavros/local_position/velocity_local /T265/odom/sample /D435/depth/color/points /D435/color/image_raw/compressed /D435/color/camera_info  /octomap_point_cloud_centers /occupied_cells_vis_array /ar_pose_marker /visualization_marker
-
-
+4 Check the Artag Database in /root/database/test_*test number*_*date*_*time*/databse.txt - numero tag, unknown, position (x,y,z), quaternion (x,y,z,w)
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
-
-
 
 **Topic to register**
 no move base:
@@ -98,7 +95,7 @@ no move base:
 rosbag record /tf /tf_static /cmd_vel /joint_states /T265/odom/sample /vrpn_client_node/LeoRover/pose /battery
 
 
-with move base:
+with move base rover:
 
 rosbag record /tf /tf_static /cmd_vel /joint_states /T265/odom/sample /vrpn_client_node/LeoRover/pose /battery /map /amcl_pose /move_base/GlobalPlanner/parameter_descriptions/move_base/GlobalPlanner/parameter_updates /move_base/GlobalPlanner/plan /move_base/GlobalPlanner/potential /move_base/TrajectoryPlannerROS/cost_cloud /move_base/TrajectoryPlannerROS/global_plan /move_base/TrajectoryPlannerROS/local_plan /move_base/TrajectoryPlannerROS/parameter_descriptions /move_base/TrajectoryPlannerROS/parameter_updates /move_base/cancel /move_base/current_goal /move_base/feedback /move_base/global_costmap/costmap /move_base/global_costmap/costmap_updates /move_base/global_costmap/footprint /move_base/global_costmap/inflation_layer/parameter_descriptions /move_base/global_costmap/inflation_layer/parameter_updates /move_base/global_costmap/obstacle_layer/parameter_descriptions /move_base/global_costmap/obstacle_layer/parameter_updates /move_base/global_costmap/parameter_descriptions /move_base/global_costmap/parameter_updates/move_base/global_costmap/static_layer/parameter_descriptions /move_base/global_costmap/static_layer/parameter_updates /move_base/goal /move_base/local_costmap/costmap/move_base/local_costmap/costmap_updates /move_base/local_costmap/footprint /move_base/local_costmap/inflation_layer/parameter_descriptions /move_base/local_costmap/inflation_layer/parameter_updates /move_base/local_costmap/obstacle_layer/parameter_descriptions /move_base/local_costmap/obstacle_layer/parameter_updates /move_base/local_costmap/parameter_descriptions /move_base/local_costmap/parameter_updates /move_base/parameter_descriptions /move_base/parameter_updates /move_base/result /move_base/status /move_base_simple/goal
 
