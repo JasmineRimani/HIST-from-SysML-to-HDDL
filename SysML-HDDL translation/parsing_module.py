@@ -205,6 +205,8 @@ class XML_parsing():
         self.method_input_types_list = []
         # Edges List 
         self.edge_list = []
+        # Feedback edge list
+        self.edge_list_feedback = []
         # List with all the parameters
         self.all_parameters_list = []
         #Action Inputs
@@ -276,7 +278,14 @@ class XML_parsing():
             try:
                 self.edge_list.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":ii['target']}) 
             except:
-                 print('Check your model! Edge id:{} is ill defined! It is probably missing an input or an output')   
+                # if you can't find one of the ends of the edge: save the edge in the edge list and in the feedback log
+                 print('Check your model! Edge id:{} is ill defined! It is probably missing an input or an output') 
+                 if ii.has_attr('source'):
+                     self.edge_list.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":''}) 
+                     self.edge_list_feedback.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":''}) 
+                 if ii.has_attr('target'):
+                     self.edge_list.append({"xmi:id":ii['xmi:id'], "input":' ', "output":['target']}) 
+                     self.edge_list_feedback.append({"xmi:id":ii['xmi:id'], "input":' ', "output":['target']}) 
             
         #Find the dependencies
         for index,ii in enumerate(self.b_packagedElement):
@@ -579,7 +588,7 @@ class XML_parsing():
                                     temporary_output_list.append(gg.get('name'))           
             
             # if the action has no effect or no parameters print a warning!
-            if temporary_output_list == []:
+            if temporary_output_list == [] and ii['xmi:type'] != 'uml:CallBehaviorAction':
                 print('The action {} has no effects - is there something wrong in the model?'.format(ii['name']))
             # if the action has no effect or no parameters print a warning!
             if temporary_parameter_list == []:
@@ -1257,6 +1266,7 @@ class XML_parsing():
         temp_param_list = []
         task_name = ''
         flag_task = 0
+        counter = 0
         parameters = []
         
         # for all the task in data_task (i) extract name and parameters, (ii) create a xmi:id
@@ -1278,22 +1288,31 @@ class XML_parsing():
                             temp_param_list[-1][index] = oo
                         
                     # If you have name and parameters
-                    if task_name != '' and parameters != []:
-                        temp_dictionary = {'name': task_name ,'xmi:id': str(uuid.uuid1()), 'parameters': temp_param_list[-1]}
-                        temp_param_list = []
-                        parameters = []
+                    if task_name != '':
+                        temp_dictionary = {'name': task_name ,'xmi:id': str(uuid.uuid1())}
                         task_name = ''
                     # If you don't have parameters
                     else:
                         flag_task = 2
-                        print('There is an error in the task definition in the HDDL document. Did you gave the task parameters?')
+                        if self.debug == 'on':
+                            print('The task has no name!')
+                    if parameters != []:
+                        temp_dictionary['parameters'] = temp_param_list[-1]
+                        temp_param_list = []
+                        parameters = []
+                    # If you don't have parameters
+                    else:
+                        flag_task = 2
+                        if self.debug == 'on':
+                            print('The task has no parameters!')
+        
         
                     # Let's search in the tasks - can we add one to the task feedback list?
                     if flag_task != 2: 
                         for jj in self.task_list:
                             if temp_dictionary['name'] == jj['name']:
-                                # flag_task = 1 
-                                counter = 0
+                                flag_task = 1 
+                                
                                 for xx in temp_dictionary['parameters']:
                                     for kk in jj['parameters']:
                                         if xx == kk:
@@ -1318,7 +1337,9 @@ class XML_parsing():
         # for all the method in method_actions (i) extract name and parameters,(ii) extract preconditions and ordered subtasks, (iii) create a xmi:id
         temp_param_list = []
         method_name = ''
+        task_name = ''
         flag_method = 0
+        counter = 0
         
         parameters = []
         preconditions = []
@@ -1359,8 +1380,6 @@ class XML_parsing():
                     precondition_str = '({})'.format(precondition_str)
                     preconditions.append(precondition_str)  
                 
-
-                
                 if ':subtasks' in ii:
                     flag_preconditions = 0
                     flag_subtasks = 1
@@ -1375,67 +1394,101 @@ class XML_parsing():
                     if subtask!= '':
                         subtask_name = subtask[0].split()[0].replace('(','')
                         ordered_substasks.append(subtask_name)
-                        
-            if method_name != '' and parameters != [] and ordered_substasks != []:
-                temp_dictionary = {'name': method_name , 'xmi:id': str(uuid.uuid1()), 'task': task_name, 'preconditions': preconditions, 'actions': ordered_substasks, 'parameters': temp_param_list[-1]}
-                temp_param_list = []
-                parameters = []
-                preconditions = []
-                effects = []
+            
+            # Check if the method has a name
+            if method_name != '' :
+                temp_dictionary = {'name': method_name, 'xmi:id': str(uuid.uuid1())}
                 method_name = ''
-                # If you don't have parameters
             else:
                 flag_method = 2
-                print('There is an error in the action definition in the HDDL document. Did you gave the task parameters, preconditions and effects?')
-                print('There is an error in the action definition in the HDDL document. Did you use the action in a method?')
-        
-            # Let's search in the tasks - can we add one to the task feedback list?
+                if self.debug == 'on':
+                    print('The method has no name')
+            # Check if the method is associate to a task
+            if task_name != '' :
+                temp_dictionary['task'] = task_name
+                task_name = ''
+            else:
+                flag_method = 2
+                if self.debug == 'on':
+                    print('The method is not refered to any task')
+            # Check if the method has parameters
+            if parameters != []:
+                temp_dictionary['parameters'] = temp_param_list[-1]
+                temp_param_list = []
+            else:
+                flag_method = 2
+                if self.debug == 'on':
+                    print('The method has no parameters')
+            # Check if the method has preconditions
+            if preconditions != []:
+                temp_dictionary['preconditions'] = [x for x in preconditions]
+                preconditions = []
+            else:
+                flag_method = 2
+                if self.debug == 'on':
+                    print('The method has no parameters')
+            # Check if the method has ordered substaks
+            if ordered_substasks != []:
+                temp_dictionary['actions'] = ordered_substasks[-1]
+                ordered_substasks = []
+            else:
+                flag_method = 2
+                if self.debug == 'on':
+                    print('The method has no ordered substasks')
+            
+            # Let's search in the methods - can we add one to the task feedback list?
             """You should check the subtasks, their order and the main task of the method to see if they are really compatible!"""
             if flag_method != 2: 
                 for jj in self.method_list:
                     # Check the name
                     if temp_dictionary['name'] == jj['name']:
-                        # flag_task = 1 
-                        counter = 0
+                        flag_method = 1
+                    # Check the task name
+                    for kk in self.task_list:
+                        if kk['name'].strip() == temp_dictionary['task'].strip():
+                            flag_method = 1
                         # Check the parameters
                         for xx in temp_dictionary['parameters']:
                             for kk in jj['parameters']:
                                 if xx == kk:
-                                    flag_action = 1
+                                    flag_method = 1
                                     counter = counter + 1
                                 
                             if counter == len(jj['parameters']):
-                                flag_action = 1
+                                flag_method = 1
                                 counter = 0
                             else:
-                                flag_action = 0
+                                flag_method = 0
                         # Check the preconditions
                         for xx in temp_dictionary['preconditions']:
                             for kk in jj['preconditions']:
                                 if xx == kk:
-                                    flag_action = 1
+                                    flag_method = 1
                                     counter = counter + 1
                                 
                             if counter == len(jj['preconditions']):
-                                flag_action = 1
+                                flag_method = 1
                                 counter = 0
                             else:
-                               flag_action = 0
-                                
+                               flag_method = 0
+                        # Check the actions names
+                        # To code
+                              
                         
-                if flag_action == 0:
-                    self.opaqueAction_list_feedback.append(temp_dictionary)
+                if flag_method == 0:
+                    self.method_list_feedback.append(temp_dictionary)
                     flag_action = 0
                 else:
                     if self.debug == 'on':
                         print("ok: {}".format(temp_dictionary))
-                    flag_action = 0
-                    x = 0                  
+                    flag_method = 0
+                 
 
         # for all the actions in data_actions (i) extract name and parameters,(ii) extract preconditions and effects, (iii) create a xmi:id
         temp_param_list = []
         action_name = ''
         flag_action = 0
+        counter = 0
         parameters = []
         preconditions = []
         effects = []

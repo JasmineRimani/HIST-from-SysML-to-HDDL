@@ -2,13 +2,14 @@
 <root>
   <!-- Input for the simulation -->
   <!-- When the software will be completed - this will be command line inputs -->
+  <!-- The Feedback section is still in coding - please don't activate the flag!-->
   <file file_name="xml_sample_5.uml"   
         map_file_name="plan_final_1m_1_int.txt" 
         feedback_file_name="feedback__domain.hddl"
         domain_name="igluna_mission"
         generate_domain_file="yes"
-        generate_problem_file="no"
-        generate_feedback="yes">
+        generate_problem_file="yes"
+        generate_feedback="no">
   </file>
   <!-- Initial Hierarchical Task network -->
   <htn>
