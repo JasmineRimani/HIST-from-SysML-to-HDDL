@@ -9,7 +9,7 @@
         domain_name="igluna_mission"
         generate_domain_file="yes"
         generate_problem_file="yes"
-        generate_feedback="no">
+        generate_feedback="yes">
   </file>
   <!-- Initial Hierarchical Task network -->
   <htn>

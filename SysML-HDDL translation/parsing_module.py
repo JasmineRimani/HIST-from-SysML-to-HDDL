@@ -230,9 +230,15 @@ class XML_parsing():
         self.debug = debug
         # Directory used now:
         self.d_now = d_now
+        # Log file general entries
+        self.log_file_general_entries = []
+
         
     def XML_ActiveParsing(self):
 
+        # Log File init
+        self.log_file_general_entries.append('Log errors and warnings during parsing: \n')
+        self.log_file_general_entries.append('------------------------------------------------- \n')
         # Passing the stored data inside the beautifulsoup parser, 
         # storing the returned object in a variable - that is the main object to unpack
 
@@ -279,13 +285,16 @@ class XML_parsing():
                 self.edge_list.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":ii['target']}) 
             except:
                 # if you can't find one of the ends of the edge: save the edge in the edge list and in the feedback log
-                 print('Check your model! Edge id:{} is ill defined! It is probably missing an input or an output') 
-                 if ii.has_attr('source'):
-                     self.edge_list.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":''}) 
-                     self.edge_list_feedback.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":''}) 
-                 if ii.has_attr('target'):
-                     self.edge_list.append({"xmi:id":ii['xmi:id'], "input":' ', "output":['target']}) 
-                     self.edge_list_feedback.append({"xmi:id":ii['xmi:id'], "input":' ', "output":['target']}) 
+                if self.debug == 'on' :
+                    print('Check your model! Edge id:{} is ill defined! It is probably missing an input or an output'.format(ii['xmi:id']))
+                # Add this to the future Log File
+                self.log_file_general_entries.append('\t\t Check your model! Edge id:{} is ill defined! It is probably missing an input or an output \n'.format(ii['xmi:id']))
+                if ii.has_attr('source'):
+                    self.edge_list.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":''}) 
+                    self.edge_list_feedback.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":''}) 
+                if ii.has_attr('target'):
+                    self.edge_list.append({"xmi:id":ii['xmi:id'], "input":' ', "output":['target']}) 
+                    self.edge_list_feedback.append({"xmi:id":ii['xmi:id'], "input":' ', "output":['target']}) 
             
         #Find the dependencies
         for index,ii in enumerate(self.b_packagedElement):
@@ -309,7 +318,11 @@ class XML_parsing():
                         
 
 
-    def DomainFileElements(self):        
+    def DomainFileElements(self):     
+        # Log File init
+        self.log_file_general_entries.append('------------------------------------------------- \n')
+        self.log_file_general_entries.append('Log errors and warnings during the HDDL Domain file element acquisition: \n')
+        self.log_file_general_entries.append('------------------------------------------------- \n')
         # Check your parsing (comment after use):
         # print('Packages list: \n {}'.format(self.package_list))
         # print('Classes list: \n {}'.format(self.hddl_type_list))
@@ -333,33 +346,35 @@ class XML_parsing():
         for uu in self.b_packagedElement:
             
             # If the packagedElement is a UseCase
-            # Just consider the inputs in the Function Folder (or any folder that is defined by the Requirements)
+            # Just consider the inputs in the DomainDefinition Folder (or any folder that is defined by the Requirements)
+            """STILL TO IMPLEMET - REASONING ON THE TAGS BASED ON THE PACKAGE DIAGRAM"""
+            
             # We are just considering the Domain File entries here! 
-            if uu['xmi:type'] == 'uml:UseCase' and  uu.parent.parent['name'] == 'Functions':
+            if uu['xmi:type'] == 'uml:UseCase' and uu.parent.parent['name'] == 'DomainDefinition':
                 
                 # Look at its children and find...
                 for index,ii in enumerate(uu.children):
                 
                     # Find the methods
-                    try: 
+                    # try: 
                         # Check the sub-UseCases that can be methods: double check on the type(considered as attribute) and the tag name
-                        if ii['xmi:type'] == 'uml:UseCase' and ii.name == 'ownedUseCase':
+                        if not isinstance(ii, str) and ii.has_attr('xmi:type') and ii['xmi:type'] == 'uml:UseCase' and ii.name == 'ownedUseCase':
                             
                             self.method_list.append({"name": ii['name'], "xmi:id":ii['xmi:id'], "task":uu.get('xmi:id')})  
                             
                             # Look at the children of the method to recognize parameters and opaque actions
                             for jj in ii.descendants:
                                 
-                                try:
                 
                                     # Start already dividing predicates(sentences) from the parameters
-                                    if jj['xmi:type'] == 'uml:ActivityParameterNode':
+                                    if not isinstance(jj, str) and jj.has_attr('xmi:type') and jj['xmi:type'] == 'uml:ActivityParameterNode':
                                         
                                         # Create a temporary dictionary with the paramters characteristics
                                         if jj.has_attr('type'):
                                             temp_dict = {"name": jj['name'], "xmi:id":jj['xmi:id'], "type":jj['type'], "method": ii['xmi:id'], "task":uu.get('xmi:id')} 
                                         
                                         else:
+                                            # if we don't have a type - we can give a type name based on the amount of words 
                                             temp_dict = {"name": jj['name'], "xmi:id":jj['xmi:id'], "type":" ", "type_name": " ","method": ii['xmi:id'], "task":uu.get('xmi:id')} 
                                         
                                         # Assign to each ActivityParameter a Type
@@ -368,18 +383,20 @@ class XML_parsing():
                                                 temp_dict["type_name"] = kk["name"]    
                                                 
                                         # Check if the attribute has a type! - if it doesn't just assign the name as type!
-                                        if temp_dict['type_name'] == " " and len(temp_dict["name"].split()) <= 1:
+                                        if 'type_name' in temp_dict and temp_dict['type_name'] == " " and len(temp_dict["name"].split()) <= 1:
                                             temp_dict["type_name"] = jj['name']
                                             id_uuid = str(uuid.uuid1())
                                             self.hddl_type_list.append({"name": jj['name'], "xmi:id": id_uuid})
                                             self.hddl_type_feedback.append({"name": jj['name'], "xmi:id": id_uuid})
                                             if self.debug == 'on':                                            
-                                                print('No predefined type for {} \n Add it on Papyrus!'.format(temp_dict.get('name')))
-                                            
-                                        if temp_dict['type_name'] == " " and len(temp_dict["name"].split()) > 1:
+                                                print('No predefined type for {}. Add it on Papyrus!'.format(temp_dict.get('name')))
+                                            self.log_file_general_entries('\t\t No predefined type for {}. Add it on Papyrus! \n'.format(temp_dict.get('name')))
+                                        
+                                        if 'type_name' in temp_dict and temp_dict['type_name'] == " " and len(temp_dict["name"].split()) > 1:
                                             temp_dict["type_name"] = 'predicate'
                                             if self.debug == 'on': 
-                                                print('No predefined type for {} \n Add it on Papyrus!'.format(temp_dict.get('name')))                                        
+                                                print('No predefined type for {}. Add it on Papyrus!'.format(temp_dict.get('name'))) 
+                                            self.log_file_general_entries.append('\t\t No predefined type for {}. Add it on Papyrus! \n'.format(temp_dict.get('name')))
                                         
                                         # Check if the attribute has an incoming edge - output
                                         if jj.has_attr('incoming'):
@@ -419,31 +436,21 @@ class XML_parsing():
                                                 self.method_input_types_list.append(temp_dict)
                                                 method_input_types_list_names.append(temp_dict["name"]+'-'+temp_dict["type_name"])
                                             
-
-                                except:
-                                    if jj != '\n' and jj.name != 'body' and not(isinstance(jj, str)):
-                                        traceback.print_exc()                             
-                                
-                                
-                                try:
-                                    
-                                    
-                                    # Initialize the ordered tasks in the Method
-                                    self.method_list[-1]['ordered_tasks'] = []
-                                    
                                     # Find the atomic actions and Find the tasks in the main task
-                                    if jj['xmi:type'] == 'uml:OpaqueAction' or jj['xmi:type'] == 'uml:CallBehaviorAction' :
+                                    if not isinstance(jj, str) and jj.has_attr('xmi:type') and (jj['xmi:type'] == 'uml:OpaqueAction' or jj['xmi:type'] == 'uml:CallBehaviorAction') :
+                                        # Initialize the ordered tasks in the Method
+                                        self.method_list[-1]['ordered_tasks'] = []
                                         # An Opaque action should always have an input and an output! 
                                         self.opaqueAction_list.append({"name": jj['name'], "xmi:type": jj['xmi:type'], "xmi:id":jj['xmi:id'], "incoming_link": jj['incoming'],  "outcoming_link": jj['outgoing'], "method": ii['xmi:id'], "task":uu.get('xmi:id')})  
                                         for kk in jj.children:
                                             # Each Opaque Action has input and outputs defined by xmi:type="uml:InputPin" or xmi:type="uml:OutputPin"
-                                            try:
+                                            # try:
                                                 # If it is an input save it into an input data structure associated to the Action name and ID
-                                                if kk['xmi:type'] == 'uml:InputPin':
+                                                if not isinstance(kk, str) and kk.has_attr('xmi:type') and kk['xmi:type'] == 'uml:InputPin':
                                                     self.opaqueAction_input_list.append({"xmi:id":kk['xmi:id'], "action": jj['xmi:id'], "incoming_edge": kk['incoming'], "method": ii['xmi:id'], "task":uu.get('xmi:id')})  
                                                 
                                                 # If it is an output save it into an output  data structure associated to the Action name and ID
-                                                if kk['xmi:type'] == 'uml:OutputPin':
+                                                if not isinstance(kk, str) and kk.has_attr('xmi:type') and kk['xmi:type'] == 'uml:OutputPin':
                                                     self.opaqueAction_output_list.append({ "xmi:id":kk['xmi:id'], "action": jj['xmi:id'], "outgoing_edge": kk['outgoing'], "method": ii['xmi:id'], "task":uu.get('xmi:id')}) 
                                                     
                                                     # Check if the outcoming edge has a name or not - Names are used to define the orders of the output
@@ -453,17 +460,18 @@ class XML_parsing():
                                                         self.opaqueAction_output_list[-1]["number"] = ''.join((filter(str.isdigit, self.opaqueAction_output_list[-1].get('name')))) 
                                                 
                                             
-                                            except:
-                                                if kk != '\n':
-                                                    traceback.print_exc() 
+                                            # except:
+                                            #     if kk != '\n':
+                                            #         traceback.print_exc() 
                                     
                                         # self.method_Actions.append(jj['xmi:id'])
                                         self.method_Actions.append({"name": jj['name'], "xmi:type": jj['xmi:type'], "xmi:id":jj['xmi:id'], "incoming_link": jj['incoming'],  "outcoming_link": jj['outgoing']})
 
                                     
-                                except:
-                                    if jj != '\n' and jj.name != 'body' and not(isinstance(jj, str)):
-                                        traceback.print_exc() 
+                                # except:
+                                #     if jj != '\n' and jj.name != 'body' and not(isinstance(jj, str)):
+                                #         traceback.print_exc() 
+                                #         self.log_file_general_entries('\t\t Error in UseCase {}, something off in the activity diagram action definition \n'.format(ii['xmi:type']))
                                 
      
                             self.method_list[-1]['parameters'] = set(method_input_types_list_names)
@@ -532,9 +540,9 @@ class XML_parsing():
                             self.method_list[-1]['ordered_tasks'] = [x['xmi:id'] for x in self.method_Actions]
                             self.method_Actions.clear()
                                 
-                    except:
-                        if ii != '\n' and ii.name != 'body' and not(isinstance(ii, str)):
-                            traceback.print_exc() 
+                    # except:
+                    #     if ii != '\n' and ii.name != 'body' and not(isinstance(ii, str)):
+                    #         self.log_file_general_entries.append('\t\t Error in UseCase {}, something off in the UseCase definition \n'.format(ii['name']))
             
         # For each method go back to the opaque action and associate the inputs/outputs and the parameters as well as the types
         temporary_input_list = []
@@ -589,10 +597,14 @@ class XML_parsing():
             
             # if the action has no effect or no parameters print a warning!
             if temporary_output_list == [] and ii['xmi:type'] != 'uml:CallBehaviorAction':
-                print('The action {} has no effects - is there something wrong in the model?'.format(ii['name']))
+                if self.debug == 'on':
+                    print('The action {} has no effects - is there something wrong in the model?'.format(ii['name']))
+                self.log_file_general_entries.append('\t\t The action {} has no effects - is there something wrong in the model? \n'.format(ii['name']))
             # if the action has no effect or no parameters print a warning!
             if temporary_parameter_list == []:
-                print('The action {} has no parameters - is there something wrong in the model?'.format(ii['name']))
+                if self.debug == 'on':
+                    print('The action {} has no parameters - is there something wrong in the model?'.format(ii['name']))
+                self.log_file_general_entries('\t\t The action {} has no parameters - is there something wrong in the model? \n'.format(ii['name']))
             # Associate inputs and outputs to the action 
             ii["preconditions"] = [x for x in temporary_input_list]
             ii["effects"] = [x for x in temporary_output_list]
@@ -631,7 +643,7 @@ class XML_parsing():
         get_param = []
         flag_found = 0
         for ii in self.b_ownedRules:
-            if ii.parent['name'] == 'Functions':
+            if ii.parent['name'] == 'DomainDefinition':
                 # check that the parameters have a known type!
                 dummy_string = ii['name']
                 dummy_vector = re.split(' |-', dummy_string)
@@ -643,9 +655,10 @@ class XML_parsing():
                 if flag_found != 1:
                     self.hddl_type_list.append(dummy_vector[-1])
                     self.hddl_type_feedback.append(dummy_vector[-1])
-                    print('Plese check your constraints in the UseCase - your type extension for {} was not found in the type folder'.format(ii['name']))
-                    print('We added that type - however, please check if that was what you were planning to do!')
-                
+                    if self.debug == 'on':
+                        print('Plese check your constraints in the UseCase - your type extension for {} was not found in the type folder'.format(ii['name']))
+                        print('We added that type - however, please check if that was what you were planning to do!')
+                self.log_file_general_entries.append('\t\t Plese check your constraints in the UseCase - your type extension for {} was not found in the type folder \n'.format(ii['name']))
                 get_param_dict = { "xmi:type":ii['xmi:type'], "xmi:id":ii['xmi:id'], "name":ii['name']}
                 for jj in self.dependencies_list:
                     if jj['output'] == ii['xmi:id']:
@@ -722,7 +735,11 @@ class XML_parsing():
     def get_order(task):
         return task.get('order')
 
-    def ProblemFileElements(self):        
+    def ProblemFileElements(self):    
+        
+        self.log_file_general_entries.append('------------------------------------------------- \n')
+        self.log_file_general_entries.append('Log errors and warnings during the HDDL Problem file element acquisition: \n')
+        self.log_file_general_entries.append('------------------------------------------------- \n')
         
         # The tasks that have to be defined by the designer in the initial task network
         # In that way, they can easily change and try different configuration of tasks
@@ -818,7 +835,8 @@ class XML_parsing():
                         
                         
                     if ii.name == 'packagedElement' and ii['xmi:type'] == "uml:Component":
-                        self.mission_components.append({"xmi:id":ii['xmi:id'], "name": ii['name']})
+                        # the replace should remove spaces from strings! 
+                        self.mission_components.append({"xmi:id":ii['xmi:id'], "name": ii['name'].replace(" ", "")})
                         for jj in ii.children:
                             if jj.name == 'ownedAttribute' and jj['xmi:type'] == "uml:Property":
                                 self.mission_components[-1]['type'] = jj['type']
@@ -833,8 +851,12 @@ class XML_parsing():
                     self.problem_file_object.append('{} - {}'.format(uu['name'], ii['name']))
                 elif 'type' not in uu:
                     self.problem_file_object.append('{} - {}'.format(uu['name'], uu['name']))
-                    print('{} is missing his type - please define a type for this component!'.format(uu['name']))
-                    print('{} has been appended to the hddl type list!'.format(uu['name']))
+                    if self.debug == 'on':
+                        print('{} is missing his type - please define a type for this component!'.format(uu['name']))
+                        print('{} has been appended to the hddl type list!'.format(uu['name']))
+                    self.log_file_general_entries.append('\t\t {} is missing his type - please define a type for this component! \n'.format(uu['name']))
+                    self.log_file_general_entries.append('\t\t {} has been appended to the hddl type list \n!'.format(uu['name']))
+                    
                     self.hddl_type_list.append({"name": uu['name'], "xmi:id":''})
                     
         
@@ -854,7 +876,9 @@ class XML_parsing():
                     if uu['name'] == dummy_variable:
                         flag_check = 1
                 if flag_check != 1:
-                    print('{} has a wrong type! Please check your types in the map_file!')
+                    if self.debug == 'on':
+                        print('{} has a wrong type! Please check your types in the map_file!'.format(uu['name']))
+                    self.log_file_general_entries.append('\t\t {} has a wrong type! Please check your types in the map_file \n!'.format(uu['name']))
                 else:
                     self.problem_file_object.append('{} - {}'.format(ii.split("-")[0], ii.split("-")[-1].replace('\n','').strip()))
 
@@ -884,12 +908,16 @@ class XML_parsing():
                             if hh in uu:
                                 object_found = 'yes'
                         if object_found == 'no':
-                            print('{} not found in the problem file objects'.format(dummy_list[-1]))
+                            if self.debug == 'on':
+                                print('{} not found in the problem file objects'.format(dummy_list[-1]))
+                            self.log_file_general_entries.append('\t\t {} not found in the problem file objects \n!'.format(dummy_list[-1]))
                             break
                         
                 
             if task_found != 'yes' and object_found != 'yes':
-                print('Please check your initial task network! Something is wrong!')
+                if self.debug == 'on':
+                    print('Please check your initial task network! Something is wrong! \n Or your task or your task parameters are not in the domain definition')
+                self.log_file_general_entries.append('\t\t Please check your initial task network! Something is wrong! \n Or your task or your task parameters are not in the domain definition \n')
                 break
         
         self.ordering_task_network = []
@@ -927,6 +955,10 @@ class XML_parsing():
         
     def Domain_FileWriting (self):
         ###################################################################
+        self.log_file_general_entries.append('------------------------------------------------- \n')
+        self.log_file_general_entries.append('Log errors and warnings during the HDDL Domain file generation: \n')
+        self.log_file_general_entries.append('------------------------------------------------- \n')
+
         # Open/Create the File
         file = open(self.d_now + '//outputs//' + self.domain_name,'w')
         # Start writing on the file
@@ -1048,6 +1080,10 @@ class XML_parsing():
         file.write(')')
     
     def Problem_FileWriting (self):
+        self.log_file_general_entries.append('------------------------------------------------- \n')
+        self.log_file_general_entries.append('Log errors and warnings during the HDDL Problem file generation: \n')
+        self.log_file_general_entries.append('------------------------------------------------- \n')
+        
         file = open(self.d_now + '//outputs//' + self.problem_name,'w')
         file.write('(define ')
         file.write(' (domain {}) \n'.format(self.domain_name))
@@ -1084,7 +1120,9 @@ class XML_parsing():
         
         
     def Feedback_file(self): 
-        
+        self.log_file_general_entries.append('------------------------------------------------- \n')
+        self.log_file_general_entries.append('Log errors and warnings during the Feedback generation: \n')
+        self.log_file_general_entries.append('------------------------------------------------- \n')
         # This class is already written as if it was to be used alone - however, the other things no!
         # Sooooo, I still need to finish the coding. 
         # At the end everything should be able to be used in tandem or alone :)
@@ -1296,6 +1334,7 @@ class XML_parsing():
                         flag_task = 2
                         if self.debug == 'on':
                             print('The task has no name!')
+                        self.log_file_general_entries.append('\t\t {} is defined as task, however it has no name \n'.format(uu))
                     if parameters != []:
                         temp_dictionary['parameters'] = temp_param_list[-1]
                         temp_param_list = []
@@ -1305,6 +1344,7 @@ class XML_parsing():
                         flag_task = 2
                         if self.debug == 'on':
                             print('The task has no parameters!')
+                        self.log_file_general_entries.append('\t\t {} is defined as task, however it has no parameters \n'.format(uu))
         
         
                     # Let's search in the tasks - can we add one to the task feedback list?
@@ -1376,8 +1416,8 @@ class XML_parsing():
                 
                 if flag_preconditions == 1 and ':precondition' not in ii and ':subtasks' not in ii and ii != ')':
                     # Just remove all the paranteses and make a new string
-                    precondition_str = ii.replace(')','').replace('(','')
-                    precondition_str = '({})'.format(precondition_str)
+                    precondition_str = ii.strip()
+                    precondition_str = '{}'.format(precondition_str)
                     preconditions.append(precondition_str)  
                 
                 if ':subtasks' in ii:
@@ -1403,6 +1443,7 @@ class XML_parsing():
                 flag_method = 2
                 if self.debug == 'on':
                     print('The method has no name')
+                self.log_file_general_entries.append('\t\t {} is defined as method, however it has no name \n'.format(uu))
             # Check if the method is associate to a task
             if task_name != '' :
                 temp_dictionary['task'] = task_name
@@ -1411,6 +1452,7 @@ class XML_parsing():
                 flag_method = 2
                 if self.debug == 'on':
                     print('The method is not refered to any task')
+                self.log_file_general_entries.append('\t\t {} is defined as method, however it has no name \n'.format(uu))
             # Check if the method has parameters
             if parameters != []:
                 temp_dictionary['parameters'] = temp_param_list[-1]
@@ -1419,6 +1461,7 @@ class XML_parsing():
                 flag_method = 2
                 if self.debug == 'on':
                     print('The method has no parameters')
+                self.log_file_general_entries.append('\t\t {} is defined as method, however it has no parameters \n'.format(uu))
             # Check if the method has preconditions
             if preconditions != []:
                 temp_dictionary['preconditions'] = [x for x in preconditions]
@@ -1426,58 +1469,77 @@ class XML_parsing():
             else:
                 flag_method = 2
                 if self.debug == 'on':
-                    print('The method has no parameters')
+                    print('The method has no preconditions')
+                self.log_file_general_entries.append('\t\t {} is defined as method, however it has no preconditions \n'.format(uu))
             # Check if the method has ordered substaks
             if ordered_substasks != []:
-                temp_dictionary['actions'] = ordered_substasks[-1]
+                temp_dictionary['actions'] = [x for x in ordered_substasks]
                 ordered_substasks = []
             else:
-                flag_method = 2
+                # It is possible that a method has no ordered subtasks
+                # flag_method = 2
+                temp_dictionary['actions'] = []
                 if self.debug == 'on':
-                    print('The method has no ordered substasks')
+                    print('The method has no ordered substasks: is this correct?')
             
             # Let's search in the methods - can we add one to the task feedback list?
-            """You should check the subtasks, their order and the main task of the method to see if they are really compatible!"""
             if flag_method != 2: 
                 for jj in self.method_list:
                     # Check the name
                     if temp_dictionary['name'] == jj['name']:
                         flag_method = 1
-                    # Check the task name
-                    for kk in self.task_list:
-                        if kk['name'].strip() == temp_dictionary['task'].strip():
-                            flag_method = 1
-                        # Check the parameters
-                        for xx in temp_dictionary['parameters']:
-                            for kk in jj['parameters']:
-                                if xx == kk:
-                                    flag_method = 1
-                                    counter = counter + 1
-                                
-                            if counter == len(jj['parameters']):
+                        # Check the task name
+                        for kk in self.task_list:
+                            if kk['name'].strip() == temp_dictionary['task'].strip():
                                 flag_method = 1
-                                counter = 0
-                            else:
-                                flag_method = 0
-                        # Check the preconditions
-                        for xx in temp_dictionary['preconditions']:
-                            for kk in jj['preconditions']:
-                                if xx == kk:
+                            # Check the parameters
+                            for xx in temp_dictionary['parameters']:
+                                for kk in jj['parameters']:
+                                    if xx == kk:
+                                        flag_method = 1
+                                        counter = counter + 1
+                                    
+                                if counter == len(jj['parameters']):
                                     flag_method = 1
-                                    counter = counter + 1
-                                
-                            if counter == len(jj['preconditions']):
-                                flag_method = 1
-                                counter = 0
-                            else:
-                               flag_method = 0
-                        # Check the actions names
-                        # To code
+                                    counter = 0
+                                else:
+                                    flag_method = 0
+                            # Check the preconditions
+                            for xx in temp_dictionary['preconditions']:
+                                for kk in jj['preconditions']:
+                                    if xx == kk:
+                                        flag_method = 1
+                                        counter = counter + 1
+                                    
+                                if counter == len(jj['preconditions']):
+                                    flag_method = 1
+                                    counter = 0
+                                else:
+                                   flag_method = 0
+                            # Check the actions names
+                            name_task = []
+                            # Check the names in order of the actions in the method
+                            for kk in jj['ordered_tasks']:
+                                for uu in self.opaqueAction_list:
+                                    if kk == uu['xmi:id']:
+                                        name_task.append(uu['name'])                        
+                            
+                            for xx in temp_dictionary['actions']:
+                                # Check if the order and the names are the same
+                                for oo in name_task:
+                                    if xx == oo:
+                                        flag_method = 1
+                                        counter = counter + 1
+                                if counter == len(jj['ordered_tasks']):
+                                    flag_method = 1
+                                    counter = 0
+                                else:
+                                   flag_method = 0
                               
                         
                 if flag_method == 0:
                     self.method_list_feedback.append(temp_dictionary)
-                    flag_action = 0
+                    flag_method = 0
                 else:
                     if self.debug == 'on':
                         print("ok: {}".format(temp_dictionary))
@@ -1516,7 +1578,7 @@ class XML_parsing():
                 
                 if flag_preconditions == 1 and ':precondition' not in ii and ':effect' not in ii and ii != ')':
                     # Just remove all the paranteses and make a new string
-                    precondition_str = ii.replace(')','').replace('(','')
+                    precondition_str = ii.strip()
                     precondition_str = '({})'.format(precondition_str)
                     preconditions.append(precondition_str)  
                 
@@ -1531,18 +1593,42 @@ class XML_parsing():
                     effects.append(effect_str)                     
                         
 
-            if action_name != '' and parameters != [] and effects != []:
-                temp_dictionary = {'name': action_name , 'xmi:type': 'uml:OpaqueAction', 'xmi:id': str(uuid.uuid1()), 'preconditions': preconditions, 'effects': effects, 'parameters': temp_param_list[-1]}
-                temp_param_list = []
-                parameters = []
-                preconditions = []
-                effects = []
+            if action_name != '' :
+                # Add on thing at the time so you know which feedback to print.
+                temp_dictionary = {'name': action_name , 'xmi:type': 'uml:OpaqueAction', 'xmi:id': str(uuid.uuid1())}
+                if parameters != []:
+                    temp_dictionary['parameters'] =  temp_param_list[-1]
+                    temp_param_list = []
+                    parameters = []
+                else: 
+                    flag_action = 2
+                    if self.debug == 'on':
+                        print('The action {} has no parameters: is it an error?'.format(action_name))
+                    self.log_file_general_entries.append('\t\t The action {} has no parameters: is it an error? \n'.format(action_name))
+                if preconditions != []:
+                    temp_dictionary['preconditions'] =  [x for x in preconditions]
+                    preconditions = []
+                else: 
+                    flag_action = 2
+                    if self.debug == 'on':
+                        print('The action {} has no preconditions: is it an error?'.format(action_name))
+                    self.log_file_general_entries.append('\t\t The action {} has no preconditions: is it an error? \n'.format(action_name))
+                if effects != []:
+                    temp_dictionary['effects']  = [x for x in effects]
+                    effects = []
+                else: 
+                    flag_action = 2
+                    if self.debug == 'on':
+                        print('The action {} has no effects: is it an error?'.format(action_name))                 
+                    self.log_file_general_entries.append('\t\t The action {} has no effects: is it an error? \n'.format(action_name))
                 action_name = ''
-                # If you don't have parameters
             else:
                 flag_action = 2
-                print('There is an error in the action definition in the HDDL document. Did you gave the task parameters, preconditions and effects?')
-                print('There is an error in the action definition in the HDDL document. Did you use the action in a method?')
+                if self.debug == 'on':
+                    print('The action has no name, is it an error?')
+                self.log_file_general_entries.append('\t\t {} is defined as an action, however it has no name \n'.format(uu))
+                # maybe print a log file anyway
+
         
             # Let's search in the tasks - can we add one to the task feedback list?
             if flag_action != 2: 
@@ -1590,39 +1676,49 @@ class XML_parsing():
                                 flag_task = 0
                                 
                         
-                if flag_action == 0:
-                    self.opaqueAction_list_feedback.append(temp_dictionary)
-                    flag_action = 0
-                else:
-                    if self.debug == 'on':
-                        print("ok: {}".format(temp_dictionary))
-                    flag_action = 0
-                    x = 0                
+            if flag_action == 0:
+                self.opaqueAction_list_feedback.append(temp_dictionary)
+                flag_action = 0
+            else:
+                if self.debug == 'on':
+                    print("ok: {}".format(temp_dictionary))
+                flag_action = 0
+                x = 0                
                 
     def Feedback_Log_FileWriting (self):
         file = open(self.d_now + '//outputs//' + datetime.now().strftime("%Y_%m_%d-%I_%M_%S")+ 'Feedback.txt','w')
-        file.write('Feedback Log File \n')
-        file.write('This file record the discrepancy between the Papyrus model and the feedback HDDL Domain File \n')
+        file.write('Feedback Log File \n')        
+        file.write('This file record all the discrepancy of the Papyrus model and/or the feedback from HDDL Domain File \n')
+        file.write('------------------------------------------------- ')
+        file.write('The following information shows discrepancies between the expected input and the real one \n')
+        for ii in self.log_file_general_entries:
+            file.write(ii)
+        file.write('------------------------------------------------- ')
         file.write('The following information is missing in the Papyrus module \n')
-
         # Missing Requirements:
         file.write('\t Missing or Modified Requirements: \n')
-        file.write('\t\t {} \n'.format(self.hddl_requirement_feedback))        
+        for ii in self.hddl_requirement_feedback:
+            file.write('\t\t {} \n'.format(ii))        
         # Missing Types:
         file.write('\t Missing or Modified Types: \n')
-        file.write('\t\t {} \n'.format(self.hddl_type_feedback))
+        for ii in self.hddl_type_feedback:
+            file.write('\t\t {} \n'.format(ii))
         # Missing Predicates:
         file.write('\t Missing or Modified Predicates: \n')
-        file.write('\t\t {} \n'.format(self.predicate_list_feedback))
+        for ii in self.predicate_list_feedback:
+            file.write('\t\t {} \n'.format(ii))
         # Missing Tasks:
         file.write('\t Missing or Modified Tasks: \n')
-        file.write('\t\t {} \n'.format(self.task_list_feedback))
+        for ii in self.task_list_feedback:
+            file.write('\t\t {} \n'.format(ii))
         # Missing Methods:
         file.write('\t Missing or Modified Methods: \n')
-        file.write('\t\t {} \n'.format(self.method_list_feedback))
+        for ii in self.method_list_feedback:
+            file.write('\t\t {} \n'.format(ii))
         # Missing Methods:
         file.write('\t Missing or Modified Actions: \n')
-        file.write('\t\t {} \n'.format(self.opaqueAction_list_feedback))
+        for ii in self.opaqueAction_list_feedback:
+            file.write('\t\t {} \n'.format(ii))
         
                      
             
@@ -1736,7 +1832,7 @@ def main():
         # Get the Feedback information from the modified domain file
         file_final.Feedback_file()
         # Create the log with the different info
-        # file_final.Feedback_Log_FileWriting()
+        file_final.Feedback_Log_FileWriting()
 
 
 

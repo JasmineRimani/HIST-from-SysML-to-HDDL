@@ -6,7 +6,7 @@
   <packagedElement xmi:type="uml:Package" xmi:id="_rfy78C2DEeylqPZKkKN_nQ" name="Requirements">
     <packagedElement xmi:type="uml:Dependency" xmi:id="_O9WgUEVXEeykYNpZ1N6_Cw" name="Define" client="_rfy78C2DEeylqPZKkKN_nQ" supplier="_uVrj8C2DEeylqPZKkKN_nQ"/>
   </packagedElement>
-  <packagedElement xmi:type="uml:Package" xmi:id="_uVrj8C2DEeylqPZKkKN_nQ" name="Functions">
+  <packagedElement xmi:type="uml:Package" xmi:id="_uVrj8C2DEeylqPZKkKN_nQ" name="DomainDefinition">
     <ownedComment xmi:type="uml:Comment" xmi:id="_MCeHgC2FEeylqPZKkKN_nQ">
       <body>The drone is a generalization of the Rover. It can do all what the rover can do plus some drone specific use cases.&#xD;
 </body>
@@ -743,9 +743,17 @@
               <guard xmi:type="uml:LiteralBoolean" xmi:id="_4mR68C_9Eey2uITxAxcuZA" value="true"/>
               <weight xmi:type="uml:LiteralInteger" xmi:id="_4mR68S_9Eey2uITxAxcuZA" value="1"/>
             </edge>
+            <edge xmi:type="uml:ObjectFlow" xmi:id="_BiLe8C_-Eey2uITxAxcuZA" target="_7DMCQC_9Eey2uITxAxcuZA">
+              <guard xmi:type="uml:LiteralBoolean" xmi:id="_Bi8T8C_-Eey2uITxAxcuZA" value="true"/>
+              <weight xmi:type="uml:LiteralInteger" xmi:id="_Bi8T8S_-Eey2uITxAxcuZA" value="1"/>
+            </edge>
             <edge xmi:type="uml:ObjectFlow" xmi:id="_Fq3PwFvpEeygashhOevo2A" target="_7DMCQC_9Eey2uITxAxcuZA" source="_FrAZsFvpEeygashhOevo2A">
               <guard xmi:type="uml:LiteralBoolean" xmi:id="_Fr5KgFvpEeygashhOevo2A" value="true"/>
               <weight xmi:type="uml:LiteralInteger" xmi:id="_Fr5KgVvpEeygashhOevo2A" value="1"/>
+            </edge>
+            <edge xmi:type="uml:ObjectFlow" xmi:id="_17TdMFzFEeyeet7I3CDbZA" target="_17d1QFzFEeyeet7I3CDbZA" source="_rc1DUC_7Eey2uITxAxcuZA">
+              <guard xmi:type="uml:LiteralBoolean" xmi:id="_18RGgFzFEeyeet7I3CDbZA" value="true"/>
+              <weight xmi:type="uml:LiteralInteger" xmi:id="_18RGgVzFEeyeet7I3CDbZA" value="1"/>
             </edge>
             <node xmi:type="uml:ActivityParameterNode" xmi:id="_dIGLsC_2Eey2uITxAxcuZA" name="(equipped_for_imaging ?system)" outgoing="_d_E6MC_6Eey2uITxAxcuZA _LphpwC_7Eey2uITxAxcuZA" type="_94GG8C2ZEeylqPZKkKN_nQ">
               <upperBound xmi:type="uml:LiteralInteger" xmi:id="_dIHZ0C_2Eey2uITxAxcuZA" value="1"/>
@@ -819,6 +827,9 @@
               <inputValue xmi:type="uml:InputPin" xmi:id="_oxdwoC_4Eey2uITxAxcuZA" incoming="_utNWUC_4Eey2uITxAxcuZA">
                 <upperBound xmi:type="uml:LiteralInteger" xmi:id="_oxeXsC_4Eey2uITxAxcuZA" value="1"/>
               </inputValue>
+              <inputValue xmi:type="uml:InputPin" xmi:id="_17d1QFzFEeyeet7I3CDbZA" incoming="_17TdMFzFEeyeet7I3CDbZA">
+                <upperBound xmi:type="uml:LiteralInteger" xmi:id="_17j74FzFEeyeet7I3CDbZA" value="1"/>
+              </inputValue>
               <outputValue xmi:type="uml:OutputPin" xmi:id="_FrAZsFvpEeygashhOevo2A" visibility="protected" outgoing="_Fq3PwFvpEeygashhOevo2A">
                 <upperBound xmi:type="uml:LiteralInteger" xmi:id="_FrF5QFvpEeygashhOevo2A" value="1"/>
               </outputValue>
@@ -876,7 +887,7 @@
             <node xmi:type="uml:ActivityParameterNode" xmi:id="_U7N3kC_7Eey2uITxAxcuZA" name="(get_arTag ?system ?objective)" incoming="_cKvZUC_7Eey2uITxAxcuZA" type="_94GG8C2ZEeylqPZKkKN_nQ">
               <upperBound xmi:type="uml:LiteralInteger" xmi:id="_U7PswC_7Eey2uITxAxcuZA" value="1"/>
             </node>
-            <node xmi:type="uml:ActivityParameterNode" xmi:id="_rc1DUC_7Eey2uITxAxcuZA" name="(available ?system)" outgoing="_bpW4oC_9Eey2uITxAxcuZA _dQM6oC_9Eey2uITxAxcuZA" type="_94GG8C2ZEeylqPZKkKN_nQ">
+            <node xmi:type="uml:ActivityParameterNode" xmi:id="_rc1DUC_7Eey2uITxAxcuZA" name="(available ?system)" outgoing="_bpW4oC_9Eey2uITxAxcuZA _dQM6oC_9Eey2uITxAxcuZA _17TdMFzFEeyeet7I3CDbZA" type="_94GG8C2ZEeylqPZKkKN_nQ">
               <upperBound xmi:type="uml:LiteralInteger" xmi:id="_rc24gC_7Eey2uITxAxcuZA" value="1"/>
             </node>
             <node xmi:type="uml:ActivityParameterNode" xmi:id="_GcOB8C_8Eey2uITxAxcuZA" name="(not (available ?system))" incoming="_Tlb68C_8Eey2uITxAxcuZA _09--kC_9Eey2uITxAxcuZA" type="_94GG8C2ZEeylqPZKkKN_nQ">

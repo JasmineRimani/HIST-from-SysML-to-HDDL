@@ -1,4 +1,4 @@
-(define (domain 2021_12_08-11_17_07_PMigluna_mission__domain.hddl) 
+(define (domain 2021_12_14-03_41_44_igluna_mission__domain.hddl) 
 	 (:requirements :typing :hierachie) 
 	 (:types 
 		 predicate - object 
@@ -26,8 +26,6 @@
 		 (communicated_image_data ?arg0 - objective) 
 		 (communicated_arTag_data ?arg0 - objective) 
 		 (is_dependent ?arg0 - system ?arg1 - system) 
-(is_independent ?arg0 - system ?arg1 - system)
-(going_back ?arg0 - system ?arg1 - waypoint)
 	) 
 
 	 (:task NavigateToGoal 
@@ -60,32 +58,9 @@
 		 :effect ()
 	 ) 
 
-	 (:task Dummy_Task  
-		 :parameters (?dummy_system-system ?dummy_waypoint-waypoint) 
-		 :precondition ()
-		 :effect ()
-	 ) 
-
-	 (:method Dummy_Task_method1 
-		 :parameters (?dummy_system-system ?dummy_waypoint-waypoint ?second_dummy_waypoint-waypoint) 
-		 :task (Dummy_Task ?dummy_system ?dummy_waypoint ) 
-		 :precondition (and 
-			(at ?dummy_system ?dummy_waypoint) 
-			(can_traverse ?dummy_system ?dummy_waypoint ?second_dummy_waypoint) 
-		) 
-		 :subtasks (and 
-			task0(Dummy_action_1 ?dummy_system ?dummy_waypoint)
-			task1(Dummy_action_2 ?dummy_system ?dummy_waypoint ?second_dummy_waypoint)
-
-		 ) 
-		 :ordering (and 
-			(< task0 task1) 
-
-		 ) 
-	 ) 
 
 	 (:method NavigateToGoal_method1 
-		 :parameters (?from_wp-waypoint ?to_wp-waypoint ?system-system) 
+		 :parameters (?system-system ?to_wp-waypoint ?from_wp-waypoint) 
 		 :task (NavigateToGoal ?system ?to_wp ) 
 		 :precondition (and 
 			(at ?system ?from_wp) 
@@ -103,7 +78,7 @@
 	 ) 
 
 	 (:method NavigateToGoal_method2 
-		 :parameters (?to_wp -waypoint ?system-system) 
+		 :parameters (?system-system ?to_wp -waypoint) 
 		 :task (NavigateToGoal ?system ?to_wp ) 
 		 :precondition (and 
 			(at ?system ?to_wp) 
@@ -112,13 +87,13 @@
 	 ) 
 
 	 (:method NavigateToGoal_method3 
-		 :parameters (?from_wp-waypoint ?to_wp-waypoint ?system-system ?mid_wp-waypoint) 
+		 :parameters (?system-system ?to_wp-waypoint ?from_wp-waypoint ?mid_wp-waypoint) 
 		 :task (NavigateToGoal ?system ?to_wp ) 
 		 :precondition (and 
 			(at ?system ?from_wp) 
+			(can_traverse ?system ?from_wp ?mid_wp) 
 			(not(can_traverse ?system ?from_wp ?to_wp)) 
 			(can_traverse ?system ?mid_wp ?to_wp) 
-			(can_traverse ?system ?from_wp ?mid_wp) 
 		) 
 		 :subtasks (and 
 			task0(Visit_mid ?system ?from_wp)
@@ -154,13 +129,13 @@
 	 ) 
 
 	 (:method TakePicture_method1 
-		 :parameters (?to_wp-waypoint ?system-system ?objective-objective ?camera-camera) 
+		 :parameters (?system-system ?camera-camera ?to_wp-waypoint ?objective-objective) 
 		 :task (TakePicture ?objective ) 
 		 :precondition (and 
+			(on_board ?camera ?system) 
 			(available ?system) 
 			(visible_from ?objective ?waypoint ?system) 
 			(equipped_for_imaging ?system) 
-			(on_board ?camera ?system) 
 		) 
 		 :subtasks (and 
 			task0(NavigateToGoal ?system ?to_wp)
@@ -178,12 +153,12 @@
 	 ) 
 
 	 (:method GoBack_method1 
-		 :parameters (?from_wp-waypoint ?system2-system ?system1-system ?to_wp-waypoint) 
+		 :parameters (?system2-system ?system1-system ?to_wp-waypoint ?from_wp-waypoint) 
 		 :task (GoBack ?system1 ) 
 		 :precondition (and 
-			(at ?system2 ?from_wp) 
-			(is_dependent ?system2 ?system1) 
 			(at ?system ?to_wp) 
+			(is_dependent ?system2 ?system1) 
+			(at ?system2 ?from_wp) 
 		) 
 		 :subtasks (and 
 			 task0(NavigateToGoal ?system2 ?to_wp)
@@ -255,8 +230,7 @@
 		 :effect (and 
 			(get_arTag ?system ?objective) 
 			(not (available ?system)) 
-			(communicated_arTag_data ?objective) 
-			(available ?system)_copy)
+			(available ?system))
 	) 
 
 	(:action CommunicateArTagData 
@@ -293,23 +267,6 @@
 			)
 		 :effect (and 
 			(available ?system2))
-	) 
-
-	(:action Dummy_action_1 
-		 :parameters (?system-system ?from_wp-waypoint) 
-		 :precondition (and 
-			(at ?system ?from_wp))
-		 :effect (and 
-			(visited ?from_wp ?system))
-	) 
-
-	(:action Dummy_action_2
-		 :parameters (?system-system ?from_wp-waypoint ?to_wp-waypoint) 
-		 :precondition (and 
-			(can_traverse ?system ?from_wp ?to_wp))
-		 :effect (and 
-			(not (at ?system ?from_wp)) 
-			(at ?system ?to_wp))
 	) 
 
 )
