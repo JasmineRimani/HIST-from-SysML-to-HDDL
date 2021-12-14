@@ -1,16 +1,29 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Nov  4 16:19:39 2021
+Created on Thu Nov 4 16:19:39 2021
 
 @author: Jasmine Rimani
 """
+# https://beautiful-soup-4.readthedocs.io/en/latest/#
 from bs4 import BeautifulSoup
+# https://docs.python.org/3/library/datetime.html
 from datetime import datetime
+# https://docs.python.org/3/library/re.html
 import re
+# https://docs.python.org/3/library/uuid.html
 import uuid
+# https://docs.python.org/3/library/os.html
+import os
+# https://docs.python.org/3/library/traceback.html
+import traceback
 
 
 """
+---------------------------------------------------------------------------------------------------------------------------------------
+PAPYRUS XML TAGS ANALYSIS
+---------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------
+
 packagedElement = Everything that is packaged by the model
 
 ownedComment = comments in the UML/SysML model
@@ -42,20 +55,13 @@ extend = when a UseCase can be explained by other sub-UseCases it extends the Us
 
 ownedRule = Used to define Constrains - used to create automatically the initial conditions in the problem file.
 
-# List of Tags in the XML file
+---------------------------------------------------------------------------------------------------------------------------------------
+PAPYRUS XML ATTRIBUTES ANALYSIS
+---------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------
+TYPES:
+---------------------------------------------------------------------------------------------------------------------------------------
 
-Maybe_useful_later_Tags = ['upperBound'] 
-
-NotUsed_Tags = ['ownedComment', 'body', 'generalization']
-
-Used_Tags = ['packagedElement', 'ownedEnd', 'ownedUseCase', 'ownedBehavior', 'edge', 'node', 'inputValue', 'outputValue', 'extend']
-
-"""
-
-
-"""
-
-xmi:id = unique identifier for each element of the xml
 
 xmi:type="uml:Package"  -->  uml folder/package - in our translation for the domain file we have:
     - Requirements: e.g.
@@ -122,19 +128,12 @@ xmi:type="uml:Class" --> the types in the HDDL have been classified as classes
 
 
 xmi:type="uml:Constraint" --> constrains to the functions in the Mission package (the one that will define the problem file)
+---------------------------------------------------------------------------------------------------------------------------------------
+OTHER USEFUL ATTRIBUTES:
+---------------------------------------------------------------------------------------------------------------------------------------
 
-# List of Tags in the XML file
+xmi:id = unique identifier for each element of the xml
 
-Maybe_useful_later_Tags = ['upperBound'] 
-
-NotUsed_Tags = ['ownedComment', 'body', 'generalization']
-
-Used_Tags = ['packagedElement', 'ownedEnd', 'ownedUseCase', 'ownedBehavior', 'edge', 'node', 'inputValue', 'outputValue', 'extend']
-
-"""
-
-
-"""
 visibility = if the class if public/private or accessible only by subclasses
 
 name = name of the element as given from the UML/SySML model
@@ -155,13 +154,13 @@ extendedCase = useCase that has been extended
 
 extensionLocation = indicates the extension point
 
-Others = ['visibility', 'name', 'general', 'memberEnd', 'node', 'target', 'source']
-
 """
 
+
+# MAIN PARSING CLASS!
 class XML_parsing():
     
-    def __init__(self, file, map_data, hddl_requirements, domain_name, htn_tasks, feedback_name):
+    def __init__(self, file, map_data, hddl_requirements, domain_name, htn_tasks, feedback_name, d_now = os.getcwd(),  debug = 'on'):
         # File that we need to parse
         self.file = file
         # File with the map data
@@ -169,16 +168,15 @@ class XML_parsing():
         # File hddl domain file requirements
         self.hddl_requirements_list = hddl_requirements
         # Put an adaptable domain file name
-        if domain_name != 'None':
-            self.domain_name = domain_name
-        else:
-           self.domain_name = ' ' 
         # Put an adaptable problem file name
-        self.problem_name = ' '
+        if domain_name != 'None':
+            self.domain_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' + domain_name + '_' +'_domain.hddl' 
+            self.problem_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' + domain_name + '_' +'_problem.hddl'
+        else:
+           self.domain_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' +'_domain.hddl' 
+           self.problem_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' +'_problem.hddl'
         # Initial Task Network
-        self.htn_tasks = htn_tasks
-        # Feedback file name
-        self.feedback_file_name = feedback_name
+        self.htn_tasks = htn_tasks 
         # Requirement list for the specific domain file
         self.requirement_list_domain_file = []
         # Packages list 
@@ -189,8 +187,6 @@ class XML_parsing():
         self.hddl_predicate_list = []
         # Actors list
         self.actor_list = []       
-        # Requirements domain files
-        self.requirements_list = [] # <-- To implement!!
         # HighLevel UseCase list - Tasks
         self.task_list = []
         # UseCase parameter list
@@ -209,6 +205,8 @@ class XML_parsing():
         self.method_input_types_list = []
         # Edges List 
         self.edge_list = []
+        # Feedback edge list
+        self.edge_list_feedback = []
         # List with all the parameters
         self.all_parameters_list = []
         #Action Inputs
@@ -217,47 +215,48 @@ class XML_parsing():
         self.opaqueAction_output_list = []
         # Final list of action without doubles
         self.final_opaque_action_list = []
-        # Domain File Name based on the domain name and date
-        self.name_string = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p") + '_' +'_domain.hddl' 
-        # Problem_file_Name
-        self.name_string_pf = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p") + '_' +'_problem.hddl'
-        # # Only the name inputs
-        # self.method_input_types_list_names = []
-        # # Only the name of predicates
-        # self.method_input_predicate_list_names = []
+        # Feedback file name
+        try:
+            # see if you have a feedback file
+            self.feedback_file_name = feedback_name
+        except NameError:
+            # if not named if as the self.domain_name
+            self.feedback_file_name = self.domain_name
         # Dependencies in the UseCase
         self.dependencies_list = []
         # feedback vector:
         self.hddl_type_feedback = []
+        # debug_on
+        self.debug = debug
+        # Directory used now:
+        self.d_now = d_now
         
     def XML_ActiveParsing(self):
 
-        # Passing the stored data inside
-        # the beautifulsoup parser, storing
-        # the returned object in a variable - that is the main object to unpack
+        # Passing the stored data inside the beautifulsoup parser, 
+        # storing the returned object in a variable - that is the main object to unpack
+
         self.Bs_data = BeautifulSoup(self.file, "xml")
         
-
-         
-        # # # Finding all instances of tag - You get a list with all the instances with that tag
-        # b_node = Bs_data.find_all('node')
-        # If the tags are nested - you get each tag one after the other from the order of the file
         
-        # Find all the packaged elements
-        # You can divide the packaged elements per Folder - so that you don't have to parse useless informations like the ones for the Mission
+        # How to use BeautifulSoup:
+            # Finding all instances of tag - You get a list with all the instances with that tag:
+                # b_node = Bs_data.find_all('node')
+                # If the tags are nested - you get each tag one after the other from the order of the file
+        
+            # Find all the packaged elements
+                # You can divide the packaged elements per Folder - so that you don't have to parse useless information like the ones for the Mission
         
         self.b_packagedElement = self.Bs_data.find_all('packagedElement') 
         
-        # Name of the Domain file
-        self.domain_name = self.b_packagedElement[0].parent['name']
-        self.problem_name = self.domain_name
-        
-        # Isolate the "xmi:type="uml:Package" " --> e.g. b_packagedElement[0]['xmi:type']
+
         for index,ii in enumerate(self.b_packagedElement):
             
+            # Isolate the "xmi:type="uml:Package" " --> e.g. b_packagedElement[0]['xmi:type']
             if ii['xmi:type'] == 'uml:Package':
                 self.package_list.append({"name": ii['name'], "xmi:id":ii['xmi:id']})    
             
+            # Isolate the classes - ':types' in HDDL
             if ii['xmi:type'] == 'uml:Class':
                 self.hddl_type_list.append({"name": ii['name'], "xmi:id":ii['xmi:id']})
                 
@@ -266,11 +265,8 @@ class XML_parsing():
                 self.actor_list.append({"name": ii['name'], "xmi:id":ii['xmi:id']})
             
             # Isolate Usecases that are packegedElements --> You get your tasks name, however you still need your parameters
-            # Parameters --> Take the minumum parameters from the method --> look lower in the 
             if ii['xmi:type'] == 'uml:UseCase':
                 self.task_list.append({"name": ii['name'], "xmi:id":ii['xmi:id'], "parameters": []})   
-
-        
 
         # Find all the constraints tag = ownedRule and xmi:type="uml:Constraint"
         self.b_ownedRules = self.Bs_data.find_all('ownedRule') 
@@ -279,10 +275,19 @@ class XML_parsing():
         self.b_edges = self.Bs_data.find_all('edge')    
         # Map all the edges
         for index,ii in enumerate(self.b_edges):
-            self.edge_list.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":ii['target']}) 
+            try:
+                self.edge_list.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":ii['target']}) 
+            except:
+                # if you can't find one of the ends of the edge: save the edge in the edge list and in the feedback log
+                 print('Check your model! Edge id:{} is ill defined! It is probably missing an input or an output') 
+                 if ii.has_attr('source'):
+                     self.edge_list.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":''}) 
+                     self.edge_list_feedback.append({"xmi:id":ii['xmi:id'], "input":ii['source'], "output":''}) 
+                 if ii.has_attr('target'):
+                     self.edge_list.append({"xmi:id":ii['xmi:id'], "input":' ', "output":['target']}) 
+                     self.edge_list_feedback.append({"xmi:id":ii['xmi:id'], "input":' ', "output":['target']}) 
             
         #Find the dependencies
-        # Find all the edges
         for index,ii in enumerate(self.b_packagedElement):
             if ii['xmi:type'] == 'uml:Dependency':
                 self.dependencies_list.append({"xmi:id":ii['xmi:id'], "input":ii['supplier'], "output":ii['client']})        
@@ -293,9 +298,8 @@ class XML_parsing():
         self.b_nodes = self.Bs_data.find_all('node')
         
         # Domain file instances analysis  
-        
         for ii in self.b_comments:
-            # The requirements for the domain file are included as comment in the UseCase
+            # The requirements for the HDDL domain file are included as comment in the UseCase
             if ii.parent['name'] == 'UseCase':
                 comment_body = ii.body.string
                 for jj in self.hddl_requirements_list:
@@ -313,7 +317,7 @@ class XML_parsing():
         # print('UseCase: \n {}'.format(self.task_list))
         # print('Links between the entities: \n {}'.format(self.edge_list))
 
-        # # Access any instance of the dictionary use case with UseCase_list[n] and any key of the dictionary with get() UseCase_list[1].get('name')
+        # To access any instance of the dictionary use case with UseCase_list[n] and any key of the dictionary with get() UseCase_list[1].get('name')
                 
         """
         For each useCase, we  can access to the sub-tags with: 
@@ -324,7 +328,6 @@ class XML_parsing():
         method_input_types_list_names = []
         self.method_Actions = []
         # The packagedElements are: Packages, Actors, UseCases, Classes
-        
         
         # you can check is the packagedElement has the "Functions" package as parent
         for uu in self.b_packagedElement:
@@ -346,7 +349,6 @@ class XML_parsing():
                             
                             # Look at the children of the method to recognize parameters and opaque actions
                             for jj in ii.descendants:
-                                # print(jj.name)
                                 
                                 try:
                 
@@ -371,23 +373,13 @@ class XML_parsing():
                                             id_uuid = str(uuid.uuid1())
                                             self.hddl_type_list.append({"name": jj['name'], "xmi:id": id_uuid})
                                             self.hddl_type_feedback.append({"name": jj['name'], "xmi:id": id_uuid})
-                                            
-                                            """ 
-                                            TO DO - FEEDBACK TO PAPYRUS
-                                                ADD THE TYPE TO THE TYPE PACKAGE IN THE PAPYRUS MODEL
-                                            """
-                                            
-                                            print('No predefined type for {} \n Add it on Papyrus!'.format(temp_dict.get('name')))
+                                            if self.debug == 'on':                                            
+                                                print('No predefined type for {} \n Add it on Papyrus!'.format(temp_dict.get('name')))
                                             
                                         if temp_dict['type_name'] == " " and len(temp_dict["name"].split()) > 1:
                                             temp_dict["type_name"] = 'predicate'
-                                            
-                                            """ 
-                                            TO DO - FEEDBACK TO PAPYRUS
-                                                ADD THE TYPE TO THE TYPE PACKAGE IN THE PAPYRUS MODEL
-                                            """
-                                            
-                                            print('No predefined type for {} \n Add it on Papyrus!'.format(temp_dict.get('name')))                                        
+                                            if self.debug == 'on': 
+                                                print('No predefined type for {} \n Add it on Papyrus!'.format(temp_dict.get('name')))                                        
                                         
                                         # Check if the attribute has an incoming edge - output
                                         if jj.has_attr('incoming'):
@@ -398,7 +390,6 @@ class XML_parsing():
                                             temp_dict["outgoing"] = jj["outgoing"] 
                                         
                                         # Chek if the attribute is a parameters - if yes save it in the method inputs list
-
                                         if temp_dict["type_name"] != 'predicate' or len(temp_dict["name"].split()) <= 1:
                                             self.method_input_types_list.append(temp_dict)
                                             method_input_types_list_names.append(temp_dict["name"]+'-'+temp_dict["type_name"])
@@ -431,7 +422,7 @@ class XML_parsing():
 
                                 except:
                                     if jj != '\n' and jj.name != 'body' and not(isinstance(jj, str)):
-                                        print('Something Wrong! Check lines before 194')                             
+                                        traceback.print_exc()                             
                                 
                                 
                                 try:
@@ -464,21 +455,15 @@ class XML_parsing():
                                             
                                             except:
                                                 if kk != '\n':
-                                                    print('Something Wrong! Check lines before 228')
+                                                    traceback.print_exc() 
                                     
                                         # self.method_Actions.append(jj['xmi:id'])
                                         self.method_Actions.append({"name": jj['name'], "xmi:type": jj['xmi:type'], "xmi:id":jj['xmi:id'], "incoming_link": jj['incoming'],  "outcoming_link": jj['outgoing']})
 
-                                    # 
-                                    # if jj['xmi:type'] == 'uml:OpaqueAction' :
-                                    #     # An Opaque action should always have an input and an output! 
-                                    #     self.opaqueAction_list.append({"name": jj['name'], "xmi:id":jj['xmi:id'], "incoming_link": jj['incoming'],  "outcoming_link": jj['outgoing'], "method": ii['xmi:id'], "task":uu.get('xmi:id')})                                      
-      
-
                                     
                                 except:
                                     if jj != '\n' and jj.name != 'body' and not(isinstance(jj, str)):
-                                        print('Something Wrong! Check lines before 235')
+                                        traceback.print_exc() 
                                 
      
                             self.method_list[-1]['parameters'] = set(method_input_types_list_names)
@@ -488,7 +473,8 @@ class XML_parsing():
                             method_input_predicate_list_names.clear()
                             # Add the tasks to the method list of ordered tasks 
                             # ordered_actions = []
-                            
+                            # In the next section we study the action order from the method and we save it!
+                            # In this case the actions are defined only by their xmi:id - this id will be related to a real action in the next section
                             if self.method_Actions != []:
                             
                                 functions_with_incoming_edge = [] 
@@ -542,26 +528,13 @@ class XML_parsing():
                                 
                                 # Sort actions based on the ordering 
                                 self.method_Actions.sort(key = XML_parsing.get_order)             
-                                
-                                
-                            # for yy in self.method_Actions:
-                                
-            
-                            #     for bb in self.opaqueAction_list:
-                            #         if yy == bb['xmi:id']:
-                            #             for kk in self.edge_list:
-                            #                 if bb['incoming_link'] == kk['xmi:id']:
-                            #                     if kk['input'] in self.method_Actions:
-                            #                         action_to_pop = self.method_Actions.index(yy)
-                            #                         self.method_Actions.pop(action_to_pop)
-                            #                         action_before = self.method_Actions.index(kk['input'])
-                            #                         self.method_Actions.insert(action_before+1,yy)
+                                                            
                             self.method_list[-1]['ordered_tasks'] = [x['xmi:id'] for x in self.method_Actions]
                             self.method_Actions.clear()
                                 
                     except:
                         if ii != '\n' and ii.name != 'body' and not(isinstance(ii, str)):
-                            print('Something Wrong! Check lines before 547 - check the while loop!!')
+                            traceback.print_exc() 
             
         # For each method go back to the opaque action and associate the inputs/outputs and the parameters as well as the types
         temporary_input_list = []
@@ -614,6 +587,12 @@ class XML_parsing():
                                     # Inputs
                                     temporary_output_list.append(gg.get('name'))           
             
+            # if the action has no effect or no parameters print a warning!
+            if temporary_output_list == [] and ii['xmi:type'] != 'uml:CallBehaviorAction':
+                print('The action {} has no effects - is there something wrong in the model?'.format(ii['name']))
+            # if the action has no effect or no parameters print a warning!
+            if temporary_parameter_list == []:
+                print('The action {} has no parameters - is there something wrong in the model?'.format(ii['name']))
             # Associate inputs and outputs to the action 
             ii["preconditions"] = [x for x in temporary_input_list]
             ii["effects"] = [x for x in temporary_output_list]
@@ -623,7 +602,6 @@ class XML_parsing():
             temporary_output_list.clear()
             temporary_parameter_list.clear()
         
-        # x = 1
         # Check the tasks - if they all have the initial name and the same parameters, inputs and effects then they are one function
         final_opaque_action = []
         # Look at all the Actions
@@ -643,25 +621,13 @@ class XML_parsing():
                 if ii['name'] == jj and ii['xmi:type'] == 'uml:OpaqueAction':
                     self.final_opaque_action_list.append(ii)
 
-        # # Among the methods of the task take the one with the least input paramters - those are the parameter of the task unless the task is used in another task
-        # # then take the parameter of that task as minumum parameters.
-        
-        # task_inputs = []
-        # # Search in all tasks
-        
-        # # For each task search the method
-        
-        # Missing - when a Task is an action of another task - xmi:type="uml:CallBehaviorAction (should be ok - still to test - look at method1 of TakePicture)
-        # Missing - when a Method don't have incoming or outcoming edges (should be ok - still to test - look at method2 of NavigateToGoal)
-        # """START TESTING FROM HERE!!!!!!!!!"""
-        # First Look if the task is in another task with its parameters.
         for ii in self.opaqueAction_list:
             if ii['xmi:type'] == 'uml:CallBehaviorAction':
                 for jj in self.task_list:
                     if jj.get('name') == ii.get('name'): 
                         jj["parameters"] = ii.get('parameters')
        
-        # Check if the user defined some constraints in the 
+        # Check if the user defined some constraints in UseCase diagram to get the task parameters
         get_param = []
         flag_found = 0
         for ii in self.b_ownedRules:
@@ -698,7 +664,7 @@ class XML_parsing():
             ii["parameters"] = [x for x in task_parameters]
             task_parameters.clear()
                 
-
+        # If the tasks have no parameter defined --> Get the minimum parameters out of the methods parameters associated to that task
         for ii in self.task_list:
             for jj in self.method_list:
                 
@@ -712,12 +678,11 @@ class XML_parsing():
                         ii["parameters"] = jj.get('parameters')
                         
         
-        # x = 1 # the random x=1 that you find around are my debug point - just ignore them
         
-        # # Take the overall predicate list and:
-        #     # search for duplicates and associate the type to each predicate
-        #     # write the predicate on the predicate list
-        #     # always check for duplicates
+        # Take the overall predicate list and:
+            # search for duplicates and associate the type to each predicate
+            # write the predicate on the predicate list
+            # always check for duplicates
         
         temporary_predicate = []
         self.predicate_list = []
@@ -752,7 +717,7 @@ class XML_parsing():
                 
             temporary_predicate.clear()
                         
-        # x = 1    
+  
         
     def get_order(task):
         return task.get('order')
@@ -760,6 +725,9 @@ class XML_parsing():
     def ProblemFileElements(self):        
         
         # The tasks that have to be defined by the designer in the initial task network
+        # In that way, they can easily change and try different configuration of tasks
+        # The task order is automatically generated looking at the general mission Activity Diagram!! 
+        # Just create a Activity Diagram "General layout"
         self.mission_tasks = []
         # Initial conditions in the problem file
         self.initial_conditions_pf = []
@@ -779,21 +747,7 @@ class XML_parsing():
                 # Save all your BehaviorActions and their inputs and outputs pins 
                 temp_dict = {"name": uu['name'], "xmi:id":uu['xmi:id'], "behavior":uu['behavior'], "incoming_edge": uu['incoming'], "outgoing_edge": uu['outgoing']} 
                 self.mission_tasks.append(temp_dict)
-                
-                # Analyse input and output to simplify the task inputs
-                # We are not considering those parameters anymore 
-                # for kk in uu.children:
-                #     # We can analyse the input (xmi:type="uml:InputPin") 
-                #     try:
-                        
-                #         if kk['xmi:type'] == 'uml:InputPin':
-                #             self.mission_tasks_input_parameter.append({"xmi:id":kk['xmi:id'], "mission_task": uu['xmi:id'], "incoming_edge": kk['incoming']})  
-                                                                           
-                #     except:
-                #         if kk != '\n' and not(isinstance(kk, str)) and kk.name != 'argument' and kk.name != 'UpperBound'  :
-                #             print('Something Wrong! Check lines before 669')
-                            
-                            
+                    
         # Hierachie of main tasks
         functions_with_incoming_edge = []
         functions_with_outcoming_edge = []
@@ -845,7 +799,6 @@ class XML_parsing():
 
 
         # Get initial conditions as constraints 
-        """CHECK THIS!"""
         for ii in self.b_ownedRules:
             
             if ii.parent.parent['name'] == 'MissionToAccomplish':
@@ -965,17 +918,6 @@ class XML_parsing():
                 self.ordering_task_network.append('(< {} {})'.format(dummy_string_1[0], dummy_string_2[0]))                    
                         
                 
-
-        # x = 1   
-         
-         # I suggest that the initial task network - therefore, what the system should do if given by the designer as input!
-         # Additional inputs can be encoded in the input file as well! 
-         # If not - I can consider that the tasks for the systems are!
-
-        
-        # xmi:id https://stackoverflow.com/questions/58839091/how-to-generate-uuid-in-python-withing-given-range
-        
-        
         # print('Packages:', package_list)
         # print('HDDL Types:', hddl_type_list)
         # print('Use Cases - Task Level:',Task_list)
@@ -986,22 +928,18 @@ class XML_parsing():
     def Domain_FileWriting (self):
         ###################################################################
         # Open/Create the File
-        file = open(self.name_string,'w')
+        file = open(self.d_now + '//outputs//' + self.domain_name,'w')
         # Start writing on the file
         file.write('(define (domain {}) \n'.format(self.domain_name))
-        """
-        Maybe consider the different type or requirement - define on papyrus a way to define the requirements 
-        of the domain file --> maybe as comment to the packages.
-        """
+        # Write requirement
         file.write('\t (:requirements :{}) \n'.format(' :'.join(self.requirement_list_domain_file)))
         #Object Type
         file.write('\t (:types \n')
         for ii in self.hddl_type_list:
-            file.write('\t\t {} - object \n'.format(ii.get('name')))
+            if ii != 'predicate':
+                file.write('\t\t {} - object \n'.format(ii.get('name')))
         # End of object type
         file.write('\t) \n\n')  
-        
-        # x = 0
         
         # Predicates
         file.write('\t (:predicates \n')
@@ -1011,8 +949,7 @@ class XML_parsing():
         # End of predicates
         file.write('\t) \n\n')   
             
-        # #Tasks!
-
+        #Tasks!
         for ii in self.task_list:
             file.write('\t (:task {} \n'.format(ii.get('name')))            
             file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters'))))
@@ -1027,14 +964,33 @@ class XML_parsing():
         order_vector = []
         file.write('\n')  #space!
         for ii in self.method_list:
+            # method name
             file.write('\t (:method {} \n'.format(ii.get('name')))
+            # method parameters
             file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters'))))
+            # method task
+            """
+            STILL TO IMPLEMENT - Check that the task parameters are effectively method parameters.
+                                 If they are not - search for the right parameters in the method
+            """
+            for jj in self.task_list:
+                if jj['xmi:id'] == ii['task']:
+                    task_name = jj['name']
+                    task_parameters = []
+                    for uu in jj['parameters']:
+                        regex_pattern ='\w+.'
+                        parameters = re.findall(regex_pattern, uu)
+                        task_parameters.append(parameters[0].replace('-', ''))
+                                        
+            file.write('\t\t :task ({} ?{}) \n'.format(task_name, ' ?'.join(task_parameters)))
+            # method preconditions
             if ii.get('preconditions') != '':
                 file.write('\t\t :precondition (and \n\t\t\t{} \n\t\t) \n'.format(' \n\t\t\t'.join(ii.get('preconditions'))))
             else:
                 file.write('\t\t :precondition ()\n')
             counter = 0
-                
+            
+            # method actions
             for jj in ii['ordered_tasks']: 
                 for kk in self.opaqueAction_list:
                     if kk['xmi:id'] == jj:
@@ -1092,7 +1048,7 @@ class XML_parsing():
         file.write(')')
     
     def Problem_FileWriting (self):
-        file = open(self.name_string_pf,'w')
+        file = open(self.d_now + '//outputs//' + self.problem_name,'w')
         file.write('(define ')
         file.write(' (domain {}) \n'.format(self.domain_name))
         # Objects
@@ -1126,32 +1082,50 @@ class XML_parsing():
         # end of the file
         file.write(')')        
         
-        # Take the first part of the C++ code
-        
-        # Add the equipments of the system
-        
-        # Create the initial task network
-        
-        # Put the ordering of the tasks
-        
-        # Set the problem initial conditions
         
     def Feedback_file(self): 
         
-        # self.hddl_type_list --> list of types
-        # self.predicate_list --> list of predicates
-        # self.task_list --> list of tasks
-        # self.method_list --> list of methods
-        # self.opaqueAction_list --> list of tasks
-        # self.feedback_file_name --> file from which we start
-        # self.hddl_type_feedback --> start building memory of the things changed while reading the first xml
+        # This class is already written as if it was to be used alone - however, the other things no!
+        # Sooooo, I still need to finish the coding. 
+        # At the end everything should be able to be used in tandem or alone :)
+        # Unfortunately all this file reading takes time
         
-        # Read the lines of the feedback file
-        with open(self.feedback_file_name, 'r') as f:
-            feedback_file_lines = f.readlines()
-            f.seek(0)
-            feedback_file = f.read()
+        # Types --> self.hddl_type_list --> list of types --> Already created while parsing the xml file
+        # However if I need to use this class alone without the xml file
+        try:
+            self.hddl_type_list
+        except NameError:
+            self.hddl_type_list = []        
 
+        # Predicates--> self.predicate_list --> list of predicates --> Already created while parsing the xml file
+        # However if I need to use this class alone without the xml file
+        try:
+            self.predicate_list
+        except NameError:
+            self.predicate_list = []   
+            
+        # Task --> self.task_list --> list of task --> Already created while parsing the xml file
+        # However if I need to use this class alone without the xml file
+        try:
+            self.task_list
+        except NameError:
+            self.task_list = []   
+            
+        # Method --> self.method_list --> list of methods --> Already created while parsing the xml file
+        # However if I need to use this class alone without the xml file   
+        try:
+            self.method_list
+        except NameError:
+            self.method_list = []   
+
+        # Action --> self.opaqueAction_list --> list of action --> Already created while parsing the xml file
+        # However if I need to use this class alone without the xml file 
+        try:
+            self.opaqueAction_list
+        except NameError:
+            self.opaqueAction_list = []   
+        
+        # self.feedback_file_name --> file from which we start <-- you should directly add it here more than have it as a class instance
 
         # Section requirements
         flag_requirements = 0
@@ -1185,7 +1159,12 @@ class XML_parsing():
         # create a feedback lists to get the new requirements, types, predicates, tasks, methods and actions
         # Requirements
         self.hddl_requirement_feedback = []
-        # Types --> self.hddl_type_feedback
+        # Types --> self.hddl_type_feedback --> Already created while parsing the xml file
+        # However if I need to use this class alone without the xml file
+        try:
+            self.hddl_type_feedback
+        except NameError:
+            self.hddl_type_feedback = []
         # Predicates
         self.predicate_list_feedback = []
         # Tasks
@@ -1196,61 +1175,75 @@ class XML_parsing():
         self.opaqueAction_list_feedback =[]
         
         
-        
-        with open(self.feedback_file_name, 'r') as f:
-            for ii in f:
+        # Read the feedback file and start splitting requirements, types, predicates, tasks, methods and actions!
+        with open(self.d_now + '//inputs//' + self.feedback_file_name, 'r') as f:
+            feedback_file_lines = f.readlines()
+            for index,ii in enumerate(feedback_file_lines):
                 line = ii.replace("\n", '').replace("\t",'').strip()
+                if index+1< len(feedback_file_lines):
+                    next_line = feedback_file_lines[index+1].replace("\n", '').replace("\t",'').strip()
+                else :
+                    next_line = ''
                 
                 if ':requirements' in line:
                     data_requirements.append(line)
                 
                 if ':types' in line:
                     flag_types = 1 
-                if flag_types == 1 and line != '':
-                    data_types.append(line)
-                    if line == ')':
+                if flag_types == 1:
+                    # this if is not added to the previous so that we can activate the out condition "if ':predicates' in next_line"
+                    # same for the other "definitions", or "HDDL classes"
+                    if line != '':
+                        data_types.append(line)
+                    if ':predicates' in next_line:
                        flag_types = 0 
                        
                 if ':predicates' in line:
                     flag_predicates = 1 
-                if flag_predicates == 1 and line != '':
-                    data_predicates.append(line)
-                    if line == ')':
+                if flag_predicates == 1:
+                    if line != '':
+                        data_predicates.append(line)
+                    if ':method' in next_line or ':action' in next_line or ':task' in next_line:
                        flag_predicates = 0 
                 
                 if ':task' in line:
                     flag_task = 1 
-                if flag_task == 1 and line != '':
-                    temporary_task_list.append(line)
-                    if line == ')':
+                if flag_task == 1:
+                    if line != '':
+                        temporary_task_list.append(line)
+                    if ':method' in next_line or ':action' in next_line or ':task' in next_line:
                        flag_task = 0  
                        data_tasks.append([x for x in temporary_task_list])
                        temporary_task_list.clear()
                 
                 if ':method' in line:
                     flag_method = 1 
-                if flag_method == 1 and line != '':
-                    temporary_method_list.append(line)
-                    if line == ')':
+                if flag_method == 1:
+                    if line != '':
+                        temporary_method_list.append(line)
+                    if ':method' in next_line or ':action' in next_line:
                        flag_method = 0  
                        data_methods.append([x for x in temporary_method_list])
                        temporary_method_list.clear()        
                        
                 if ':action' in line:
                     flag_action = 1 
-                if flag_action == 1 and line != '':
-                    temporary_action_list.append(line)
-                    if line == ')':
+                if flag_action == 1:
+                    if line != '':
+                        temporary_action_list.append(line)
+                    if ':method' in next_line or ':action' in next_line or ':task' in next_line:
                        flag_action = 0  
                        data_actions.append([x for x in temporary_action_list])
                        temporary_action_list.clear()    
                     
+
+        # For all the "HDDL classes", we will analyse only the different instances in respect to the one from the xml file
+        # In the log file - we will put ony the feedback instances.
+        # The function to write the xml file derived from this analysis need still to be written! I hope to have time soon!
         
-        # x = 0
+        
         flag_type = 0 
-        
-        
-        
+        # Get the types different from the ones in the Papyrus xml file
         for ii in data_types:
             if ii != '(:types' and ii != ')':
                 for jj in self.hddl_type_list:
@@ -1261,7 +1254,7 @@ class XML_parsing():
                 if flag_type != 1:
                     self.hddl_type_feedback.append({'name': ii.split('-')[0].strip(),'xmi:id': str(uuid.uuid1())})
                 
-                        
+        # Get the predicates!                
         for ii in data_predicates:
             
             if ii != '(:predicates' and ii != ')':
@@ -1273,6 +1266,7 @@ class XML_parsing():
         temp_param_list = []
         task_name = ''
         flag_task = 0
+        counter = 0
         parameters = []
         
         # for all the task in data_task (i) extract name and parameters, (ii) create a xmi:id
@@ -1294,22 +1288,31 @@ class XML_parsing():
                             temp_param_list[-1][index] = oo
                         
                     # If you have name and parameters
-                    if task_name != '' and parameters != []:
-                        temp_dictionary = {'name': task_name ,'xmi:id': str(uuid.uuid1()), 'parameters': temp_param_list[-1]}
-                        temp_param_list = []
-                        parameters = []
+                    if task_name != '':
+                        temp_dictionary = {'name': task_name ,'xmi:id': str(uuid.uuid1())}
                         task_name = ''
                     # If you don't have parameters
                     else:
                         flag_task = 2
-                        print('There is an error in the task definition in the HDDL document. Did you gave the task parameters?')
+                        if self.debug == 'on':
+                            print('The task has no name!')
+                    if parameters != []:
+                        temp_dictionary['parameters'] = temp_param_list[-1]
+                        temp_param_list = []
+                        parameters = []
+                    # If you don't have parameters
+                    else:
+                        flag_task = 2
+                        if self.debug == 'on':
+                            print('The task has no parameters!')
+        
         
                     # Let's search in the tasks - can we add one to the task feedback list?
                     if flag_task != 2: 
                         for jj in self.task_list:
                             if temp_dictionary['name'] == jj['name']:
-                                # flag_task = 1 
-                                counter = 0
+                                flag_task = 1 
+                                
                                 for xx in temp_dictionary['parameters']:
                                     for kk in jj['parameters']:
                                         if xx == kk:
@@ -1326,213 +1329,365 @@ class XML_parsing():
                             self.task_list_feedback.append(temp_dictionary)
                             flag_task = 0
                         else:
-                            print("ok: {}".format(temp_dictionary))
+                            if self.debug == 'on':
+                                print("ok: {}".format(temp_dictionary))
                             flag_task = 0
                             x = 0
-            
-                
-                
-                
-                
-    
-                    
-        
-        # Patterns that may work with the tasks
-        # pattern = '\(:\w.+\s\s\s\s :\w'
-        # pattern that may work with the types
-        # pattern = '\(:\w.+\s\s\s\s \w'
-        # This may work as well
-        # pattern = '(\(:\w.+) (.*)'
-        # ['(:requirements :typing :hierachie) ', '(:types ', '(:predicates ', 
-        # '(:task NavigateToGoal ', '(:task EvaluateAvailableResources ', 
-        # '(:task TakePicture ', '(:task GoBack ', '(:task StartMission ', 
-        # '(:task Dummy_Task  ', '(:method Dummy_Task _method1 ', 
-        # '(:method NavigateToGoal_method1 ', '(:method NavigateToGoal_method2 ', 
-        # '(:method NavigateToGoal_method3 ', '(:method EvaluateAvailableResource_method1 ', 
-        # '(:method TakePicture_method1 ', '(:method GoBack_method1 ', 
-        # '(:method StartMission_method1 ', '(:action Dummy_action_1 ', 
-        # '(:action Dummy_action_2', '(:action Visit ', '(:action Navigate ', 
-        # '(:action Unvisit ', '(:action GetDataFromSensors ', '(:action SendSystemState ', 
-        # '(:action ReadArTag ', '(:action CommunicateArTagData ', '(:action TakeImage ', 
-        # '(:action CommunicateImageData ', '(:action MakeAvailable ']
-        
-        # Finds everything thats starts wurg :\w
-        # pattern = '(\(:\w.+)'
-        
-        # In theory you can use regex - however, now I am not in the mood for it
-        # matches = re.findall('(:types[])', feedback_file_lines.read())
-        
-        # pattern_types = '^(:types ...)$'
-        # https://stackoverflow.com/questions/35888841/how-to-read-a-file-and-extract-data-between-multiline-patterns
-        
-        # I love python:
-            # https://www.programiz.com/python-programming/methods/string/startswith
-            # https://www.programiz.com/python-programming/methods/string/endswith
-        
-        # Find the beginning of the section -  Pattern - 
-        # pattern = '(\(:\w.+)\s\s\s '
-        # re.findall(pattern, feedback_file)
 
+        # for all the method in method_actions (i) extract name and parameters,(ii) extract preconditions and ordered subtasks, (iii) create a xmi:id
+        temp_param_list = []
+        method_name = ''
+        task_name = ''
+        flag_method = 0
+        counter = 0
         
-        
-        
-        # for ii in feedback_file_lines:
-        #     # Regex Pattern 
-        #     # pattern = '(\(:\w.+)\s\s\s '
-            
-        #     # Find the pattern: re.findall(pattern, feedback_file)
-        #     # dummy_string = re.findall(pattern, ii)
-        #     # if the dummy string is not activated - then it's a normal line - treat it like that inside the case
-        #     # You have to do some reconfiguration things
-            
-        #     # clean the string
-        #     dummy_string = ii.replace("\n", '').replace("\t",'').strip()
-            
-            
-        #     if dummy_string != '':
-            
-        #         if dummy_string == ':requirements':
-        #             # Activate the flag - 
-        #             pass
-                
-        #         if dummy_string == ':types':
-        #             # activate types
-        #             # deactivate the flag of requirements
-        #             pass
-                
-        #         if dummy_string == ':predicates':
-        #             # activate predicates
-        #             # deactive the flag of types
-        #             pass
-                
-        #         if dummy_string == ':task':
-        #             # activate task
-        #             # deactivate predicates 
-        #             pass
-    
-        #         if dummy_string == ':methods':
-        #             # activate methods
-        #             pass
-                
-        #         if dummy_string == ':action':
-        #             # activate actions
-        #             pass
-                
-        
-        
-        
-        
-        
-        
-        
-        # self.predicate_list_feedback = []
-        # self.task_list_feedback = []
-        # flag_types = 0
-        # type_existing = 'no'
-        # flag_predicates = 0
-        # flag_tasks = 0
-        # task_existing = 'no'
-        
-        
-        # #Check the list of types 
-        # for ii in feedback_file_lines:
-            
-        #     dummy_string = ii.replace('\n', '')
-        #     dummy_string = dummy_string.replace('\t', '')
-            
-        #     # When we arrive at the types part 
-        #     if flag_types == 1:
-        #         for jj in self.hddl_type_list:
-        #             if jj['name'] == dummy_string.split('-')[0].strip():
-        #                 type_existing = 'yes'
-        #         if type_existing != 'yes':
-        #             self.hddl_type_feedback.append({'name':dummy_string.split('-')[0].strip(), 'xmi:id':uuid.uuid1()})
-        #             type_existing = 'no'
-            
-        #     if ':types' in dummy_string:
-        #         flag_types = 1
+        parameters = []
+        preconditions = []
+        ordered_substasks = []
 
-        #     # Found the end of the type section
-        #     if ')' in dummy_string and flag_types == 1:
-        #         flag_types = 0
-                
-        #     # Find the predicates
-        #     if flag_predicates == 1:
-        #         dummy_string = dummy_string.replace('(', '')
-        #         dummy_string = dummy_string.replace(')', '')
-        #         dummy_string = dummy_string.strip()
-        #         if not dummy_string in self.predicate_list and dummy_string != '':
-        #             self.predicate_list_feedback.append(dummy_string)
-            
-        #     if ':predicates' in dummy_string:
-        #         flag_predicates = 1
+        for uu in data_methods:
 
-        #     # Found the end of the predicate section
-        #     if ':task' in dummy_string and flag_predicates == 1:
-        #         flag_predicates = 0 
-        #         flag_tasks = 1
-            
-        #     # Find tasks!!!
-            
-        #     """Still Writing This part - I am thinking: how can I extract portions of file so that I can easily
-        #     store the information I need for the feedback line?"""
-            
-        #     if ':task' in dummy_string:
-        #         dummy_string = dummy_string.replace('(', '')
-        #         dummy_string = dummy_string.replace(')', '')
-        #         dummy_list = dummy_string.split()
-        #         task_name = dummy_list[-1].strip()
+            flag_preconditions = 0
+            flag_subtasks = 0
+            flag_task_method = 0
+            for ii in uu:
+                if ':method' in ii:
+                    method_name = ii.split()[1].strip()
+                if ':parameters' in ii:
+
+                    regex_pattern ='\?\w+.*\w+'
+                    parameters = re.findall(regex_pattern, ii, re.S)
+
+                    for jj in parameters:
+                        
+                        temp_param_list.append(jj.strip().split('?')[1::])
+                        # No unwanted white spaces needed!
+                        for index,oo in enumerate(temp_param_list[-1]):
+                            oo = oo.strip()
+                            temp_param_list[-1][index] = oo
+                            
+                if ':task' in ii and flag_task_method == 0:
+                    regex_pattern ='\w+.'
+                    task_name = re.findall(regex_pattern,ii)[1].strip()
                 
+                if ':precondition' in ii:
+                    flag_preconditions = 1
+                    flag_task_method = 1
                 
+                if flag_preconditions == 1 and ':precondition' not in ii and ':subtasks' not in ii and ii != ')':
+                    # Just remove all the paranteses and make a new string
+                    precondition_str = ii.replace(')','').replace('(','')
+                    precondition_str = '({})'.format(precondition_str)
+                    preconditions.append(precondition_str)  
                 
-        #         for jj in self.task_list:
-        #             if jj['name'] == task_name and task_name!= '' :
-        #                 task_existing = 'yes'
-        #         if task_existing == 'yes':
-        #             self.task_list_feedback.append({'name':task_name, 'xmi:id':uuid.uuid1()}) 
+                if ':subtasks' in ii:
+                    flag_preconditions = 0
+                    flag_subtasks = 1
+
+                if ':ordering' in ii:
+                    flag_subtasks = 0
+                
+                if flag_subtasks == 1  and ':subtasks' not in ii and ii != ')':
+                    # Just remove all the paranteses and make a new string
+                    regex_pattern ='\(\w+.*'
+                    subtask = re.findall(regex_pattern, ii)
+                    if subtask!= '':
+                        subtask_name = subtask[0].split()[0].replace('(','')
+                        ordered_substasks.append(subtask_name)
             
+            # Check if the method has a name
+            if method_name != '' :
+                temp_dictionary = {'name': method_name, 'xmi:id': str(uuid.uuid1())}
+                method_name = ''
+            else:
+                flag_method = 2
+                if self.debug == 'on':
+                    print('The method has no name')
+            # Check if the method is associate to a task
+            if task_name != '' :
+                temp_dictionary['task'] = task_name
+                task_name = ''
+            else:
+                flag_method = 2
+                if self.debug == 'on':
+                    print('The method is not refered to any task')
+            # Check if the method has parameters
+            if parameters != []:
+                temp_dictionary['parameters'] = temp_param_list[-1]
+                temp_param_list = []
+            else:
+                flag_method = 2
+                if self.debug == 'on':
+                    print('The method has no parameters')
+            # Check if the method has preconditions
+            if preconditions != []:
+                temp_dictionary['preconditions'] = [x for x in preconditions]
+                preconditions = []
+            else:
+                flag_method = 2
+                if self.debug == 'on':
+                    print('The method has no parameters')
+            # Check if the method has ordered substaks
+            if ordered_substasks != []:
+                temp_dictionary['actions'] = [x for x in ordered_substasks]
+                ordered_substasks = []
+            else:
+                # It is possible that a method has no ordered subtasks
+                # flag_method = 2
+                if self.debug == 'on':
+                    print('The method has no ordered substasks')
             
-            
-        #     # Find methods!!!
-            
-            
-        #     # Find actions!!!
-            
+            # Let's search in the methods - can we add one to the task feedback list?
+            """You should check the subtasks, their order and the main task of the method to see if they are really compatible!"""
+            if flag_method != 2: 
+                for jj in self.method_list:
+                    # Check the name
+                    if temp_dictionary['name'] == jj['name']:
+                        flag_method = 1
+                        # Check the task name
+                        for kk in self.task_list:
+                            if kk['name'].strip() == temp_dictionary['task'].strip():
+                                flag_method = 1
+                            # Check the parameters
+                            for xx in temp_dictionary['parameters']:
+                                for kk in jj['parameters']:
+                                    if xx == kk:
+                                        flag_method = 1
+                                        counter = counter + 1
+                                    
+                                if counter == len(jj['parameters']):
+                                    flag_method = 1
+                                    counter = 0
+                                else:
+                                    flag_method = 0
+                            # Check the preconditions
+                            for xx in temp_dictionary['preconditions']:
+                                for kk in jj['preconditions']:
+                                    if xx == kk:
+                                        flag_method = 1
+                                        counter = counter + 1
+                                    
+                                if counter == len(jj['preconditions']):
+                                    flag_method = 1
+                                    counter = 0
+                                else:
+                                   flag_method = 0
+                            # Check the actions names
+                            name_task = []
+                            # Check the names in order of the actions in the method
+                            for kk in jj['ordered_tasks']:
+                                for uu in self.opaqueAction_list:
+                                    if kk == uu['xmi:id']:
+                                        name_task.append(uu['name'])                        
+                            
+                            for xx in temp_dictionary['actions']:
+                                # Check if the order and the names are the same
+                                for oo in name_task:
+                                    if xx == oo:
+                                        flag_method = 1
+                                        counter = counter + 1
+                                if counter == len(jj['ordered_tasks']):
+                                    flag_method = 1
+                                    counter = 0
+                                else:
+                                   flag_method = 0
+                              
+                        
+                if flag_method == 0:
+                    self.method_list_feedback.append(temp_dictionary)
+                    flag_method = 0
+                else:
+                    if self.debug == 'on':
+                        print("ok: {}".format(temp_dictionary))
+                    flag_method = 0
+                 
+
+        # for all the actions in data_actions (i) extract name and parameters,(ii) extract preconditions and effects, (iii) create a xmi:id
+        temp_param_list = []
+        action_name = ''
+        flag_action = 0
+        counter = 0
+        parameters = []
+        preconditions = []
+        effects = []
+
+        for uu in data_actions:
+            flag_effects = 0
+            flag_preconditions = 0
+            for ii in uu:
+                if ':action' in ii:
+                    action_name = ii.split()[1].strip()
+                if ':parameters' in ii:
+
+                    regex_pattern ='\?\w+.*\w+'
+                    parameters = re.findall(regex_pattern, ii, re.S)
+
+                    for jj in parameters:
+                        
+                        temp_param_list.append(jj.strip().split('?')[1::])
+                        # No unwanted white spaces needed!
+                        for index,oo in enumerate(temp_param_list[-1]):
+                            oo = oo.strip()
+                            temp_param_list[-1][index] = oo
+                if ':precondition' in ii:
+                    flag_preconditions = 1
+                
+                if flag_preconditions == 1 and ':precondition' not in ii and ':effect' not in ii and ii != ')':
+                    # Just remove all the paranteses and make a new string
+                    precondition_str = ii.replace(')','').replace('(','')
+                    precondition_str = '({})'.format(precondition_str)
+                    preconditions.append(precondition_str)  
+                
+                if ':effect' in ii:
+                    flag_preconditions = 0
+                    flag_effects = 1
+                
+                if flag_effects == 1  and ':effect' not in ii and ii != ')':
+                    # Just remove all the paranteses and make a new string
+                    effect_str = ii.replace(')','').replace('(','')
+                    effect_str = '({})'.format(effect_str)
+                    effects.append(effect_str)                     
+                        
+
+            if action_name != '' and parameters != [] and effects != []:
+                temp_dictionary = {'name': action_name , 'xmi:type': 'uml:OpaqueAction', 'xmi:id': str(uuid.uuid1()), 'preconditions': preconditions, 'effects': effects, 'parameters': temp_param_list[-1]}
+                temp_param_list = []
+                parameters = []
+                preconditions = []
+                effects = []
+                action_name = ''
+                # If you don't have parameters
+            else:
+                flag_action = 2
+                print('There is an error in the action definition in the HDDL document. Did you gave the task parameters, preconditions and effects?')
+                print('There is an error in the action definition in the HDDL document. Did you use the action in a method?')
         
+            # Let's search in the tasks - can we add one to the task feedback list?
+            if flag_action != 2: 
+                for jj in self.opaqueAction_list:
+                    # Check the name
+                    if temp_dictionary['name'] == jj['name']:
+                        # flag_task = 1 
+                        counter = 0
+                        # Check the parameters
+                        for xx in temp_dictionary['parameters']:
+                            for kk in jj['parameters']:
+                                if xx == kk:
+                                    flag_action = 1
+                                    counter = counter + 1
+                                
+                            if counter == len(jj['parameters']):
+                                flag_action = 1
+                                counter = 0
+                            else:
+                                flag_action = 0
+                        # Check the preconditions
+                        for xx in temp_dictionary['preconditions']:
+                            for kk in jj['preconditions']:
+                                if xx == kk:
+                                    flag_action = 1
+                                    counter = counter + 1
+                                
+                            if counter == len(jj['preconditions']):
+                                flag_action = 1
+                                counter = 0
+                            else:
+                               flag_action = 0
+
+                        # Check the effects
+                        for xx in temp_dictionary['effects']:
+                            for kk in jj['effects']:
+                                if xx == kk:
+                                    flag_action = 1
+                                    counter = counter + 1
+                                
+                            if counter == len(jj['effects']):
+                                flag_action = 1
+                                counter = 0
+                            else:
+                                flag_task = 0
+                                
+                        
+                if flag_action == 0:
+                    self.opaqueAction_list_feedback.append(temp_dictionary)
+                    flag_action = 0
+                else:
+                    if self.debug == 'on':
+                        print("ok: {}".format(temp_dictionary))
+                    flag_action = 0
+                    x = 0                
+                
+    def Feedback_Log_FileWriting (self):
+        file = open(self.d_now + '//outputs//' + datetime.now().strftime("%Y_%m_%d-%I_%M_%S")+ 'Feedback.txt','w')
+        file.write('Feedback Log File \n')
+        file.write('This file record the discrepancy between the Papyrus model and the feedback HDDL Domain File \n')
+        file.write('The following information is missing in the Papyrus module \n')
+
+        # Missing Requirements:
+        file.write('\t Missing or Modified Requirements: \n')
+        file.write('\t\t {} \n'.format(self.hddl_requirement_feedback))        
+        # Missing Types:
+        file.write('\t Missing or Modified Types: \n')
+        file.write('\t\t {} \n'.format(self.hddl_type_feedback))
+        # Missing Predicates:
+        file.write('\t Missing or Modified Predicates: \n')
+        file.write('\t\t {} \n'.format(self.predicate_list_feedback))
+        # Missing Tasks:
+        file.write('\t Missing or Modified Tasks: \n')
+        file.write('\t\t {} \n'.format(self.task_list_feedback))
+        # Missing Methods:
+        file.write('\t Missing or Modified Methods: \n')
+        file.write('\t\t {} \n'.format(self.method_list_feedback))
+        # Missing Methods:
+        file.write('\t Missing or Modified Actions: \n')
+        file.write('\t\t {} \n'.format(self.opaqueAction_list_feedback))
+        
+                     
             
-        
-        
-        
     
 def main():
     
     
     # First Parse de input file to get the information you need
+    # The configuration file should be in the same folder of the parsing module - at least for now
     with open('configuration_file.xml', 'r') as f:
         configuration_file = f.read()    
     
+    # Get current directory address
+    d_now = os.getcwd()
+    # Go to the input directory
+    d_input = d_now + '\\inputs'
+    
+    
+    # Read the configuration file.xml with BeautifulSoup (https://beautiful-soup-4.readthedocs.io/en/latest/#)
     configuration_file_soup = BeautifulSoup(configuration_file, 'xml')
     file_parameters = configuration_file_soup.find_all('file')
     
+    # Get the name of the Papyrus File
     file_papyrus = file_parameters[0]['file_name']
     
+    # Get the name of the Domain File - if not create an automatic name
     if file_parameters[0].has_attr('domain_name'):
         domain_name = file_parameters[0]['domain_name']
     else:
         domain_name = 'None'
-        
+    
+    # Get the name of the Feedback file - if you want to create one
     if file_parameters[0].has_attr('feedback_file_name'):
         feedback_name = file_parameters[0]['feedback_file_name']
     else:
         feedback_name = 'None'
-        
+    
+    # Get the name of map file (from Maximilien Code - Look at the CORODRO Repository of the drone)
+    # Maximilien code is available even here: https://github.com/MaxIGL/SLAM_Igluna
     if file_parameters[0].has_attr('map_file_name'):
         map_file_name = file_parameters[0]['map_file_name']
-        with open(map_file_name, 'r') as f:
+        with open(d_input +'\\' + map_file_name, 'r') as f:
             map_data = f.readlines() 
     else:
         map_file_name = 'None'
-
+    
+    # See which analysis we should do with the data from Papyrus
     if file_parameters[0].has_attr('generate_problem_file'):
         generate_problem_file = file_parameters[0]['generate_problem_file']
     else:
@@ -1547,14 +1702,14 @@ def main():
         generate_feedback_file = file_parameters[0]['generate_feedback']
     else:
         generate_feedback_file = 'no'
-        
+    
+    # Get the HDDL Requirements
     hddl_requirements_soup = configuration_file_soup.find_all('li')
     list_requirements = []
     for xx in hddl_requirements_soup:
         dummy_string = xx.contents[0]
         list_requirements.append(dummy_string)
-    
-    
+
     if list_requirements == [] :
         # Types of domain requirements considered in the HDDL module
         # call them from the configuration file - you can even create an executable of python where you ask for them
@@ -1566,31 +1721,40 @@ def main():
         hddl_requirements = list_requirements
     
     htn_tasks_soup = configuration_file_soup.find_all('li_htn')
+    # Get the initial Task Network for the problem file!
     htn_tasks = []
     for xx in htn_tasks_soup:
         dummy_string = xx.contents[0]
         htn_tasks.append(dummy_string)    
 
-    with open(file_papyrus, 'r') as f:
+    with open(d_input +'\\' +file_papyrus, 'r') as f:
         data = f.read()
         
-
-    file_final = XML_parsing(data, map_data, hddl_requirements, domain_name, htn_tasks, feedback_name)
-    # Actively Parse the XML
+    
+    # Now let's start with the real analysis
+    # First create the class with all the parameter you need
+    file_final = XML_parsing(data, map_data, hddl_requirements, domain_name, htn_tasks, feedback_name, d_now)
+    # Parse the XLM from Papyrus
     file_final.XML_ActiveParsing()
-    # Create the file that you need/want
-    # Take out the element you need for the domain file:
-    file_final.DomainFileElements()
     # Create domain file
     if generate_domain_file == 'yes':
+        # Take out the element you need for the domain file:
+        file_final.DomainFileElements()
         file_final.Domain_FileWriting()
     # Get the elements to design the problem file:
     if generate_problem_file == 'yes':
         file_final.ProblemFileElements()
         file_final.Problem_FileWriting()
-    # Create Feedback file
+    # Create Feedback file - For now it's a simple log:
+        # We listed the requirements, types, predicates, tasks, methods and actions different from the XML file
+        # A routine will be soon implemented to directly translate the log file into usable Papyrus elements! 
     if generate_feedback_file == 'yes':
-        file_final.Feedback_file() 
+        if generate_domain_file == 'no':
+            file_final.DomainFileElements()
+        # Get the Feedback information from the modified domain file
+        file_final.Feedback_file()
+        # Create the log with the different info
+        # file_final.Feedback_Log_FileWriting()
 
 
 
