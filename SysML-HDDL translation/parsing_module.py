@@ -160,7 +160,7 @@ extensionLocation = indicates the extension point
 # MAIN PARSING CLASS!
 class XML_parsing():
     
-    def __init__(self, file, map_data, hddl_requirements, domain_name, htn_tasks, feedback_name, d_now = os.getcwd(),  debug = 'on'):
+    def __init__(self, file, map_data, hddl_requirements, domain_name, htn_tasks, feedback_name, d_now = os.getcwd(),  debug = 'on', task_parameters = 'common'):
         # File that we need to parse
         self.file = file
         # File with the map data
@@ -232,6 +232,8 @@ class XML_parsing():
         self.d_now = d_now
         # Log file general entries
         self.log_file_general_entries = []
+        # Task parameters consideration
+        self.task_parameters = task_parameters
 
         
     def XML_ActiveParsing(self):
@@ -409,7 +411,7 @@ class XML_parsing():
                                         # Chek if the attribute is a parameters - if yes save it in the method inputs list
                                         if temp_dict["type_name"] != 'predicate' or len(temp_dict["name"].split()) <= 1:
                                             self.method_input_types_list.append(temp_dict)
-                                            method_input_types_list_names.append(temp_dict["name"]+'-'+temp_dict["type_name"])
+                                            method_input_types_list_names.append((temp_dict["name"]+'-'+temp_dict["type_name"]).replace(" ", ""))
                                         
                                         # The preconditions are ActivityParameters that have on outgoing edge but no incoming one 
                                         # (if the have an incoming one then they are activated by one on the Opaque Actions)
@@ -434,7 +436,7 @@ class XML_parsing():
                                                  self.all_predicates_list.append(temp_dict["name"])
                                             if len(temp_dict["name"].split()) <= 1:
                                                 self.method_input_types_list.append(temp_dict)
-                                                method_input_types_list_names.append(temp_dict["name"]+'-'+temp_dict["type_name"])
+                                                method_input_types_list_names.append((temp_dict["name"]+'-'+temp_dict["type_name"]).replace(" ", ""))
                                             
                                     # Find the atomic actions and Find the tasks in the main task
                                     if not isinstance(jj, str) and jj.has_attr('xmi:type') and (jj['xmi:type'] == 'uml:OpaqueAction' or jj['xmi:type'] == 'uml:CallBehaviorAction') :
@@ -477,7 +479,7 @@ class XML_parsing():
                             self.method_list[-1]['parameters'] = set(method_input_types_list_names)
                             method_input_types_list_names.clear()
                             # For each method associate the inputs
-                            self.method_list[-1]['preconditions'] = set(method_input_predicate_list_names)
+                            self.method_list[-1]['preconditions'] = [x for x in method_input_predicate_list_names]
                             method_input_predicate_list_names.clear()
                             # Add the tasks to the method list of ordered tasks 
                             # ordered_actions = []
@@ -490,13 +492,13 @@ class XML_parsing():
                                 for bb in self.method_Actions:
                                     for kk in self.edge_list:
                                         if 'incoming_link' in bb and bb['incoming_link'] == kk['xmi:id']:
-                                            for uu in self.method_Actions:
-                                                if uu['xmi:id'] == kk['input']:
+                                            for action in self.method_Actions:
+                                                if action['xmi:id'] == kk['input']:
                                                     functions_with_incoming_edge.append(bb)
                                                     bb['previous_action'] = kk['input']
                                         if 'outcoming_link' in bb and bb['outcoming_link'] == kk['xmi:id']:
-                                            for uu in self.method_Actions:
-                                                if uu['xmi:id'] == kk['output']:
+                                            for action in self.method_Actions:
+                                                if action['xmi:id'] == kk['output']:
                                                   functions_with_outcoming_edge.append(bb)
                                                   bb['following_action'] = kk['output']  
                                 for yy in self.method_Actions:
@@ -516,9 +518,9 @@ class XML_parsing():
                                     for yy in self.method_Actions:
                                         if 'order' in yy and yy['order'] != len(self.method_Actions):
                                             # check the next element that should be there
-                                            for uu in self.method_Actions:
-                                                if'previous_action'in uu and uu['previous_action'] == yy['xmi:id']:
-                                                    uu['order'] = yy['order'] + 1 
+                                            for action in self.method_Actions:
+                                                if'previous_action'in action and action['previous_action'] == yy['xmi:id']:
+                                                    action['order'] = yy['order'] + 1 
                                         elif 'order' in yy and yy['order'] == len(self.method_Actions):
                                             pass
                                         
@@ -608,7 +610,7 @@ class XML_parsing():
             # Associate inputs and outputs to the action 
             ii["preconditions"] = [x for x in temporary_input_list]
             ii["effects"] = [x for x in temporary_output_list]
-            ii["parameters"] = [x for x in temporary_parameter_list]
+            ii["parameters"] = set([x for x in temporary_parameter_list])
             # Clear the lists
             temporary_input_list.clear() 
             temporary_output_list.clear()
@@ -658,39 +660,70 @@ class XML_parsing():
                     if self.debug == 'on':
                         print('Plese check your constraints in the UseCase - your type extension for {} was not found in the type folder'.format(ii['name']))
                         print('We added that type - however, please check if that was what you were planning to do!')
-                self.log_file_general_entries.append('\t\t Plese check your constraints in the UseCase - your type extension for {} was not found in the type folder \n'.format(ii['name']))
-                get_param_dict = { "xmi:type":ii['xmi:type'], "xmi:id":ii['xmi:id'], "name":ii['name']}
+                        self.log_file_general_entries.append('\t\t Plese check your constraints in the UseCase - your type extension for {} was not found in the type folder \n'.format(ii['name']))
+                
+                
+                
+                
                 for jj in self.dependencies_list:
+                    flag_found = 0
+                    get_param_dict = { "xmi:type":ii['xmi:type'], "xmi:id":ii['xmi:id'], "name":ii['name']}
                     if jj['output'] == ii['xmi:id']:
                         get_param_dict['task'] = jj['input']
-                get_param.append(get_param_dict)
+                        get_param.append(get_param_dict)
+                        get_param_dict ={}
+                        
+                
             
         
         task_parameters = []
+        # If the task parameters are already defined in the main use case diagram as constraints
         for ii in self.task_list:
             if get_param != []:
                 for jj in get_param:
                     if ('task') in jj:
                         if jj['task'] == ii['xmi:id']:
-                            task_parameters.append(jj['name'])
+                            task_parameters.append(jj['name'].replace(" ", ""))
             
-            ii["parameters"] = [x for x in task_parameters]
+            ii["parameters"] = set([x for x in task_parameters])
             task_parameters.clear()
                 
-        # If the tasks have no parameter defined --> Get the minimum parameters out of the methods parameters associated to that task
+        # If the tasks have no parameter defined --> Get the minimum or the common parameters out of the methods parameters associated to that task
+        task_parameters_matrix = []
+
         for ii in self.task_list:
-            for jj in self.method_list:
-                
-                if ii.get('xmi:id') == jj.get('task'):
-                    # for each method check the length of the parameters list - if it longer than the one of the task, leave it like that - if not replace the list
-                    if ii["parameters"] != []:
-                        if len(ii["parameters"]) >= len(jj.get('parameters')):
-                            dummy_parameter = [x for x in jj.get('parameters')]
-                            ii["parameters"] = jj.get('parameters')
-                    else:
-                        ii["parameters"] = jj.get('parameters')
+            if ii["parameters"] == set():
+                # Minimum parameters
+                if self.task_parameters == 'min':
+                    for jj in self.method_list:
                         
-        
+                        if ii.get('xmi:id') == jj.get('task'):
+                            # for each method check the length of the parameters list - if it longer than the one of the task, leave it like that - if not replace the list
+                            if ii["parameters"] != []:
+                                if len(ii["parameters"]) >= len(jj.get('parameters')):
+                                    dummy_parameter = [x for x in jj.get('parameters')]
+                                    ii["parameters"] = jj.get('parameters')
+                            else:
+                                ii["parameters"] = jj.get('parameters')
+                            
+                # Common parameters
+                if self.task_parameters == 'common':
+                    for jj in self.method_list:
+                        
+                        if ii.get('xmi:id') == jj.get('task'):
+                            # for each method check the length of the parameters list - look if there are common paramaters
+                                task_parameters_matrix.append(jj.get('parameters'))     
+                    
+                    for index, task_param in enumerate(task_parameters_matrix):
+                        if index == 0:
+                            common_param = task_param
+                        elif index == 1:
+                            common_param = task_param.intersection(task_parameters_matrix[index-1])
+                        else:
+                            common_param = task_param.intersection(common_param)
+                
+                    ii["parameters"] = common_param
+                    
         
         # Take the overall predicate list and:
             # search for duplicates and associate the type to each predicate
@@ -1780,6 +1813,12 @@ def main():
         generate_feedback_file = file_parameters[0]['generate_feedback']
     else:
         generate_feedback_file = 'no'
+        
+    if file_parameters[0].has_attr('task_parameters'):
+        task_parameters = file_parameters[0]['task_parameters']
+    else:
+        # if nothing is said consider the common task parameters
+        task_parameters = 'common'
     
     # Get the HDDL Requirements
     hddl_requirements_soup = configuration_file_soup.find_all('li')
@@ -1811,7 +1850,7 @@ def main():
     
     # Now let's start with the real analysis
     # First create the class with all the parameter you need
-    file_final = XML_parsing(data, map_data, hddl_requirements, domain_name, htn_tasks, feedback_name, d_now)
+    file_final = XML_parsing(data, map_data, hddl_requirements, domain_name, htn_tasks, feedback_name, d_now, task_parameters)
     # Parse the XLM from Papyrus
     file_final.XML_ActiveParsing()
     # Create domain file
