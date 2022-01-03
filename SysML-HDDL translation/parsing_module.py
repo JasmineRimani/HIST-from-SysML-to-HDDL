@@ -266,7 +266,7 @@ class XML_parsing():
             
             # Isolate the classes - ':types' in HDDL
             if ii['xmi:type'] == 'uml:Class':
-                self.hddl_type_list.append({"name": ii['name'], "xmi:id":ii['xmi:id']})
+                self.hddl_type_list.append({"name": ii['name'].replace(" ", ""), "xmi:id":ii['xmi:id']})
                 
             # Isolate Actors:
             if ii['xmi:type'] == 'uml:Actor':
@@ -655,12 +655,12 @@ class XML_parsing():
                         flag_found = 1
                 
                 if flag_found != 1:
-                    self.hddl_type_list.append(dummy_vector[-1])
-                    self.hddl_type_feedback.append(dummy_vector[-1])
+                    self.hddl_type_list.append(dummy_vector[-1].replace(" ", ""))
+                    self.hddl_type_feedback.append(dummy_vector[-1].replace(" ", ""))
                     if self.debug == 'on':
-                        print('Plese check your constraints in the UseCase - your type extension for {} was not found in the type folder'.format(ii['name']))
+                        print('Plese check your constraints in the UseCase - your type extension for {} was not found in the type folder'.format(ii['name'].replace(" ", "")))
                         print('We added that type - however, please check if that was what you were planning to do!')
-                        self.log_file_general_entries.append('\t\t Plese check your constraints in the UseCase - your type extension for {} was not found in the type folder \n'.format(ii['name']))
+                        self.log_file_general_entries.append('\t\t Plese check your constraints in the UseCase - your type extension for {} was not found in the type folder \n'.format(ii['name'].replace(" ", "")))
                 
                 
                 
@@ -881,16 +881,16 @@ class XML_parsing():
 
             for ii in self.hddl_type_list:
                 if 'type' in uu and uu['type'] == ii['xmi:id']:
-                    self.problem_file_object.append('{} - {}'.format(uu['name'], ii['name']))
+                    self.problem_file_object.append('{} - {}'.format(uu['name'].replace(" ", ""), ii['name']))
                 elif 'type' not in uu:
-                    self.problem_file_object.append('{} - {}'.format(uu['name'], uu['name']))
+                    self.problem_file_object.append('{} - {}'.format(uu['name'].replace(" ", ""), uu['name'].replace(" ", "")))
                     if self.debug == 'on':
-                        print('{} is missing his type - please define a type for this component!'.format(uu['name']))
-                        print('{} has been appended to the hddl type list!'.format(uu['name']))
+                        print('{} is missing his type - please define a type for this component!'.format(uu['name'].replace(" ", "")))
+                        print('{} has been appended to the hddl type list!'.format(uu['name'].replace(" ", "")))
                     self.log_file_general_entries.append('\t\t {} is missing his type - please define a type for this component! \n'.format(uu['name']))
-                    self.log_file_general_entries.append('\t\t {} has been appended to the hddl type list \n!'.format(uu['name']))
+                    self.log_file_general_entries.append('\t\t {} has been appended to the hddl type list \n!'.format(uu['name'].replace(" ", "")))
                     
-                    self.hddl_type_list.append({"name": uu['name'], "xmi:id":''})
+                    self.hddl_type_list.append({"name": uu['name'].replace(" ", ""), "xmi:id":''})
                     
         
         # Let's start with the map data to create the problem file
@@ -910,8 +910,8 @@ class XML_parsing():
                         flag_check = 1
                 if flag_check != 1:
                     if self.debug == 'on':
-                        print('{} has a wrong type! Please check your types in the map_file!'.format(uu['name']))
-                    self.log_file_general_entries.append('\t\t {} has a wrong type! Please check your types in the map_file \n!'.format(uu['name']))
+                        print('{} has a wrong type! Please check your types in the map_file!'.format(uu['name'].replace(" ", "")))
+                    self.log_file_general_entries.append('\t\t {} has a wrong type! Please check your types in the map_file \n!'.format(uu['name'].replace(" ", "")))
                 else:
                     self.problem_file_object.append('{} - {}'.format(ii.split("-")[0], ii.split("-")[-1].replace('\n','').strip()))
 
@@ -999,12 +999,12 @@ class XML_parsing():
         # Write requirement
         file.write('\t (:requirements :{}) \n'.format(' :'.join(self.requirement_list_domain_file)))
         #Object Type
-        file.write('\t (:types \n')
+        file.write('\t (:types  ')
         for ii in self.hddl_type_list:
-            if ii != 'predicate':
-                file.write('\t\t {} - object \n'.format(ii.get('name')))
+            if ii.get('name').strip() != 'predicate':
+                file.write('{} '.format(ii.get('name')))
         # End of object type
-        file.write('\t) \n\n')  
+        file.write(') \n\n')  
         
         # Predicates
         file.write('\t (:predicates \n')
@@ -1130,13 +1130,13 @@ class XML_parsing():
         file.write('\t\t :parameters () \n')
         file.write('\t\t :subtasks (and \n')
         for ii in self.htn_tasks:
-            file.write('\t\t({})\n'.format(ii))
+            file.write('\t\t\t({})\n'.format(ii))
         
         file.write('\t\t )\n\n')
         #Ordering
         file.write('\t\t :ordering (and \n')
         for ii in self.ordering_task_network:
-            file.write('\t\t{}\n'.format(ii))
+            file.write('\t\t\t{}\n'.format(ii))
         
         file.write('\t\t )\n\n')
         
