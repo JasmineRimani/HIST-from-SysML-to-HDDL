@@ -3,6 +3,11 @@
 # Motivation
 The need to exctract useful information from SysML/MBSE models and convert them in usable entities for other disciplines is raising. This code extracts a Papyrus model of "Functinal Analysis" to automatically generate the HDDL domain file. The code can generate a HDDL problem file as well as a feedback file with the differences between the Papyrus model and the HDDL domain file. 
 
+**Folder and their Languages**
+- SysML-HDDL Traslation Template: Papyrus model that will be used to try the official benchmark of HDDL and to create the step by step tutorial
+- inputs: Folder that groups all inputs needed for the translation --> uml model + "map of the environment" + "possible domain feedback file that we want to check"
+- outputs: Folder that groups all outputs domain file + problem file + feedback file 
+
 **Files and their Languages**
 - Papyrus Model --> uml 
      - uml file with all the information stored in the Papyrus SysML model.
@@ -41,22 +46,25 @@ The need to exctract useful information from SysML/MBSE models and convert them 
 # Still Actively Coding and Polishing:
 - ***Functions***:
      - def Feedback_file(self):
-        - Check the methods parsing from the HDDL file:
+        - Check the methods parsing from the HDDL file [DONE]:
             - Check that the name, parameters, tasks, preconditions, subtasks and ordering are the same.
             - If one of them is different add the method to the feedback log with a comment on the different entries 
-        - Check the task and action parsing from the HDDL file:
+        - Check the task and action parsing from the HDDL file [DONE]:
             - Check that the name, parameters, preconditions, and effects are the same.
             - If one of them is different add the method to the feedback log with a comment on the different entries  
      - In def Feedback_Log_FileWriting(self):
         - Find a way to clearly state the missing information in ordered sections
-        - Add for each section related to each HDDL "classes" which Papyrus SysML definition counter part should be used in the modeling. 
+        - Add for each section related to each HDDL "classes" which Papyrus SysML definition counter part should be used in the modeling  [DONE]. 
      - In def Domain_FileWriting (self):
-        - Code a check to match the task's parameters' names with the method's parameters' name when defining a HDDL method 
+        - Code a check to match the task's parameters' names with the method's parameters' name when defining a HDDL method  [DONE].
+     - In def ProblemFileElements(self):
+        - Code the multiple problem file generation with common core
+    
 
 # To Code:
 - ***Functions***:
      - def Feedback_xml_file(self):
-        - Directly add the information from Feedback_file(self) to the Papyrus model in a folder called Feedback.
+        - Directly add the information from Feedback_file(self) to the Papyrus model in a folder called Feedback. [DONE]
            - The feedback entries will be already in the final Papyrus model 
 
 # HDDL Benchmarks to try:
@@ -64,10 +72,11 @@ The need to exctract useful information from SysML/MBSE models and convert them 
 
 # New comments to implement:
 - Task parameters: They can be (i) defined as constraints, (ii) defined as common parameters between the methods, (iii) defined as minimum set of parameters of the method. You can add an option so that the used can decide which option between (ii) and (iii) to use. [DONE]
-- For the paper and solidity of the model try the official HDDL Benchmark and see if they are (i) easy to model, (ii) if the translated HDDL has differences, (iii) if you need more parameters to better model the domain. 
+- For the paper and solidity of the model try the official HDDL Benchmark and see if they are (i) easy to model, (ii) if the translated HDDL has differences, (iii) if you need more parameters to better model the domain: domains to try (i) Satellite-GTOHP, (ii) Snake, (iii) Transport. 
 -	For the generalization of the problem file - maybe we can model as components the "static data" the data that are always the same in the HDDL problem file, than define some different scenarios as mission and create a problem file for each of them. We aim to build a part of the problem file, not all of it, giving an aid to the developers and leaving them the freedom to add and modify those files.
--	In the official effects of the HDDL competition as for now there is no ordering! So no need to add it to Papyrus and the HDDL models. (If you want to create an order you need to directly use a method of target defined subtasks).
+-	In the official effects of the HDDL competition as for now there is no ordering! So no need to add it to Papyrus and the HDDL models. (If you want to create an order you need to directly use a method of target defined subtasks). [DONE]
 -	You may have a nested :task/:subtaks methods: e.g. The NavigateToGoal :task with a mid point can be defined as two separate NavigateToGoal :task without mid point (1st method in CoRoDro). That's can help!  
-- **Check that the objects are one word in the problem file**
+- Check that the objects are one word in the problem file. [DONE]
+- Some task may have no parameters (from the ipc2020-domains) - find a way to define that! 
 
 
