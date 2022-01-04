@@ -235,7 +235,7 @@ class XML_parsing():
         # Task parameters consideration
         self.task_parameters = task_parameters
 
-        
+    # Parse the XML File with BeautifulSoap    
     def XML_ActiveParsing(self):
 
         # Log File init
@@ -319,7 +319,7 @@ class XML_parsing():
                         self.requirement_list_domain_file.append(jj)
                         
 
-
+    # Get out the elements of the Domain File
     def DomainFileElements(self):     
         # Log File init
         self.log_file_general_entries.append('------------------------------------------------- \n')
@@ -764,7 +764,7 @@ class XML_parsing():
             temporary_predicate.clear()
                         
   
-        
+    # Get out the elements of the Problem File
     def get_order(task):
         return task.get('order')
 
@@ -985,7 +985,7 @@ class XML_parsing():
         # print('Use Cases - Method Level:',Method_list)
         
 
-        
+    # Write the Domain File
     def Domain_FileWriting (self):
         ###################################################################
         self.log_file_general_entries.append('------------------------------------------------- \n')
@@ -1112,6 +1112,7 @@ class XML_parsing():
         # end of the file
         file.write(')')
     
+    # Write the Problem File
     def Problem_FileWriting (self):
         self.log_file_general_entries.append('------------------------------------------------- \n')
         self.log_file_general_entries.append('Log errors and warnings during the HDDL Problem file generation: \n')
