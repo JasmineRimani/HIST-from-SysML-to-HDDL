@@ -12,7 +12,7 @@
         domain_name="igluna_mission"
         generate_domain_file="yes"
         generate_problem_file="yes"
-        generate_feedback="no"
+        generate_feedback="yes"
         task_parameters = 'common'>
   </file>
   <!-- Initial Hierarchical Task network -->
