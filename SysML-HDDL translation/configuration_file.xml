@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <!-- Input for the simulation -->
+  <!-- When the software will be completed - this will be command line inputs -->
+  <!-- The Task parameters can be defined as constraints. If not the user may define them with the flags "min" or "common"!-->
+  <!-- Task flag "min" considers as task parameters the minum set of parameters from all the methods of the task. !-->
+  <!-- Task flag "common" considers as task parameters the common set of parameters from all the methods of the task. (Default Option)!-->
+  <!-- To the test the Task flag option, please use "xml_sample_7.uml" !-->
+  <file file_name="xml_sample_7.uml"   
+        map_file_name="plan_final_1m_1_int.txt" 
+        feedback_file_name="feedback__domain.hddl"
+        domain_name="igluna_mission"
+        generate_domain_file="yes"
+        generate_problem_file="yes"
+        generate_feedback="yes"
+        task_parameters = 'common'>
+  </file>
+  <!-- Initial Hierarchical Task network -->
+  <htn>
+ 
+      <li_htn>task0(TakePicture objective4)</li_htn> 
+      <li_htn>task1(TakePicture objective2)</li_htn>  
+      <li_htn>task2(TakePicture objective1)</li_htn>  
+      <li_htn>task3(TakePicture objective6)</li_htn>  
+      <li_htn>task4(TakePicture objective5)</li_htn>   
+      <li_htn>task5(EvaluateAvailableResources rover)</li_htn> 
+
+  </htn>
+  <!-- HDDL Requirements for the domain file! -->
+  <!-- The list encompass the main ones from https://planning.wiki/ref/pddl/requirements -->
+  <hddl_requirements>
+  <li>typing</li>
+  <li>hierachie</li>
+  <li>fluents</li>
+  <li>STRIPS</li>
+  <li>Disjunctive Preconditions</li>
+  <li>Equality</li>
+  <li>Existential Preconditions</li>
+  <li>Universal Preconditions</li>
+  <li>Quantified Preconditions</li>
+  <li>Conditional Effects</li>
+  <li>Action Expansions</li>
+  <li>Foreach Expansions</li>
+  <li>DAG Expansions</li>
+  <li>Domain Axioms</li>
+  <li>Subgoals Through Axioms</li>
+  <li>Safety Constraints</li>
+  <li>Expression Evaluation</li>
+  <li>Fluents</li>
+  <li>Open World</li>
+  <li>True Negation</li>
+  <li>ADL</li>
+  <li>UCPOP</li>
+  </hddl_requirements>
+
+
+</root>
