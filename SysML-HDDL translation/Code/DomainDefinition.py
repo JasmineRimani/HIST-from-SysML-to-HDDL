@@ -513,14 +513,14 @@ class DomainDefinition():
         # Open/Create the File
         file = open(self.d_now + '//outputs//' + self.domain_name,'w')
         # Start writing on the file
-        file.write('(define (domain {}) \n'.format(self.domain_name))
+        file.write('(define (domain {}) \n'.format(self.domain_name.lower()))
         # Write requirement
-        file.write('\t (:requirements :{}) \n'.format(' :'.join(self.requirement_list_domain_file)))
+        file.write('\t (:requirements :{}) \n'.format(' :'.join(self.requirement_list_domain_file).lower()))
         #Object Type
         file.write('\t (:types  ')
         for ii in self.hddl_type_list:
             if ii.get('name').strip() != 'predicate':
-                file.write('{} '.format(ii.get('name')))
+                file.write('{} '.format(ii.get('name').lower()))
         # End of object type
         file.write(') \n\n')  
         
@@ -528,14 +528,14 @@ class DomainDefinition():
         file.write('\t (:predicates \n')
         #Writes Predicates
         for ii in self.predicate_list:
-            file.write('\t\t ({}) \n'.format(ii))
+            file.write('\t\t ({}) \n'.format(ii).lower())
         # End of predicates
         file.write('\t) \n\n')   
             
         #Tasks!
         for ii in self.task_list:
             file.write('\t (:task {} \n'.format(ii.get('name')))            
-            file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters'))))
+            file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters')).lower()))
             file.write('\t\t :precondition ()\n')
             file.write('\t\t :effect ()\n')
             file.write('\t ) \n\n') 
@@ -550,7 +550,7 @@ class DomainDefinition():
             # method name
             file.write('\t (:method {} \n'.format(ii.get('name')))
             # method parameters
-            file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters'))))
+            file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters')).lower()))
             # method task
             """
             STILL TO IMPLEMENT - Check that the task parameters are effectively method parameters.
@@ -565,10 +565,10 @@ class DomainDefinition():
                         parameters = re.findall(regex_pattern, uu)
                         task_parameters.append(parameters[0].replace('-', ''))
                                         
-            file.write('\t\t :task ({} ?{}) \n'.format(task_name, ' ?'.join(task_parameters)))
+            file.write('\t\t :task ({} ?{}) \n'.format(task_name, ' ?'.join(task_parameters).lower()))
             # method preconditions
             if ii.get('preconditions') != '':
-                file.write('\t\t :precondition (and \n\t\t\t{} \n\t\t) \n'.format(' \n\t\t\t'.join(ii.get('preconditions'))))
+                file.write('\t\t :precondition (and \n\t\t\t{} \n\t\t) \n'.format(' \n\t\t\t'.join(ii.get('preconditions')).lower()))
             else:
                 file.write('\t\t :precondition ()\n')
             counter = 0
@@ -582,7 +582,7 @@ class DomainDefinition():
                         dummy_vector = re.split(' |-', dummy_string)
                         # vector[start:end:step]
                         dummy_vector = dummy_vector[0::2]
-                        string_vector.append('task{}({} ?{})'.format(counter,kk['name'], ' ?'.join(dummy_vector) ))
+                        string_vector.append('task{}({} ?{})'.format(counter,kk['name'], ' ?'.join(dummy_vector).lower() ))
                         counter = counter + 1
                     if counter > 1 and '(< task{} task{})'.format(counter-2, counter-1) not in order_vector:
                         # For each task check incoming and outcoming links
@@ -593,7 +593,7 @@ class DomainDefinition():
                 file.write('\t\t\t{}\n'.format('\n\t\t\t'.join(string_vector)))
                 file.write('\t\t ) \n')
                 file.write('\t\t :ordering (and \n')
-                file.write('\t\t\t{}\n'.format(' \n\t\t\t'.join(order_vector)))
+                file.write('\t\t\t{}\n'.format(' \n\t\t\t'.join(order_vector).lower()))
                 file.write('\t\t ) \n')
                 string_vector.clear()
                 order_vector.clear()
@@ -614,14 +614,14 @@ class DomainDefinition():
         file.write('\n')  #space!
         for ii in self.final_opaque_action_list:
 
-            file.write('\t(:action {} \n'.format(ii.get('name')))            
-            file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters'))))
+            file.write('\t(:action {} \n'.format(ii.get('name').lower()))            
+            file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters')).lower()))
             if ii.get('preconditions') != '':
-                file.write('\t\t :precondition (and \n\t\t\t{})\n'.format(' \n\t\t\t'.join(ii.get('preconditions'))))
+                file.write('\t\t :precondition (and \n\t\t\t{})\n'.format(' \n\t\t\t'.join(ii.get('preconditions')).lower()))
             else:
                 file.write('\t\t :precondition ()\n')
             if ii.get('effects') != '':
-                file.write('\t\t :effect (and \n\t\t\t{})\n'.format(' \n\t\t\t'.join(ii.get('effects'))))
+                file.write('\t\t :effect (and \n\t\t\t{})\n'.format(' \n\t\t\t'.join(ii.get('effects')).lower()))
             else:
                 file.write('\t\t :effect ()\n')
                         
