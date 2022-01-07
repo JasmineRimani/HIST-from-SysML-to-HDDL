@@ -196,12 +196,12 @@ def main():
     
     # Get the name of map file (from Maximilien Code - Look at the CORODRO Repository of the drone)
     # Maximilien code is available even here: https://github.com/MaxIGL/SLAM_Igluna
-    if file_parameters[0].has_attr('map_file_name'):
-        map_file_name = file_parameters[0]['map_file_name']
-        with open(d_input +'\\' + map_file_name, 'r') as f:
-            map_data = f.readlines() 
-    else:
-        map_file_name = 'None'
+    # if file_parameters[0].has_attr('map_file_name'):
+    #     map_file_name = file_parameters[0]['map_file_name']
+    #     with open(d_input +'\\' + map_file_name, 'r') as f:
+    #         map_data = f.readlines() 
+    # else:
+    #     map_file_name = 'None'
     
     # See which analysis we should do with the data from Papyrus
     if file_parameters[0].has_attr('generate_problem_file'):
@@ -242,12 +242,12 @@ def main():
     else:
         hddl_requirements = list_requirements
     
-    htn_tasks_soup = configuration_file_soup.find_all('li_htn')
-    # Get the initial Task Network for the problem file!
-    htn_tasks = []
-    for xx in htn_tasks_soup:
-        dummy_string = xx.contents[0]
-        htn_tasks.append(dummy_string)    
+    # htn_tasks_soup = configuration_file_soup.find_all('li_htn')
+    # # Get the initial Task Network for the problem file!
+    # htn_tasks = []
+    # for xx in htn_tasks_soup:
+    #     dummy_string = xx.contents[0]
+    #     htn_tasks.append(dummy_string)    
 
     with open(d_input +'\\' +file_papyrus, 'r') as f:
         data = f.read()
@@ -272,7 +272,7 @@ def main():
         
     if generate_problem_file == 'yes':
         print("Generating Problem File/s")
-        ProblemFile = ProblemDefinition(domain_name, parsed_dictionary, domain_file_elements, map_data, htn_tasks)
+        ProblemFile = ProblemDefinition(domain_name, parsed_dictionary, domain_file_elements)
         problem_file_elements = ProblemFile.ProblemFileElements()
         ProblemFile.ProblemFileWriting()
         print("Problem File Generated under the name of ", domain_file_elements["problem_name"])

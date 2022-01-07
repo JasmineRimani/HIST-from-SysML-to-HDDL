@@ -5,8 +5,8 @@
   <!-- The Task parameters can be defined as constraints. If not the user may define them with the flags "min" or "common"!-->
   <!-- Task flag "min" considers as task parameters the minum set of parameters from all the methods of the task. !-->
   <!-- Task flag "common" considers as task parameters the common set of parameters from all the methods of the task. (Default Option)!-->
-  <!-- To the test the Task flag option, please use "xml_sample_6.uml" !-->
-  <file file_name="xml_sample_5.uml"   
+  <!-- To the test the Task flag option, please use "xml_sample_7.uml" !-->
+  <file file_name="xml_sample_7.uml"   
         map_file_name="plan_final_1m_1_int.txt" 
         feedback_file_name="feedback__domain.hddl"
         domain_name="igluna_mission"
@@ -23,7 +23,7 @@
       <li_htn>task2(TakePicture objective1)</li_htn>  
       <li_htn>task3(TakePicture objective6)</li_htn>  
       <li_htn>task4(TakePicture objective5)</li_htn>   
-      <li_htn>task5(EvaluateAvailableResources Rover)</li_htn> 
+      <li_htn>task5(EvaluateAvailableResources rover)</li_htn> 
 
   </htn>
   <!-- HDDL Requirements for the domain file! -->

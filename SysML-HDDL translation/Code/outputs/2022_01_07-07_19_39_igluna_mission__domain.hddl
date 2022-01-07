@@ -1,0 +1,264 @@
+(define (domain 2022_01_07-07_19_39_igluna_mission__domain.hddl) 
+	 (:requirements :typing :hierachie) 
+	 (:types  system waypoint camera objective mode control_center rover drone controlcenter fisheye depth ) 
+
+	 (:predicates 
+		 (at ?arg0 - system ?arg1 - waypoint) 
+		 (can_traverse ?arg0 - system ?arg1 - waypoint ?arg2 - waypoint) 
+		 (visited ?arg0 - waypoint ?arg1 - system) 
+		 (equipped_for_health_monitoring ?arg0 - system) 
+		 (got_health_data ?arg0 - system) 
+		 (available ?arg0 - system) 
+		 (communicated_health_data ?arg0 - system) 
+		 (equipped_for_imaging ?arg0 - system) 
+		 (on_board ?arg0 - camera ?arg1 - system) 
+		 (visible_from ?arg0 - objective ?arg2 - system) 
+		 (have_image ?arg0 - system ?arg1 - objective) 
+		 (get_artag ?arg0 - system ?arg1 - objective) 
+		 (communicated_image_data ?arg0 - objective) 
+		 (communicated_artag_data ?arg0 - objective) 
+		 (is_dependent ?arg0 - system ?arg1 - system) 
+	) 
+
+	 (:task NavigateToGoal 
+		 :parameters (?system-system ?to_wp-waypoint) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task EvaluateAvailableResources 
+		 :parameters (?system-system) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task TakePicture 
+		 :parameters (?objective-objective) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task GoBack 
+		 :parameters (?system1-system ?system2-system) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task StartMission 
+		 :parameters (?system1-system ?system2-system) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+
+	 (:method NavigateToGoal_method1 
+		 :parameters (?system-system ?to_wp-waypoint ?from_wp-waypoint) 
+		 :task (NavigateToGoal ?system ?to_wp) 
+		 :precondition (and 
+			(at ?system ?from_wp) 
+			(can_traverse ?system ?from_wp ?to_wp) 
+		) 
+		 :subtasks (and 
+			task0(Visit ?system ?from_wp)
+			task1(Navigate ?system ?to_wp ?from_wp)
+			task2(Unvisit ?system ?from_wp)
+		 ) 
+		 :ordering (and 
+			(< task0 task1) 
+			(< task1 task2)
+		 ) 
+	 ) 
+
+	 (:method NavigateToGoal_method2 
+		 :parameters (?system-system ?to_wp-waypoint) 
+		 :task (NavigateToGoal ?system ?to_wp) 
+		 :precondition (and 
+			(at ?system ?to_wp) 
+		) 
+		 :subtasks () 
+	 ) 
+
+	 (:method NavigateToGoal_method3 
+		 :parameters (?system-system ?to_wp-waypoint ?from_wp-waypoint ?mid_wp-waypoint) 
+		 :task (NavigateToGoal ?system ?to_wp) 
+		 :precondition (and 
+			(at ?system ?from_wp) 
+			(not(can_traverse ?system ?from_wp ?to_wp)) 
+			(can_traverse ?system ?from_wp ?mid_wp) 
+			(can_traverse ?system ?mid_wp ?to_wp) 
+		) 
+		 :subtasks (and 
+			task0(Visit_mid ?system ?from_wp)
+			task1(Navigate_mid ?system ?from_wp ?mid_wp)
+			task2(Unvisit_mid ?system ?mid_wp)
+			task3(Visit_last ?system ?to_wp ?mid_wp)
+			task4(Navigate_last ?system ?to_wp ?mid_wp)
+			task5(Unvist_last ?system ?mid_wp)
+		 ) 
+		 :ordering (and 
+			(< task0 task1) 
+			(< task1 task2) 
+			(< task2 task3) 
+			(< task3 task4) 
+			(< task4 task5)
+		 ) 
+	 ) 
+
+	 (:method EvaluateAvailableResource_method1 
+		 :parameters (?system-system) 
+		 :task (EvaluateAvailableResources ?system) 
+		 :precondition (and 
+			(equipped_for_health_monitoring ?system) 
+			(available ?system) 
+		) 
+		 :subtasks (and 
+			task0(GetDataFromSensors ?system)
+			task1(SendSystemState ?system)
+		 ) 
+		 :ordering (and 
+			(< task0 task1)
+		 ) 
+	 ) 
+
+	 (:method TakePicture_method1 
+		 :parameters (?system-system ?to_wp-waypoint ?objective-objective ?camera-camera) 
+		 :task (TakePicture ?objective) 
+		 :precondition (and 
+			(equipped_for_imaging ?system) 
+			(on_board ?camera ?system) 
+			(visible_from ?objective ?waypoint ?system) 
+			(available ?system) 
+		) 
+		 :subtasks (and 
+			task0(NavigateToGoal ?system ?to_wp)
+			task1(ReadArTag ?system ?to_wp ?objective ?camera)
+			task2(CommunicateArTagData ?system ?objective)
+			task3(TakeImage ?system ?to_wp ?objective ?camera)
+			task4(CommunicateImageData ?system ?objective)
+		 ) 
+		 :ordering (and 
+			(< task0 task1) 
+			(< task1 task2) 
+			(< task2 task3) 
+			(< task3 task4)
+		 ) 
+	 ) 
+
+	 (:method GoBack_method1 
+		 :parameters (?to_wp-waypoint ?from_wp-waypoint ?system1-system ?system2-system) 
+		 :task (GoBack ?system1 ?system2) 
+		 :precondition (and 
+			(is_dependent ?system2 ?system1) 
+			(at ?system2 ?from_wp) 
+			(at ?system ?to_wp) 
+		) 
+		 :subtasks (and 
+			 task0(NavigateToGoal ?to_wp ?system2)
+		 ) 
+	 ) 
+
+	 (:method StartMission_method1 
+		 :parameters (?system1-system ?system2-system) 
+		 :task (StartMission ?system1 ?system2) 
+		 :precondition (and 
+			(is_dependent ?system2 ?system1) 
+		) 
+		 :subtasks (and 
+			 task0(MakeAvailable ?system2)
+		 ) 
+	 ) 
+
+
+	(:action visit 
+		 :parameters (?system-system ?from_wp-waypoint) 
+		 :precondition (and 
+			(at ?system ?from_wp))
+		 :effect (and 
+			(visited ?from_wp ?system))
+	) 
+
+	(:action navigate 
+		 :parameters (?system-system ?to_wp-waypoint ?from_wp-waypoint) 
+		 :precondition (and 
+			(can_traverse ?system ?from_wp ?to_wp))
+		 :effect (and 
+			(not (at ?system ?from_wp)) 
+			(at ?system ?to_wp))
+	) 
+
+	(:action unvisit 
+		 :parameters (?system-system ?from_wp-waypoint) 
+		 :precondition (and 
+			)
+		 :effect (and 
+			(not (visited ?from_wp ?system)))
+	) 
+
+	(:action getdatafromsensors 
+		 :parameters (?system-system) 
+		 :precondition (and 
+			(equipped_for_health_monitoring ?system))
+		 :effect (and 
+			(got_health_data ?system))
+	) 
+
+	(:action sendsystemstate 
+		 :parameters (?system-system) 
+		 :precondition (and 
+			(available ?system))
+		 :effect (and 
+			(not (available ?system)) 
+			(communicated_health_data ?system) 
+			(available ?system)_copy)
+	) 
+
+	(:action readartag 
+		 :parameters (?system-system ?to_wp-waypoint ?objective-objective ?camera-camera) 
+		 :precondition (and 
+			(visible_from ?objective ?waypoint ?system) 
+			(on_board ?camera ?system) 
+			(equipped_for_imaging ?system) 
+			(available ?system))
+		 :effect (and 
+			(get_artag ?system ?objective) 
+			(not (available ?system)) 
+			(available ?system))
+	) 
+
+	(:action communicateartagdata 
+		 :parameters (?system-system ?objective-objective) 
+		 :precondition (and 
+			(available ?system))
+		 :effect (and 
+			(communicated_artag_data ?objective))
+	) 
+
+	(:action takeimage 
+		 :parameters (?system-system ?to_wp-waypoint ?objective-objective ?camera-camera) 
+		 :precondition (and 
+			(visible_from ?objective ?waypoint ?system) 
+			(on_board ?camera ?system) 
+			(equipped_for_imaging ?system))
+		 :effect (and 
+			(have_image ?system ?objective))
+	) 
+
+	(:action communicateimagedata 
+		 :parameters (?system-system ?objective-objective) 
+		 :precondition (and 
+			(available ?system))
+		 :effect (and 
+			(not (available ?system)) 
+			(communicated_image_data ?objective) 
+			(available ?system))
+	) 
+
+	(:action makeavailable 
+		 :parameters (?system2-system) 
+		 :precondition (and 
+			)
+		 :effect (and 
+			(available ?system2))
+	) 
+
+)

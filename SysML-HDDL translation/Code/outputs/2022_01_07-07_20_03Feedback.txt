@@ -1,0 +1,30 @@
+Feedback Log File 
+This file record all the discrepancy of the Papyrus model and/or the feedback from HDDL Domain File 
+------------------------------------------------- The following information shows discrepancies between the expected input and the real one 
+Log errors and warnings during parsing: 
+------------------------------------------------- 
+		 Check your model! Edge id:_BiLe8C_-Eey2uITxAxcuZA is ill defined! It is probably missing an input or an output 
+------------------------------------------------- 
+Log errors and warnings during the HDDL Domain file element acquisition: 
+------------------------------------------------- 
+------------------------------------------------- 
+Log errors and warnings during the HDDL Problem file element acquisition: 
+------------------------------------------------- 
+------------------------------------------------- 
+Log errors and warnings during the Feedback generation: 
+------------------------------------------------- 
+------------------------------------------------- The following information is missing in the Papyrus module 
+	 Possible Missing or Modified Requirements: 
+	 Possible Missing or Modified Types: 
+	 Possible Missing or Modified Predicates: 
+		 is_independent ?arg0 - system ?arg1 - system 
+		 going_back ?arg0 - system ?arg1 - waypoint 
+	 Possible Missing or Modified Tasks: 
+		 (:task GoBack 
+		 (:task Dummy_Task 
+	 Possible Missing or Modified Methods: 
+		 (:method Dummy_Task_method1 
+	 Possible Missing or Modified Actions: 
+		 (:action ReadArTag 
+		 (:action Dummy_action_1 
+		 (:action Dummy_action_2 
