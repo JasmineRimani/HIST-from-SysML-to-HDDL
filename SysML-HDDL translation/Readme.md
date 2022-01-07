@@ -57,7 +57,7 @@ The need to exctract useful information from SysML/MBSE models and convert them 
      - In def DomainFileWriting (self):
         - Code a check to match the task's parameters' names with the method's parameters' name when defining a HDDL method  [DONE].
      - In def ProblemFileElements(self):
-        - Code the multiple problem file generation with common core
+        - Code the multiple problem file generation with common core. [DONE]
     
 
 # To Code:
