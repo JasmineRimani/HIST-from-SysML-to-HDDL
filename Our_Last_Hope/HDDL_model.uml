@@ -1005,10 +1005,10 @@
     <packagedElement xmi:type="uml:Dependency" xmi:id="_X8cVUEeTEeyfR69e6oOSMw" client="_Mt3kEEeTEeyfR69e6oOSMw" supplier="_a2yF0C2EEeylqPZKkKN_nQ"/>
     <packagedElement xmi:type="uml:Dependency" xmi:id="_Y5i2wEeTEeyfR69e6oOSMw" client="_Ig7pkEeTEeyfR69e6oOSMw" supplier="_a2yF0C2EEeylqPZKkKN_nQ"/>
     <packagedElement xmi:type="uml:Dependency" xmi:id="_a4MUwEeTEeyfR69e6oOSMw" client="_9gFLQEeSEeyfR69e6oOSMw" supplier="_dCuY8C2EEeylqPZKkKN_nQ"/>
-    <packagedElement xmi:type="uml:Dependency" xmi:id="_cwhIUEeTEeyfR69e6oOSMw" client="_A-WB4EeTEeyfR69e6oOSMw" supplier="_lEHFkC29EeyJR5-c4iMVXA"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_cwhIUEeTEeyfR69e6oOSMw" client="_A-WB4EeTEeyfR69e6oOSMw" supplier="_avIJMC2FEeylqPZKkKN_nQ"/>
     <packagedElement xmi:type="uml:Dependency" xmi:id="_daerUEeTEeyfR69e6oOSMw" client="_A-WB4EeTEeyfR69e6oOSMw" supplier="_Y5doEC2FEeylqPZKkKN_nQ"/>
     <packagedElement xmi:type="uml:Dependency" xmi:id="_ejLYwEeTEeyfR69e6oOSMw" client="_ERE98EeTEeyfR69e6oOSMw" supplier="_Y5doEC2FEeylqPZKkKN_nQ"/>
-    <packagedElement xmi:type="uml:Dependency" xmi:id="_fWfsEEeTEeyfR69e6oOSMw" client="_ERE98EeTEeyfR69e6oOSMw" supplier="_lEHFkC29EeyJR5-c4iMVXA"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_fWfsEEeTEeyfR69e6oOSMw" client="_ERE98EeTEeyfR69e6oOSMw" supplier="_avIJMC2FEeylqPZKkKN_nQ"/>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_wVEBwC2DEeylqPZKkKN_nQ" name="Types">
     <ownedComment xmi:type="uml:Comment" xmi:id="_ggPIQEVXEeykYNpZ1N6_Cw">
@@ -1026,13 +1026,46 @@ the elements of the UseCase</body>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_w3ylgEVXEeykYNpZ1N6_Cw" name="Mission">
     <packagedElement xmi:type="uml:Dependency" xmi:id="_zL0doEVXEeykYNpZ1N6_Cw" name="Defines" client="_w3ylgEVXEeykYNpZ1N6_Cw" supplier="_rfy78C2DEeylqPZKkKN_nQ"/>
-    <packagedElement xmi:type="uml:Package" xmi:id="_7qcPwEVXEeykYNpZ1N6_Cw" name="Components" visibility="public">
+    <packagedElement xmi:type="uml:Package" xmi:id="_7qcPwEVXEeykYNpZ1N6_Cw" name="StaticMissionData" visibility="public">
       <ownedComment xmi:type="uml:Comment" xmi:id="_EY6bwEVYEeykYNpZ1N6_Cw">
         <body>The components defines&#xD;
 the equipment of the &#xD;
 systems under study&#xD;
 </body>
       </ownedComment>
+      <packagedElement xmi:type="uml:Class" xmi:id="_kklGMG-CEeycHcrHqO7Dzg" name="rover">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_H4BeUG-GEeycHcrHqO7Dzg" name="rover" type="_-3EQoC2ZEeylqPZKkKN_nQ"/>
+        <nestedClassifier xmi:type="uml:Class" xmi:id="_7oYZAG-CEeycHcrHqO7Dzg" name="camera1">
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_S2iaUG-GEeycHcrHqO7Dzg" name="camera" type="_b9LbQC_3Eey2uITxAxcuZA"/>
+        </nestedClassifier>
+        <nestedClassifier xmi:type="uml:Class" xmi:id="_790dgG-CEeycHcrHqO7Dzg" name="camera2">
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_XpUz4G-GEeycHcrHqO7Dzg" name="camera" type="_b9LbQC_3Eey2uITxAxcuZA"/>
+        </nestedClassifier>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_s4kVoG-CEeycHcrHqO7Dzg" name="Drone">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_Nrpp0G-GEeycHcrHqO7Dzg" name="Drone" type="_-3EQoC2ZEeylqPZKkKN_nQ"/>
+        <nestedClassifier xmi:type="uml:Class" xmi:id="_sh8v8G-DEeycHcrHqO7Dzg" name="camera3">
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_ZD6ikG-GEeycHcrHqO7Dzg" name="camera" type="_b9LbQC_3Eey2uITxAxcuZA"/>
+        </nestedClassifier>
+        <nestedClassifier xmi:type="uml:Class" xmi:id="_t0Bb0G-DEeycHcrHqO7Dzg" name="camera4">
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_ZVmvgG-GEeycHcrHqO7Dzg" name="camera" type="_b9LbQC_3Eey2uITxAxcuZA"/>
+        </nestedClassifier>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_t2ogYG-CEeycHcrHqO7Dzg" name="ControlCenter">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_8JFncG-EEeycHcrHqO7Dzg" name="ControlCenter" type="_S0ZSMEY6EeyhYpX6KgufSQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_AqavgG-DEeycHcrHqO7Dzg" name="fisheye">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_bKdYUG-GEeycHcrHqO7Dzg" name="mode" type="_HBYeIEXtEeyhYpX6KgufSQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_GCWdgG-DEeycHcrHqO7Dzg" name="depth">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_gPSkIG-GEeycHcrHqO7Dzg" name="mode" type="_HBYeIEXtEeyhYpX6KgufSQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Abstraction" xmi:id="_yR4uQG-DEeycHcrHqO7Dzg" name="In communication" client="_t2ogYG-CEeycHcrHqO7Dzg" supplier="_kklGMG-CEeycHcrHqO7Dzg"/>
+      <packagedElement xmi:type="uml:Abstraction" xmi:id="_z9D2oG-DEeycHcrHqO7Dzg" name="In communication" client="_t2ogYG-CEeycHcrHqO7Dzg" supplier="_s4kVoG-CEeycHcrHqO7Dzg"/>
+      <packagedElement xmi:type="uml:Abstraction" xmi:id="_B9HRAG-EEeycHcrHqO7Dzg" name="ExhibitMode" client="_7oYZAG-CEeycHcrHqO7Dzg" supplier="_AqavgG-DEeycHcrHqO7Dzg"/>
+      <packagedElement xmi:type="uml:Abstraction" xmi:id="_FV9cIG-EEeycHcrHqO7Dzg" name="ExhibitMode" client="_sh8v8G-DEeycHcrHqO7Dzg" supplier="_AqavgG-DEeycHcrHqO7Dzg"/>
+      <packagedElement xmi:type="uml:Abstraction" xmi:id="_Hlf10G-EEeycHcrHqO7Dzg" name="ExhibitMode" client="_790dgG-CEeycHcrHqO7Dzg" supplier="_GCWdgG-DEeycHcrHqO7Dzg"/>
+      <packagedElement xmi:type="uml:Abstraction" xmi:id="_JKYwAG-EEeycHcrHqO7Dzg" name="ExhibitMode" client="_t0Bb0G-DEeycHcrHqO7Dzg" supplier="_GCWdgG-DEeycHcrHqO7Dzg"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_YMamAEVZEeykYNpZ1N6_Cw" name="MissionToAccomplish">
       <ownedComment xmi:type="uml:Comment" xmi:id="_u8Ol0EVZEeykYNpZ1N6_Cw">
@@ -1040,19 +1073,25 @@ systems under study&#xD;
 overall activity diagram &#xD;
 to be accomplished.</body>
       </ownedComment>
-      <packagedElement xmi:type="uml:Activity" xmi:id="_ysAfsEVYEeykYNpZ1N6_Cw" name="MissionToAccomplish">
-        <ownedComment xmi:type="uml:Comment" xmi:id="_BUTl0EVZEeykYNpZ1N6_Cw">
-          <body>The activities of this diagram &#xD;
-are the tasks defined in the &#xD;
-function folder </body>
-        </ownedComment>
-      </packagedElement>
-      <packagedElement xmi:type="uml:Activity" xmi:id="_AVPkAEXyEeyhYpX6KgufSQ" name="SampleMission" node="_anvK8EXzEeyhYpX6KgufSQ _ijaoEEXzEeyhYpX6KgufSQ _k70p4EXzEeyhYpX6KgufSQ _tIM1cEXzEeyhYpX6KgufSQ _7lwEIEXzEeyhYpX6KgufSQ __GKP0EXzEeyhYpX6KgufSQ _DLnM0EX1EeyhYpX6KgufSQ _PilbcEXzEeyhYpX6KgufSQ" group="_tIM1cEXzEeyhYpX6KgufSQ">
+      <packagedElement xmi:type="uml:Activity" xmi:id="_AVPkAEXyEeyhYpX6KgufSQ" name="Mission" node="_anvK8EXzEeyhYpX6KgufSQ _ijaoEEXzEeyhYpX6KgufSQ _k70p4EXzEeyhYpX6KgufSQ _7lwEIEXzEeyhYpX6KgufSQ __GKP0EXzEeyhYpX6KgufSQ _DLnM0EX1EeyhYpX6KgufSQ _PilbcEXzEeyhYpX6KgufSQ _tIM1cEXzEeyhYpX6KgufSQ" group="_tIM1cEXzEeyhYpX6KgufSQ">
         <ownedComment xmi:type="uml:Comment" xmi:id="_4ZQWgEZBEeyhYpX6KgufSQ">
-          <body>Verify:&#xD;
-- Presence map_file&#xD;
-- Presence objectives&#xD;
+          <body>Other initial conditions files:&#xD;
+Map_file = plan_final_1m_1_int.txt&#xD;
+&#xD;
 </body>
+        </ownedComment>
+        <ownedComment xmi:type="uml:Comment" xmi:id="_qGHDMG_REeycHcrHqO7Dzg">
+          <body>Initial HTN:&#xD;
+task0(TakePicture objective4) &#xD;
+task1(TakePicture objective2) &#xD;
+task2(TakePicture objective1) &#xD;
+task3(TakePicture objective6) &#xD;
+task4(TakePicture objective5)  &#xD;
+task5(EvaluateAvailableResources rover)&#xD;
+</body>
+        </ownedComment>
+        <ownedComment xmi:type="uml:Comment" xmi:id="_HeZy4G_SEeycHcrHqO7Dzg">
+          <body></body>
         </ownedComment>
         <ownedRule xmi:type="uml:Constraint" xmi:id="_qfZyIEY-EeyhYpX6KgufSQ" name="(is_dependent ?drone ?rover)" constrainedElement="_PilbcEXzEeyhYpX6KgufSQ _anvK8EXzEeyhYpX6KgufSQ">
           <specification xmi:type="uml:OpaqueExpression" xmi:id="_qfaZMEY-EeyhYpX6KgufSQ" name="constraintSpec">
@@ -1066,13 +1105,13 @@ function folder </body>
             <body>true</body>
           </specification>
         </ownedRule>
-        <ownedRule xmi:type="uml:Constraint" xmi:id="_JH5wAEZAEeyhYpX6KgufSQ" name="(at rover waypoint(n))" constrainedElement="__GKP0EXzEeyhYpX6KgufSQ">
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_JH5wAEZAEeyhYpX6KgufSQ" name="(at rover waypoint0)" constrainedElement="__GKP0EXzEeyhYpX6KgufSQ">
           <specification xmi:type="uml:OpaqueExpression" xmi:id="_JH6XEEZAEeyhYpX6KgufSQ" name="constraintSpec">
             <language>OCL</language>
             <body>true</body>
           </specification>
         </ownedRule>
-        <ownedRule xmi:type="uml:Constraint" xmi:id="_QGhH8EZAEeyhYpX6KgufSQ" name="(at drone waypoint(n))" visibility="public" constrainedElement="_ijaoEEXzEeyhYpX6KgufSQ">
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_QGhH8EZAEeyhYpX6KgufSQ" name="(at drone waypoint0)" visibility="public" constrainedElement="_ijaoEEXzEeyhYpX6KgufSQ">
           <specification xmi:type="uml:OpaqueExpression" xmi:id="_QGiWEEZAEeyhYpX6KgufSQ" name="constraintSpec">
             <language>OCL</language>
             <body>true</body>
@@ -1235,48 +1274,215 @@ function folder </body>
           <upperBound xmi:type="uml:LiteralInteger" xmi:id="_DLnz4EX1EeyhYpX6KgufSQ" value="1"/>
         </node>
       </packagedElement>
-      <packagedElement xmi:type="uml:StateMachine" xmi:id="_dDc04EXyEeyhYpX6KgufSQ" name="StateMachine4">
-        <region xmi:type="uml:Region" xmi:id="_eNp-MEXyEeyhYpX6KgufSQ" name="Region1">
-          <subvertex xmi:type="uml:Pseudostate" xmi:id="_fUGB0EXyEeyhYpX6KgufSQ"/>
-          <subvertex xmi:type="uml:State" xmi:id="_gm34UEXyEeyhYpX6KgufSQ" name="Idle"/>
-        </region>
+      <packagedElement xmi:type="uml:Activity" xmi:id="_0okKYG-GEeycHcrHqO7Dzg" name="Mission_2" node="_LojUMG-HEeycHcrHqO7Dzg _Mw6qcG-HEeycHcrHqO7Dzg _SN864G-HEeycHcrHqO7Dzg _apRhYG-HEeycHcrHqO7Dzg _goEbEG-HEeycHcrHqO7Dzg _goFpMG-HEeycHcrHqO7Dzg _goGQQG-HEeycHcrHqO7Dzg" group="_zXGGAG-HEeycHcrHqO7Dzg">
+        <ownedComment xmi:type="uml:Comment" xmi:id="_MXGAIG_SEeycHcrHqO7Dzg">
+          <body>Other initial conditions files:&#xD;
+Map_file = plan_final_1m_1_int.txt&#xD;
+&#xD;
+</body>
+        </ownedComment>
+        <ownedComment xmi:type="uml:Comment" xmi:id="_MXGnMG_SEeycHcrHqO7Dzg">
+          <body>Initial HTN:&#xD;
+task0(TakePicture objective4) &#xD;
+task1(TakePicture objective2) &#xD;
+task2(TakePicture objective1) &#xD;
+task3(TakePicture objective6) &#xD;
+task4(TakePicture objective5)  &#xD;
+task5(EvaluateAvailableResources rover)&#xD;
+</body>
+        </ownedComment>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_4oAmAG-HEeycHcrHqO7Dzg" name="(at rover waypoint10)" constrainedElement="__GKP0EXzEeyhYpX6KgufSQ">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_4oAmAW-HEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_4oAmAm-HEeycHcrHqO7Dzg" name="(available rover)" constrainedElement="__GKP0EXzEeyhYpX6KgufSQ">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_4oAmA2-HEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_4oBNEG-HEeycHcrHqO7Dzg" name="(at drone waypoint10)" visibility="public" constrainedElement="_ijaoEEXzEeyhYpX6KgufSQ">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_4oBNEW-HEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_A5LK8G-IEeycHcrHqO7Dzg" name="(is_dependent ?drone ?rover)" constrainedElement="_PilbcEXzEeyhYpX6KgufSQ _anvK8EXzEeyhYpX6KgufSQ">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_A5LK8W-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_A5LyAG-IEeycHcrHqO7Dzg" name="(channel_free control_center)">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_A5LyAW-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_A5LyAm-IEeycHcrHqO7Dzg" name="(equipped_for_imaging drone)" constrainedElement="_XZlz8EXzEeyhYpX6KgufSQ _JxZjgEZBEeyhYpX6KgufSQ _MIQtMEZBEeyhYpX6KgufSQ">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_A5LyA2-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_A5LyBG-IEeycHcrHqO7Dzg" name="(equipped_for_arTag_reading drone)" constrainedElement="_XZlz8EXzEeyhYpX6KgufSQ">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_A5LyBW-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_A5MZEG-IEeycHcrHqO7Dzg" name="(equipped_for_health_monitoring rover)" constrainedElement="_Rs_dgEXzEeyhYpX6KgufSQ">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_A5MZEW-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_A5MZEm-IEeycHcrHqO7Dzg" name="(equipped_for_imaging rover)" constrainedElement="_XZlz8EXzEeyhYpX6KgufSQ _CE3VoEZBEeyhYpX6KgufSQ">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_A5MZE2-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_A5MZFG-IEeycHcrHqO7Dzg" name="(equipped_for_arTag_reading rover)" constrainedElement="_XZlz8EXzEeyhYpX6KgufSQ">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_A5MZFW-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_A5MZFm-IEeycHcrHqO7Dzg" name="(equipped_for_arTag_reading drone)" constrainedElement="_Rs_dgEXzEeyhYpX6KgufSQ">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_A5MZF2-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_JyIvsG-IEeycHcrHqO7Dzg" name="(supports camera3 depth)">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_JyIvsW-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_JyIvsm-IEeycHcrHqO7Dzg" name="(on_board camera4 drone)" constrainedElement="_JyJWxm-IEeycHcrHqO7Dzg">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_JyIvs2-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_JyIvtG-IEeycHcrHqO7Dzg" name="(on_board camera2 rover)" constrainedElement="_gxa_AEZAEeyhYpX6KgufSQ _JyJWwm-IEeycHcrHqO7Dzg">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_JyIvtW-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_JyJWwG-IEeycHcrHqO7Dzg" name="(on_board camera3 drone)" constrainedElement="_JyIvsG-IEeycHcrHqO7Dzg">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_JyJWwW-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_JyJWwm-IEeycHcrHqO7Dzg" name="(supports camera2 fisheye)">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_JyJWw2-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_JyJWxG-IEeycHcrHqO7Dzg" name="(on_board camera1 rover)" constrainedElement="_JyJ90G-IEeycHcrHqO7Dzg">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_JyJWxW-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_JyJWxm-IEeycHcrHqO7Dzg" name="(supports camera4 fisheye)">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_JyJWx2-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_JyJ90G-IEeycHcrHqO7Dzg" name="(supports camera1 depth)">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_JyJ90W-IEeycHcrHqO7Dzg" name="constraintSpec">
+            <language>OCL</language>
+            <body>true</body>
+          </specification>
+        </ownedRule>
+        <edge xmi:type="uml:ControlFlow" xmi:id="_kPZuIG-HEeycHcrHqO7Dzg" target="_XrzDoG-HEeycHcrHqO7Dzg" source="_Mw6qcG-HEeycHcrHqO7Dzg"/>
+        <edge xmi:type="uml:ControlFlow" xmi:id="_k6occG-HEeycHcrHqO7Dzg" target="_Mw6qcG-HEeycHcrHqO7Dzg" source="_LojUMG-HEeycHcrHqO7Dzg"/>
+        <edge xmi:type="uml:ControlFlow" xmi:id="_mADMYG-HEeycHcrHqO7Dzg" target="_QDo_cG-HEeycHcrHqO7Dzg" source="_XrzDoG-HEeycHcrHqO7Dzg"/>
+        <edge xmi:type="uml:ControlFlow" xmi:id="_m6qagG-HEeycHcrHqO7Dzg" target="_SN864G-HEeycHcrHqO7Dzg" source="_QDo_cG-HEeycHcrHqO7Dzg"/>
+        <edge xmi:type="uml:ControlFlow" xmi:id="_o-iWwG-HEeycHcrHqO7Dzg" target="_apRhYG-HEeycHcrHqO7Dzg" source="_SN864G-HEeycHcrHqO7Dzg"/>
+        <edge xmi:type="uml:ObjectFlow" xmi:id="_suuD0G-HEeycHcrHqO7Dzg" target="_QDo_cW-HEeycHcrHqO7Dzg" source="_goGQQG-HEeycHcrHqO7Dzg">
+          <guard xmi:type="uml:LiteralBoolean" xmi:id="_su5C8G-HEeycHcrHqO7Dzg" value="true"/>
+          <weight xmi:type="uml:LiteralInteger" xmi:id="_su5C8W-HEeycHcrHqO7Dzg" value="1"/>
+        </edge>
+        <edge xmi:type="uml:ObjectFlow" xmi:id="_tT50gG-HEeycHcrHqO7Dzg" target="_Mw6qcW-HEeycHcrHqO7Dzg" source="_goEbEG-HEeycHcrHqO7Dzg">
+          <guard xmi:type="uml:LiteralBoolean" xmi:id="_tUCXYG-HEeycHcrHqO7Dzg" value="true"/>
+          <weight xmi:type="uml:LiteralInteger" xmi:id="_tUCXYW-HEeycHcrHqO7Dzg" value="1"/>
+        </edge>
+        <edge xmi:type="uml:ObjectFlow" xmi:id="_ui9ooG-HEeycHcrHqO7Dzg" target="_XrzDoW-HEeycHcrHqO7Dzg" source="_goEbEG-HEeycHcrHqO7Dzg">
+          <guard xmi:type="uml:LiteralBoolean" xmi:id="_ujLrEG-HEeycHcrHqO7Dzg" value="true"/>
+          <weight xmi:type="uml:LiteralInteger" xmi:id="_ujLrEW-HEeycHcrHqO7Dzg" value="1"/>
+        </edge>
+        <edge xmi:type="uml:ObjectFlow" xmi:id="_vHOzUG-HEeycHcrHqO7Dzg" target="_SN864W-HEeycHcrHqO7Dzg" source="_goEbEG-HEeycHcrHqO7Dzg">
+          <guard xmi:type="uml:LiteralBoolean" xmi:id="_vHWvIG-HEeycHcrHqO7Dzg" value="true"/>
+          <weight xmi:type="uml:LiteralInteger" xmi:id="_vHWvIW-HEeycHcrHqO7Dzg" value="1"/>
+        </edge>
+        <edge xmi:type="uml:ObjectFlow" xmi:id="_v705AG-HEeycHcrHqO7Dzg" target="_Mw6qc2-HEeycHcrHqO7Dzg" source="_goFpMG-HEeycHcrHqO7Dzg">
+          <guard xmi:type="uml:LiteralBoolean" xmi:id="_v7-qAG-HEeycHcrHqO7Dzg" value="true"/>
+          <weight xmi:type="uml:LiteralInteger" xmi:id="_v7-qAW-HEeycHcrHqO7Dzg" value="1"/>
+        </edge>
+        <edge xmi:type="uml:ObjectFlow" xmi:id="_wmj4EG-HEeycHcrHqO7Dzg" target="_XrzDo2-HEeycHcrHqO7Dzg" source="_goFpMG-HEeycHcrHqO7Dzg">
+          <guard xmi:type="uml:LiteralBoolean" xmi:id="_wmuQIG-HEeycHcrHqO7Dzg" value="true"/>
+          <weight xmi:type="uml:LiteralInteger" xmi:id="_wmuQIW-HEeycHcrHqO7Dzg" value="1"/>
+        </edge>
+        <edge xmi:type="uml:ObjectFlow" xmi:id="_xVmIUG-HEeycHcrHqO7Dzg" target="_SN8642-HEeycHcrHqO7Dzg" source="_goFpMG-HEeycHcrHqO7Dzg">
+          <guard xmi:type="uml:LiteralBoolean" xmi:id="_xVv5UG-HEeycHcrHqO7Dzg" value="true"/>
+          <weight xmi:type="uml:LiteralInteger" xmi:id="_xVv5UW-HEeycHcrHqO7Dzg" value="1"/>
+        </edge>
+        <group xmi:type="uml:LoopNode" xmi:id="_zXGGAG-HEeycHcrHqO7Dzg" name="ThroughtOutTheMission">
+          <node xmi:type="uml:CallBehaviorAction" xmi:id="_QDo_cG-HEeycHcrHqO7Dzg" name="TakePicture" incoming="_mADMYG-HEeycHcrHqO7Dzg" outgoing="_m6qagG-HEeycHcrHqO7Dzg" behavior="_LLI6EEXzEeyhYpX6KgufSQ">
+            <argument xmi:type="uml:InputPin" xmi:id="_QDo_cW-HEeycHcrHqO7Dzg" incoming="_suuD0G-HEeycHcrHqO7Dzg">
+              <upperBound xmi:type="uml:LiteralInteger" xmi:id="_QDo_cm-HEeycHcrHqO7Dzg" value="1"/>
+            </argument>
+          </node>
+          <node xmi:type="uml:CallBehaviorAction" xmi:id="_XrzDoG-HEeycHcrHqO7Dzg" name="EvaluateAvailableResources" incoming="_kPZuIG-HEeycHcrHqO7Dzg" outgoing="_mADMYG-HEeycHcrHqO7Dzg" behavior="_IAMBAEXzEeyhYpX6KgufSQ">
+            <argument xmi:type="uml:InputPin" xmi:id="_XrzDoW-HEeycHcrHqO7Dzg" name="" incoming="_ui9ooG-HEeycHcrHqO7Dzg">
+              <upperBound xmi:type="uml:LiteralInteger" xmi:id="_XrzDom-HEeycHcrHqO7Dzg" value="1"/>
+            </argument>
+            <argument xmi:type="uml:InputPin" xmi:id="_XrzDo2-HEeycHcrHqO7Dzg" name="" incoming="_wmj4EG-HEeycHcrHqO7Dzg">
+              <upperBound xmi:type="uml:LiteralInteger" xmi:id="_XrzDpG-HEeycHcrHqO7Dzg" value="1"/>
+            </argument>
+          </node>
+        </group>
+        <node xmi:type="uml:InitialNode" xmi:id="_LojUMG-HEeycHcrHqO7Dzg" name="InitialNode1" outgoing="_k6occG-HEeycHcrHqO7Dzg"/>
+        <node xmi:type="uml:CallBehaviorAction" xmi:id="_Mw6qcG-HEeycHcrHqO7Dzg" name="StartMission" incoming="_k6occG-HEeycHcrHqO7Dzg" outgoing="_kPZuIG-HEeycHcrHqO7Dzg" behavior="_OUhF0EXzEeyhYpX6KgufSQ">
+          <argument xmi:type="uml:InputPin" xmi:id="_Mw6qcW-HEeycHcrHqO7Dzg" incoming="_tT50gG-HEeycHcrHqO7Dzg">
+            <upperBound xmi:type="uml:LiteralInteger" xmi:id="_Mw6qcm-HEeycHcrHqO7Dzg" value="1"/>
+          </argument>
+          <argument xmi:type="uml:InputPin" xmi:id="_Mw6qc2-HEeycHcrHqO7Dzg" incoming="_v705AG-HEeycHcrHqO7Dzg">
+            <upperBound xmi:type="uml:LiteralInteger" xmi:id="_Mw6qdG-HEeycHcrHqO7Dzg" value="1"/>
+          </argument>
+        </node>
+        <node xmi:type="uml:CallBehaviorAction" xmi:id="_SN864G-HEeycHcrHqO7Dzg" name="GoBack" incoming="_m6qagG-HEeycHcrHqO7Dzg" outgoing="_o-iWwG-HEeycHcrHqO7Dzg" behavior="_M2AgcEXzEeyhYpX6KgufSQ">
+          <argument xmi:type="uml:InputPin" xmi:id="_SN864W-HEeycHcrHqO7Dzg" incoming="_vHOzUG-HEeycHcrHqO7Dzg">
+            <upperBound xmi:type="uml:LiteralInteger" xmi:id="_SN864m-HEeycHcrHqO7Dzg" value="1"/>
+          </argument>
+          <argument xmi:type="uml:InputPin" xmi:id="_SN8642-HEeycHcrHqO7Dzg" incoming="_xVmIUG-HEeycHcrHqO7Dzg">
+            <upperBound xmi:type="uml:LiteralInteger" xmi:id="_SN865G-HEeycHcrHqO7Dzg" value="1"/>
+          </argument>
+        </node>
+        <node xmi:type="uml:ActivityFinalNode" xmi:id="_apRhYG-HEeycHcrHqO7Dzg" name="ActivityFinalNode6" incoming="_o-iWwG-HEeycHcrHqO7Dzg"/>
+        <node xmi:type="uml:ActivityParameterNode" xmi:id="_goEbEG-HEeycHcrHqO7Dzg" name="rover" outgoing="_tT50gG-HEeycHcrHqO7Dzg _ui9ooG-HEeycHcrHqO7Dzg _vHOzUG-HEeycHcrHqO7Dzg" type="_-3EQoC2ZEeylqPZKkKN_nQ">
+          <upperBound xmi:type="uml:LiteralInteger" xmi:id="_goEbEW-HEeycHcrHqO7Dzg" value="1"/>
+        </node>
+        <node xmi:type="uml:ActivityParameterNode" xmi:id="_goFpMG-HEeycHcrHqO7Dzg" name="drone" outgoing="_v705AG-HEeycHcrHqO7Dzg _wmj4EG-HEeycHcrHqO7Dzg _xVmIUG-HEeycHcrHqO7Dzg" type="_-3EQoC2ZEeylqPZKkKN_nQ">
+          <upperBound xmi:type="uml:LiteralInteger" xmi:id="_goFpMW-HEeycHcrHqO7Dzg" value="1"/>
+        </node>
+        <node xmi:type="uml:ActivityParameterNode" xmi:id="_goGQQG-HEeycHcrHqO7Dzg" name="Objective" outgoing="_suuD0G-HEeycHcrHqO7Dzg">
+          <upperBound xmi:type="uml:LiteralInteger" xmi:id="_goGQQW-HEeycHcrHqO7Dzg" value="1"/>
+        </node>
       </packagedElement>
     </packagedElement>
     <packagedElement xmi:type="uml:Dependency" xmi:id="_tha0sEVZEeykYNpZ1N6_Cw" name="Explained" client="_w3ylgEVXEeykYNpZ1N6_Cw" supplier="_YMamAEVZEeykYNpZ1N6_Cw"/>
-    <packagedElement xmi:type="uml:Component" xmi:id="_pHOM8EXrEeyhYpX6KgufSQ" name="Rover">
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_9TxpYEY5EeyhYpX6KgufSQ" name="MainExplorationSystem" type="_-3EQoC2ZEeylqPZKkKN_nQ"/>
-      <packagedElement xmi:type="uml:Component" xmi:id="_r_y8kEXrEeyhYpX6KgufSQ" name="Camera1">
-        <ownedAttribute xmi:type="uml:Port" xmi:id="_Gh5iQEXsEeyhYpX6KgufSQ" name="Depth " type="_HBYeIEXtEeyhYpX6KgufSQ" aggregation="composite"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_881UMEhWEeyfR69e6oOSMw" name="camera" type="_b9LbQC_3Eey2uITxAxcuZA"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:Component" xmi:id="_skm50EXrEeyhYpX6KgufSQ" name="Camera2">
-        <ownedAttribute xmi:type="uml:Port" xmi:id="_Hdzw4EXsEeyhYpX6KgufSQ" name="Fisheye" type="_HBYeIEXtEeyhYpX6KgufSQ" aggregation="composite"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_C5YLIEhXEeyfR69e6oOSMw" name="camera2" type="_b9LbQC_3Eey2uITxAxcuZA"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:Dependency" xmi:id="_PGANgEY9EeyhYpX6KgufSQ" name="Provide Telemetry and data" client="_pHOM8EXrEeyhYpX6KgufSQ" supplier="_HbtisEY6EeyhYpX6KgufSQ"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Component" xmi:id="_sc-zkEYGEeyhYpX6KgufSQ" name="Drone">
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_5asfAEY5EeyhYpX6KgufSQ" name="SecondaryExplorationSystem" visibility="public" type="_-3EQoC2ZEeylqPZKkKN_nQ">
-        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_6p3A0EY5EeyhYpX6KgufSQ"/>
-        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_6oV94EY5EeyhYpX6KgufSQ" value="*"/>
-      </ownedAttribute>
-      <interfaceRealization xmi:type="uml:InterfaceRealization" xmi:id="_KoECkEY9EeyhYpX6KgufSQ" client="_sc-zkEYGEeyhYpX6KgufSQ"/>
-      <packagedElement xmi:type="uml:Component" xmi:id="_35w_8EYGEeyhYpX6KgufSQ" name="Camera3">
-        <ownedAttribute xmi:type="uml:Port" xmi:id="_869B4EYGEeyhYpX6KgufSQ" name="Depth" type="_HBYeIEXtEeyhYpX6KgufSQ" aggregation="composite"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_HlptAEhXEeyfR69e6oOSMw" name="camera3" type="_b9LbQC_3Eey2uITxAxcuZA"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:Component" xmi:id="_5JwBIEYGEeyhYpX6KgufSQ" name="Camera4">
-        <ownedAttribute xmi:type="uml:Port" xmi:id="_-aF5YEYGEeyhYpX6KgufSQ" name="Fisheye" type="_HBYeIEXtEeyhYpX6KgufSQ" aggregation="composite"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_LWvZAEhXEeyfR69e6oOSMw" name="Camera4" type="_b9LbQC_3Eey2uITxAxcuZA"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:Dependency" xmi:id="_BiovIEY9EeyhYpX6KgufSQ" name="Extends Capabilities" client="_sc-zkEYGEeyhYpX6KgufSQ" supplier="_pHOM8EXrEeyhYpX6KgufSQ"/>
-      <packagedElement xmi:type="uml:Dependency" xmi:id="_bfQpMEY9EeyhYpX6KgufSQ" name="Provide Telemetry and Data" client="_sc-zkEYGEeyhYpX6KgufSQ" supplier="_HbtisEY6EeyhYpX6KgufSQ"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Component" xmi:id="_HbtisEY6EeyhYpX6KgufSQ" name="Control Center">
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_KuUi8EY6EeyhYpX6KgufSQ" name="control_center" type="_S0ZSMEY6EeyhYpX6KgufSQ"/>
-      <packagedElement xmi:type="uml:Dependency" xmi:id="_TJhGQEY9EeyhYpX6KgufSQ" name="Provides Command" client="_HbtisEY6EeyhYpX6KgufSQ" supplier="_pHOM8EXrEeyhYpX6KgufSQ"/>
-      <packagedElement xmi:type="uml:Dependency" xmi:id="_WCgFkEY9EeyhYpX6KgufSQ" name="Provide Command" client="_HbtisEY6EeyhYpX6KgufSQ" supplier="_sc-zkEYGEeyhYpX6KgufSQ"/>
-    </packagedElement>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_a35SYEXpEeyhYpX6KgufSQ" name="Feedback">
     <ownedComment xmi:type="uml:Comment" xmi:id="_hYdcYEXpEeyhYpX6KgufSQ">
