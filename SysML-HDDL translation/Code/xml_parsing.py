@@ -74,7 +74,7 @@ class XML_parsing():
                 package_list.append({"name": ii['name'], "xmi:id":ii['xmi:id']})    
             
             # Isolate the classes - ':types' in HDDL
-            if ii['xmi:type'] == 'uml:Class':
+            if ii['xmi:type'] == 'uml:Class' and ii.parent["name"] == 'Types':
                 hddl_type_list.append({"name": ii['name'].replace(" ", ""), "xmi:id":ii['xmi:id']})
                 
             # Isolate Actors:
@@ -132,12 +132,12 @@ class XML_parsing():
         # Domain file instances analysis  
         for ii in b_comments:
             # The requirements for the HDDL domain file are included as comment in the UseCase
-            if ii.parent['name'] == 'UseCase':
+            if ii.parent['name'] == 'UseCase' and "Requirements" in ii.body.contents[0]:
                 comment_body = ii.body.string
                 for jj in self.hddl_requirements_list:
                     # avoid case-sensitivity 
-                    if jj.lower() in comment_body.lower():
-                        requirement_list_domain_file.append(jj)
+                    if jj.lower() in comment_body.lower() and jj.lower() not in requirement_list_domain_file:
+                        requirement_list_domain_file.append(jj.lower())
       
         self.xml_parsing_output["requirement_list_domain_file"] = requirement_list_domain_file
         self.xml_parsing_output["log_file_general_entries"] = log_file_general_entries

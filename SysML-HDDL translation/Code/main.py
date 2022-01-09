@@ -218,6 +218,11 @@ def main():
         generate_feedback_file = file_parameters[0]['generate_feedback']
     else:
         generate_feedback_file = 'no'
+
+    if file_parameters[0].has_attr('flag_ordering'):
+        flag_ordering_file = file_parameters[0]['flag_ordering']
+    else:
+        flag_ordering_file = 'yes'        
         
     if file_parameters[0].has_attr('task_parameters'):
         task_parameters = file_parameters[0]['task_parameters']
@@ -238,7 +243,7 @@ def main():
         hddl_requirements = ['typing', 'hierachie', 'fluents', 'STRIPS', 'Disjunctive Preconditions', 'Equality'
                          'Existential Preconditions','Universal Preconditions', 'Quantified Preconditions', 'Conditional Effects',
                          'Action Expansions','Foreach Expansions', 'DAG Expansions', 'Domain Axioms', 'Subgoals Through Axioms', 'Safety Constraints'
-                         'Expression Evaluation', 'Fluents', 'Open World', 'True Negation', 'ADL', 'UCPOP']
+                         'Expression Evaluation', 'Fluents', 'Open World', 'True Negation', 'ADL', 'UCPOP', 'hierarchy', 'method-preconditions',  'negative-preconditions']
     else:
         hddl_requirements = list_requirements
     
@@ -263,7 +268,7 @@ def main():
     if generate_domain_file == 'yes':
         print("Generating Domain File")
         # Take out the element you need for the domain file:
-        DomainFile = DomainDefinition(domain_name, parsed_dictionary, task_parameters)
+        DomainFile = DomainDefinition(domain_name, parsed_dictionary, task_parameters, flag_ordering_file)
         # Identify the Domain File Elements
         domain_file_elements = DomainFile.DomainFileElements()
         # Write the Domain FIle

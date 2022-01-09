@@ -16,7 +16,7 @@ import os
 
 # MAIN PARSING CLASS!
 class DomainDefinition():
-    def __init__(self, domain_name, parsed_dictionary, task_parameters = 'common', d_now = os.getcwd(),  debug = 'on'):
+    def __init__(self, domain_name, parsed_dictionary, task_parameters = 'common', flag_ordering_file = 'yes', d_now = os.getcwd(),  debug = 'on'):
 
         # Put an adaptable domain file name
         # Put an adaptable problem file name
@@ -68,6 +68,8 @@ class DomainDefinition():
         self.d_now = d_now
         # Task parameters consideration
         self.task_parameters = task_parameters
+        # Parameters Ordering 
+        self.flag_ordering_file = flag_ordering_file
         # General Dictionary with all the output from the Domain File Creation 
         self.domain_definition_output = {}
 
@@ -339,7 +341,7 @@ class DomainDefinition():
             if temporary_parameter_list == []:
                 if self.debug == 'on':
                     print('The action {} has no parameters - is there something wrong in the model?'.format(ii['name']))
-                self.log_file_general_entries('\t\t The action {} has no parameters - is there something wrong in the model? \n'.format(ii['name']))
+                self.log_file_general_entries.append('\t\t The action {} has no parameters - is there something wrong in the model? \n'.format(ii['name']))
             # Associate inputs and outputs to the action 
             ii["preconditions"] = [x for x in temporary_input_list]
             ii["effects"] = [x for x in temporary_output_list]
@@ -352,25 +354,26 @@ class DomainDefinition():
         # Check the tasks - if they all have the initial name and the same parameters, inputs and effects then they are one function
         final_opaque_action = []
         # Look at all the Actions
-        for ii in self.opaqueAction_list:
+        for action in self.opaqueAction_list:
             
             # Split the name of the action
-            name = ii['name'].split('_')[0]
-            final_opaque_action.append(name)
+            name = action['name'].split('_')[0]
+            final_opaque_action.append(name.lower())
             
         # we want the action to have just one occurance
         final_opaque_action_set = set(final_opaque_action)  
         
-        for ii in self.opaqueAction_list:
-            for jj in final_opaque_action_set:
-                if ii['name'] == jj and ii['xmi:type'] == 'uml:OpaqueAction':
-                    self.final_opaque_action_list.append(ii)
+        for final_action in final_opaque_action_set:
+            for action in self.opaqueAction_list:
+                if action['name'].lower() == final_action and action['xmi:type'] == 'uml:OpaqueAction':
+                    self.final_opaque_action_list.append(action)
+                    break
 
-        for ii in self.opaqueAction_list:
-            if ii['xmi:type'] == 'uml:CallBehaviorAction':
-                for jj in self.task_list:
-                    if jj.get('name') == ii.get('name'): 
-                        jj["parameters"] = ii.get('parameters')
+        for action in self.opaqueAction_list:
+            if action ['xmi:type'] == 'uml:CallBehaviorAction':
+                for task in self.task_list:
+                    if task.get('name') == action .get('name'): 
+                        task["parameters"] = action .get('parameters')
        
         # Check if the user defined some constraints in UseCase diagram to get the task parameters
         get_param = []
@@ -460,6 +463,7 @@ class DomainDefinition():
         
         temporary_predicate = []
         self.predicate_list = []
+
         
         for ii in self.all_predicates_list:
             # First remove brankets 
@@ -484,10 +488,17 @@ class DomainDefinition():
             
             #create the predicate final version
             final_predicate= ' '.join(temporary_predicate)
+            if len(final_predicate) <= 1:
+                
+                print('\t\t The predicate {} has no parameters - it has been inserted as it was written - please check it!'.format(jj))
+                self.log_file_general_entries.append('\t\t The predicate {} has no parameters - it has been inserted as it was written - please check it!'.format(jj))
+                # Final predicate in its original form - there is an error in the format - inform the user
+                final_predicate = kk
             
-            
-            if not(final_predicate in self.predicate_list):
+            # We don't consider equality constraints in the predicates
+            if not(final_predicate in self.predicate_list) and not('=' in final_predicate):
                 self.predicate_list.append(('{}').format(final_predicate))
+
                 
             temporary_predicate.clear()
             
@@ -574,39 +585,77 @@ class DomainDefinition():
             counter = 0
             
             # method actions
-            for jj in ii['ordered_tasks']: 
-                for kk in self.opaqueAction_list:
-                    if kk['xmi:id'] == jj:
-                        # Task Parameters
-                        dummy_string = ' '.join(kk['parameters'])
-                        dummy_vector = re.split(' |-', dummy_string)
-                        # vector[start:end:step]
-                        dummy_vector = dummy_vector[0::2]
-                        string_vector.append('task{}({} ?{})'.format(counter,kk['name'], ' ?'.join(dummy_vector).lower() ))
-                        counter = counter + 1
-                    if counter > 1 and '(< task{} task{})'.format(counter-2, counter-1) not in order_vector:
-                        # For each task check incoming and outcoming links
-                        order_vector.append('(< task{} task{})'.format(counter-2, counter-1))
+            if self.flag_ordering_file == 'yes':
+                for jj in ii['ordered_tasks']: 
+                    for kk in self.opaqueAction_list:
+                        if kk['xmi:id'] == jj:
+                            # Task Parameters
+                            dummy_string = ' '.join(kk['parameters'])
+                            dummy_vector = re.split(' |-', dummy_string)
+                            # vector[start:end:step]
+                            dummy_vector = dummy_vector[0::2]
+                            string_vector.append('task{}({} ?{})'.format(counter,kk['name'], ' ?'.join(dummy_vector).lower() ))
+                            counter = counter + 1
+                        if counter > 1 and '(< task{} task{})'.format(counter-2, counter-1) not in order_vector:
+                            # For each task check incoming and outcoming links
+                            order_vector.append('(< task{} task{})'.format(counter-2, counter-1))
 
-            if counter != 0 and counter != 1:
-                file.write('\t\t :subtasks (and \n')
-                file.write('\t\t\t{}\n'.format('\n\t\t\t'.join(string_vector)))
-                file.write('\t\t ) \n')
-                file.write('\t\t :ordering (and \n')
-                file.write('\t\t\t{}\n'.format(' \n\t\t\t'.join(order_vector).lower()))
-                file.write('\t\t ) \n')
-                string_vector.clear()
-                order_vector.clear()
-            elif counter == 1:
-                file.write('\t\t :subtasks (and \n')
-                file.write('\t\t\t {}\n'.format(' \n\t\t\t'.join(string_vector)))
-                file.write('\t\t ) \n')
-                string_vector.clear()
-                order_vector.clear()
-            else:
-                file.write('\t\t :subtasks () \n')
-                string_vector.clear()
-                order_vector.clear()
+            if self.flag_ordering_file == 'no':
+                for jj in ii['ordered_tasks']: 
+                    for kk in self.opaqueAction_list:
+                        if kk['xmi:id'] == jj:
+                            # Task Parameters
+                            dummy_string = ' '.join(kk['parameters'])
+                            dummy_vector = re.split(' |-', dummy_string)
+                            # vector[start:end:step]
+                            dummy_vector = dummy_vector[0::2]
+                            if kk["parameters"] != set():
+                                string_vector.append('task{}({} ?{})'.format(counter,kk['name'], ' ?'.join(dummy_vector).lower() ))
+                            else:
+                                string_vector.append('task{}({})'.format(counter,kk['name']))
+                            counter = counter + 1
+
+                            
+            if self.flag_ordering_file == 'yes':                            
+                if counter != 0 and counter != 1:
+                    file.write('\t\t :subtasks (and \n')
+                    file.write('\t\t\t{}\n'.format('\n\t\t\t'.join(string_vector).lower()))
+                    file.write('\t\t ) \n')
+                    file.write('\t\t :ordering (and \n')
+                    file.write('\t\t\t{}\n'.format(' \n\t\t\t'.join(order_vector).lower()))
+                    file.write('\t\t ) \n')
+                    string_vector.clear()
+                    order_vector.clear()
+                elif counter == 1:
+                    file.write('\t\t :subtasks (and \n')
+                    file.write('\t\t\t {}\n'.format(' \n\t\t\t'.join(string_vector).lower()))
+                    file.write('\t\t ) \n')
+                    string_vector.clear()
+                    order_vector.clear()
+                else:
+                    file.write('\t\t :subtasks () \n')
+                    string_vector.clear()
+                    order_vector.clear()
+
+            if self.flag_ordering_file == 'no':
+                if counter != 0 and counter != 1:
+                    file.write('\t\t :ordered-subtasks (and \n')
+                    file.write('\t\t\t{}\n'.format('\n\t\t\t'.join(string_vector).lower()))
+                    file.write('\t\t ) \n')
+                    string_vector.clear()
+                    order_vector.clear()
+                elif counter == 1:
+                    file.write('\t\t :ordered-subtasks (and \n')
+                    file.write('\t\t\t {}\n'.format(' \n\t\t\t'.join(string_vector).lower()))
+                    file.write('\t\t ) \n')
+                    string_vector.clear()
+                    order_vector.clear()
+                else:
+                    file.write('\t\t :ordered-subtasks () \n')
+                    string_vector.clear()
+                    order_vector.clear()                
+                
+                
                 
             file.write('\t ) \n\n') 
 
@@ -614,13 +663,16 @@ class DomainDefinition():
         file.write('\n')  #space!
         for ii in self.final_opaque_action_list:
 
-            file.write('\t(:action {} \n'.format(ii.get('name').lower()))            
-            file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters')).lower()))
-            if ii.get('preconditions') != '':
+            file.write('\t(:action {} \n'.format(ii.get('name').lower()))     
+            if ii['parameters'] != set():
+                file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters')).lower()))
+            else:
+                file.write('\t\t :parameters () \n')
+            if ii.get('preconditions') != []:
                 file.write('\t\t :precondition (and \n\t\t\t{})\n'.format(' \n\t\t\t'.join(ii.get('preconditions')).lower()))
             else:
                 file.write('\t\t :precondition ()\n')
-            if ii.get('effects') != '':
+            if ii.get('effects') != []:
                 file.write('\t\t :effect (and \n\t\t\t{})\n'.format(' \n\t\t\t'.join(ii.get('effects')).lower()))
             else:
                 file.write('\t\t :effect ()\n')
