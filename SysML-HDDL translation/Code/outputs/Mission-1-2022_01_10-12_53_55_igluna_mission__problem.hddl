@@ -1,0 +1,49 @@
+(define  (domain 2022_01_10-12_53_55_igluna_mission__domain.hddl) 
+	 (:objects 
+		satellite0 - satellite
+		instrument0 - instrument
+		spectrograph2 - mode
+		thermograph0 - mode
+		star0 - direction
+		groundstation1 - direction
+		groundstation2 - direction
+		phenomenon3 - direction
+		phenomenon4 - direction
+		phenomenon6 - direction
+		star5 - direction
+		instrument1 - instrument
+		instrument2 - instrument
+		satellite1 - satellite
+		instrument3 - instrument
+		star1 - instrument
+		start2 - instrument
+		star3 - direction
+		star4 - direction
+		phenomenon5 - direction
+		phenomenon7 - direction
+		infrared0 - mode
+	 )
+
+	 :htn( 
+		 :parameters () 
+		 :ordered-subtasks (and 
+			(task1 (DoMission phenomenon4 thermograph0)  )
+			(task2 (DoMission star5 thermograph0)        )
+			(task3 (DoMission phenomenon6 thermograph0))
+		 )
+
+	 )
+
+	 (:init 
+		(supports instrument0 thermograph0)
+		(calibration_target instrument0 groundstation2)
+		(on_board instrument0 satellite0)
+		(pointing satellite0 phenomenon6)
+		(supports instrument0 thermograph0)
+		(calibration_target instrument0 groundstation2)
+		(on_board instrument0 satellite0)
+		(power_avail satellite0)
+		(pointing satellite0 phenomenon6)
+	 )
+
+)

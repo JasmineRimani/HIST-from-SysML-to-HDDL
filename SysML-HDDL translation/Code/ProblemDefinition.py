@@ -50,6 +50,8 @@ class ProblemDefinition():
         self.problem_file_object = []
         # Mission Dictionary: General Dictionary where you put all the mission specific info
         self.general_mission_dictionary = []
+        # To order or not the initial task network
+        self.flag_ordering = 'yes'
 
 
     # Get out the elements of the Problem File
@@ -167,6 +169,8 @@ class ProblemDefinition():
                                     
                             # get the htn
                             if "HTN" in child.body.contents[0]:
+                                if "ordered" in child.body.contents[0]:
+                                    self.flag_ordering = 'no'
                                 temp_list = child.body.contents[0].split("\r\n")
                                 # we don't consider the first line
                                 for index,ii in enumerate(temp_list[1::]):
@@ -175,8 +179,9 @@ class ProblemDefinition():
                                     
                                         task_found = 'no'  
                                         object_found = 'no'
-                                        dummy_string = ii.replace('task{}('.format(index),'')         
-                                        dummy_string = dummy_string.replace(')'.format(index),'') 
+                                        
+                                        dummy_string = ii.replace('task','').replace('('.format(index),'')[1::]         
+                                        dummy_string = dummy_string.replace(')'.format(index),'').strip()
                                         dummy_list = dummy_string.split()
                                       
                                         for task in self.task_list:
@@ -185,7 +190,7 @@ class ProblemDefinition():
                                                 for hddl_object in dummy_list[1::]:
                                                     object_found = 'no'
                                                     for object_element in self.problem_file_object+ problem_file_object_mutant:
-                                                        if hddl_object in object_element:
+                                                        if hddl_object.lower() in object_element.lower():
                                                             object_found = 'yes'
                                                     if object_found == 'no':
                                                         if self.debug == 'on':
@@ -213,57 +218,58 @@ class ProblemDefinition():
                 
                 
                 # Hierachie of main tasks
-                functions_with_incoming_edge = []
-                functions_with_outcoming_edge = []
-                for yy in mission_tasks:
-                    for kk in self.edge_list:
-                        if 'incoming_edge' in yy and yy['incoming_edge'] == kk['xmi:id']:
-                            for uu in mission_tasks:
-                                if uu['xmi:id'] == kk['input']:
-                                    functions_with_incoming_edge.append(yy)
-                                    yy['previous_action'] = kk['input']
-                        
-                            
-                        if 'outgoing_edge' in yy and yy['outgoing_edge'] == kk['xmi:id']:
-                            for uu in mission_tasks:
-                                if uu['xmi:id'] == kk['output']:
-                                    functions_with_outcoming_edge.append(yy)
-                                    yy['following_action'] = kk['output']
-                
-                ordered_mission_tasks = []
-                for yy in mission_tasks:
-                    if yy not in functions_with_incoming_edge and yy in functions_with_outcoming_edge:
-                        yy['order'] = 0
-                    elif yy in functions_with_incoming_edge and yy not in functions_with_outcoming_edge:
-                        yy['order'] = len(mission_tasks) - 1
-         
-                flag = 0 
-                counter = 0
-                
-                while flag == 0:
+                if self.flag_ordering != 'no':
+                    functions_with_incoming_edge = []
+                    functions_with_outcoming_edge = []
                     for yy in mission_tasks:
-                        if 'order' in yy and yy['order'] != len(mission_tasks):
-                            # check the next element that should be there
-                            for uu in mission_tasks:
-                                if'previous_action'in uu and uu['previous_action'] == yy['xmi:id']:
-                                    uu['order'] = yy['order'] + 1 
-                        elif 'order' in yy and yy['order'] == len(mission_tasks): 
-                            pass
+                        for kk in self.edge_list:
+                            if 'incoming_edge' in yy and yy['incoming_edge'] == kk['xmi:id']:
+                                for uu in mission_tasks:
+                                    if uu['xmi:id'] == kk['input']:
+                                        functions_with_incoming_edge.append(yy)
+                                        yy['previous_action'] = kk['input']
+                            
+                                
+                            if 'outgoing_edge' in yy and yy['outgoing_edge'] == kk['xmi:id']:
+                                for uu in mission_tasks:
+                                    if uu['xmi:id'] == kk['output']:
+                                        functions_with_outcoming_edge.append(yy)
+                                        yy['following_action'] = kk['output']
                     
-                        if 'order' in yy:
-                            counter = counter + 1
+                    ordered_mission_tasks = []
+                    for yy in mission_tasks:
+                        if yy not in functions_with_incoming_edge and yy in functions_with_outcoming_edge:
+                            yy['order'] = 0
+                        elif yy in functions_with_incoming_edge and yy not in functions_with_outcoming_edge:
+                            yy['order'] = len(mission_tasks) - 1
+             
+                    flag = 0 
+                    counter = 0
                     
-                    if counter == len(mission_tasks):
-                        flag = 1
-                    else:
-                        counter = 0
-                    
-                # Sort actions based on the ordering    
-                mission_tasks.sort(key = ProblemDefinition.get_order) 
-                temporary_general_dictionary["mission_tasks"] = [x for x in mission_tasks]
+                    while flag == 0:
+                        for yy in mission_tasks:
+                            if 'order' in yy and yy['order'] != len(mission_tasks):
+                                # check the next element that should be there
+                                for uu in mission_tasks:
+                                    if'previous_action'in uu and uu['previous_action'] == yy['xmi:id']:
+                                        uu['order'] = yy['order'] + 1 
+                            elif 'order' in yy and yy['order'] == len(mission_tasks): 
+                                pass
+                        
+                            if 'order' in yy:
+                                counter = counter + 1
+                        
+                        if counter == len(mission_tasks):
+                            flag = 1
+                        else:
+                            counter = 0
+                        
+                    # Sort actions based on the ordering    
+                    mission_tasks.sort(key = ProblemDefinition.get_order) 
+                    temporary_general_dictionary["mission_tasks"] = [x for x in mission_tasks]
                 
                 
-                if htn_tasks != []:
+                if htn_tasks != [] and self.flag_ordering == 'yes':
                     ordering_task_network = []
                     for index,ii in enumerate(htn_tasks):
                         dummy_string = ii.replace('task{}('.format(index),'')         
@@ -330,20 +336,31 @@ class ProblemDefinition():
             # Hierarchical Task Network
             file.write('\t :htn( \n')
             file.write('\t\t :parameters () \n')
-            file.write('\t\t :subtasks (and \n')
-            for ii in element["htn"]:
-                file.write('\t\t\t({})\n'.format(ii))
             
-            file.write('\t\t )\n\n')
-            #Ordering
-            file.write('\t\t :ordering (and \n')
-            for ii in element["htn_order"]:
-                file.write('\t\t\t{}\n'.format(ii.lower()))
-            
-            file.write('\t\t )\n\n')
-            
-            #close hierarchical task network
-            file.write('\t )\n\n')
+            if self.flag_ordering == 'yes':
+                file.write('\t\t :subtasks (and \n')
+                for ii in element["htn"]:
+                    file.write('\t\t\t({})\n'.format(ii))
+                
+                file.write('\t\t )\n\n')
+                #Ordering
+                file.write('\t\t :ordering (and \n')
+                for ii in element["htn_order"]:
+                    file.write('\t\t\t{}\n'.format(ii.lower()))
+                
+                file.write('\t\t )\n\n')
+                
+                #close hierarchical task network
+                file.write('\t )\n\n')
+            else:
+                file.write('\t\t :ordered-subtasks (and \n')
+                for ii in element["htn"]:
+                    file.write('\t\t\t({})\n'.format(ii))
+                
+                file.write('\t\t )\n\n')
+                
+                #close hierarchical task network
+                file.write('\t )\n\n')                
             
             # Initial Conditions
             file.write('\t (:init \n')
