@@ -46,6 +46,8 @@ class XML_parsing():
         log_file_general_entries = []
         # Dependencies in the UseCase
         dependencies_list = []
+        # Constraints in a Package
+        b_ownedRules_from_package = []
 
         # Log File init
         log_file_general_entries.append('Log errors and warnings during parsing: \n')
@@ -84,6 +86,10 @@ class XML_parsing():
             # Isolate Usecases that are packegedElements --> You get your tasks name, however you still need your parameters
             if ii['xmi:type'] == 'uml:UseCase':
                 task_list.append({"name": ii['name'], "xmi:id":ii['xmi:id'], "parameters": []})   
+                
+            # Isolate Packaged Constraints:
+            if ii['xmi:type'] == 'uml:Constraint':
+                b_ownedRules_from_package.append(ii)                
 
         self.xml_parsing_output["b_package_list"] = package_list
         self.xml_parsing_output["hddl_type_list"] = hddl_type_list
@@ -93,7 +99,7 @@ class XML_parsing():
         
         # Find all the constraints tag = ownedRule and xmi:type="uml:Constraint"
         b_ownedRules = Bs_data.find_all('ownedRule') 
-        self.xml_parsing_output["b_ownedRules"] = b_ownedRules
+        self.xml_parsing_output["b_ownedRules"] = b_ownedRules + b_ownedRules_from_package
         
         # Find all the edges
         b_edges = Bs_data.find_all('edge')    
@@ -118,7 +124,7 @@ class XML_parsing():
         self.xml_parsing_output["edge_list"] = edge_list
         #Find the dependencies
         for index,ii in enumerate(b_packagedElement):
-            if ii['xmi:type'] == 'uml:Dependency':
+            if ii['xmi:type'] == 'uml:Dependency' or ii['xmi:type'] == 'uml:Realization':
                 dependencies_list.append({"xmi:id":ii['xmi:id'], "input":ii['supplier'], "output":ii['client']})        
         
         self.xml_parsing_output["dependencies_list"] = dependencies_list
