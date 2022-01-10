@@ -1,0 +1,229 @@
+(define (domain sat_mission) 
+	 (:requirements :typing :equality :hierarchy :method-preconditions :negative-preconditions) 
+	 (:types  direction mode satellite instrument ) 
+
+	 (:predicates 
+		 (calibrated ?arg0 - instrument) 
+		 (on_board ?arg0 - instrument ?arg1 - satellite) 
+		 (supports ?arg0 - instrument ?arg1 - mode) 
+		 (power_on ?arg0 - instrument) 
+		 (pointing ?arg0 - satellite ?arg1 - direction) 
+		 (have_image ?arg0 - direction ?arg1 - mode) 
+		 (power_avail ?arg0 - satellite) 
+		 (calibration_target ?arg0 - instrument ?arg1 - direction) 
+	) 
+
+	 (:task DoMission 
+		 :parameters (?direction-direction ?mode-mode) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task PrepareMission 
+		 :parameters (?satellite-satellite ?direction-direction ?instrument-instrument) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task DoSwitching 
+		 :parameters (?satellite-satellite ?instrument-instrument) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task DoCalibration 
+		 :parameters (?satellite-satellite ?direction-direction ?instrument-instrument) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task MakePowerAvailable 
+		 :parameters (?satellite-satellite ?instrument_2-instrument) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task DoTurning 
+		 :parameters (?satellite-satellite ?direction-direction) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+
+	 (:method DoMission_method1 
+		 :parameters (?satellite-satellite ?direction-direction ?mode-mode ?instrument-instrument) 
+		 :task (DoMission ?direction ?mode) 
+		 :precondition (and 
+			 
+		) 
+		 :ordered-subtasks (and 
+			task0(PrepareMission ?satellite ?direction ?instrument)
+			task1(TakeImage ?satellite ?direction ?mode ?instrument)
+		 ) 
+	 ) 
+
+	 (:method PrepareMission_method1 
+		 :parameters (?satellite-satellite ?direction-direction ?instrument-instrument) 
+		 :task (PrepareMission ?satellite ?direction ?instrument) 
+		 :precondition (and 
+			 
+		) 
+		 :ordered-subtasks (and 
+			task0(DoSwitching ?satellite ?instrument)
+			task1(DoTurning ?satellite ?direction)
+		 ) 
+	 ) 
+
+	 (:method DoSwitching_method1 
+		 :parameters (?satellite-satellite ?direction-direction ?instrument_2-instrument ?instrument-instrument) 
+		 :task (DoSwitching ?satellite ?instrument) 
+		 :precondition (and 
+			(on_board ?instrument_2 ?satellite)  
+		) 
+		 :ordered-subtasks (and 
+			task0(MakePowerAvailable ?satellite ?instrument_2)
+			task1(SwitchOn ?satellite ?instrument)
+			task2(DoCalibration ?satellite ?direction ?instrument)
+		 ) 
+	 ) 
+
+	 (:method DoSwitching_method2 
+		 :parameters (?satellite-satellite ?direction-direction ?instrument-instrument) 
+		 :task (DoSwitching ?satellite ?instrument) 
+		 :precondition (and 
+			 
+		) 
+		 :ordered-subtasks (and 
+			task0(SwitchOn ?satellite ?instrument)
+			task1(DoCalibration ?satellite ?direction ?instrument)
+		 ) 
+	 ) 
+
+	 (:method DoSwitching_method3 
+		 :parameters (?satellite-satellite ?instrument-instrument) 
+		 :task (DoSwitching ?satellite ?instrument) 
+		 :precondition (and 
+			(power_on ?instrument) 
+		) 
+		 :ordered-subtasks (and 
+			 task0(Nop)
+		 ) 
+	 ) 
+
+	 (:method DoCalibration_method1 
+		 :parameters (?satellite-satellite ?direction-direction ?instrument-instrument) 
+		 :task (DoCalibration ?satellite ?direction ?instrument) 
+		 :precondition (and 
+			(not(calibrated ?instrument)) 
+		) 
+		 :ordered-subtasks (and 
+			task0(PrepareMission ?satellite ?direction ?instrument)
+			task1(Calibrate ?satellite ?direction ?instrument)
+		 ) 
+	 ) 
+
+	 (:method DoCalibration_method2 
+		 :parameters (?satellite-satellite ?direction-direction ?instrument-instrument) 
+		 :task (DoCalibration ?satellite ?direction ?instrument) 
+		 :precondition (and 
+			(calibrated ?instrument) 
+		) 
+		 :ordered-subtasks (and 
+			 task0(Nop)
+		 ) 
+	 ) 
+
+	 (:method MakePowerAvailable_method1 
+		 :parameters (?satellite-satellite ?instrument_2-instrument) 
+		 :task (MakePowerAvailable ?satellite ?instrument_2) 
+		 :precondition (and 
+			(not(power_avail ?satellite)) 
+		) 
+		 :ordered-subtasks (and 
+			 task0(SwitchOff ?satellite ?instrument_2)
+		 ) 
+	 ) 
+
+	 (:method DoTurning_method1 
+		 :parameters (?satellite-satellite ?direction-direction ?other_direction-direction) 
+		 :task (DoTurning ?satellite ?direction) 
+		 :precondition (and 
+			(not(pointing ?satellite ?direction)) 
+		) 
+		 :ordered-subtasks (and 
+			 task0(TurnTo ?satellite ?direction ?other_direction)
+		 ) 
+	 ) 
+
+	 (:method DoTurning_method2 
+		 :parameters (?satellite-satellite ?direction-direction) 
+		 :task (DoTurning ?satellite ?direction) 
+		 :precondition (and 
+			(pointing ?satellite ?direction) 
+		) 
+		 :ordered-subtasks (and 
+			 task0(Nop)
+		 ) 
+	 ) 
+
+
+	(:action Calibrate 
+		 :parameters (?satellite-satellite ?direction-direction ?instrument-instrument) 
+		 :precondition (and 
+			(on_board ?instrument ?satellite) 
+			(calibration_target ?instrument ?direction) 
+			(power_on ?instrument) 
+			(pointing ?satellite ?direction))
+		 :effect (and 
+			 (calibrated ?instrument))
+	) 
+
+	(:action TakeImage 
+		 :parameters (?satellite-satellite ?direction-direction ?mode-mode ?instrument-instrument) 
+		 :precondition (and 
+			(calibrated ?instrument) 
+			(on_board ?instrument ?satellite) 
+			(supports ?instrument ?mode) 
+			(power_on ?instrument) 
+			(pointing ?satellite ?direction))
+		 :effect (and 
+			(have_image ?direction ?mode))
+	) 
+
+	(:action SwitchOff 
+		 :parameters (?satellite-satellite ?instrument_2-instrument) 
+		 :precondition (and 
+			(power_on ?instrument_2) 
+			(on_board ?instrument_2 ?satellite))
+		 :effect (and 
+			 (not (power_on ?instrument_2)) 
+			(power_avail ?satellite))
+	) 
+
+	(:action Nop 
+		 :parameters () 
+		 :precondition ()
+		 :effect ()
+	) 
+
+	(:action SwitchOn 
+		 :parameters (?satellite-satellite ?instrument-instrument) 
+		 :precondition (and 
+			(on_board ?instrument ?satellite))
+		 :effect (and 
+			(power_on ?instrument) 
+			(not (calibrated ?instrument)) 
+			(not (power_avail ?satellite)))
+	) 
+
+	(:action TurnTo 
+		 :parameters (?satellite-satellite ?direction-direction ?other_direction-direction) 
+		 :precondition (and 
+			(pointing ?satellite ?other_direction) 
+			 (not (= ?direction ?other_direction)))
+		 :effect (and 
+			(not (pointing ?satellite ?other_direction)) 
+			(pointing ?satellite ?direction))
+	) 
+
+)

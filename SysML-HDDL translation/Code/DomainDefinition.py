@@ -16,15 +16,17 @@ import os
 
 # MAIN PARSING CLASS!
 class DomainDefinition():
-    def __init__(self, domain_name, parsed_dictionary, task_parameters = 'common', flag_ordering_file = 'yes', d_now = os.getcwd(),  debug = 'on'):
+    def __init__(self, domain_name, parsed_dictionary, task_parameters = 'common', flag_ordering_file = 'yes', method_precondition_from_action = 'yes', d_now = os.getcwd(),  debug = 'on'):
 
         # Put an adaptable domain file name
         # Put an adaptable problem file name
         if domain_name != 'None':
             self.domain_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' + domain_name + '_' +'_domain.hddl' 
+            self.domain_name_simple = domain_name
             self.problem_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' + domain_name + '_' +'_problem.hddl'
         else:
            self.domain_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' +'_domain.hddl' 
+           self.domain_name_simple = datetime.now().strftime("%Y_%m_%d-%I_%M_%S")
            self.problem_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' +'_problem.hddl'
         # All the packaged elements
         self.b_packagedElement = parsed_dictionary["b_packagedElement"]
@@ -70,6 +72,9 @@ class DomainDefinition():
         self.task_parameters = task_parameters
         # Parameters Ordering 
         self.flag_ordering_file = flag_ordering_file
+        # A flag to indicate if the method considers its substasks preconditions or not
+        # For default it doesn't
+        self.method_precondition_from_action = method_precondition_from_action
         # General Dictionary with all the output from the Domain File Creation 
         self.domain_definition_output = {}
 
@@ -164,7 +169,8 @@ class DomainDefinition():
                                         # (if the have an incoming one then they are activated by one on the Opaque Actions)
                                         if 'outgoing' in temp_dict and not('incoming' in temp_dict) and len(temp_dict["name"].split()) > 1:
                                             self.method_input_predicate_list.append(temp_dict)
-                                            method_input_predicate_list_names.append(temp_dict["name"])
+                                            if self.method_precondition_from_action == 'yes':
+                                                method_input_predicate_list_names.append(temp_dict["name"])
                                             # Save all the predicates name to a list 
                                             self.all_predicates_list.append(temp_dict["name"])
                                         
@@ -177,8 +183,8 @@ class DomainDefinition():
                                         # If a method has nothing inside however to be realized it needs some parameters! 
                                         # E.g. when you call navigate to a waypoint action but you are already at that waypoint! Look at the example method2
                                         if not('incoming' in temp_dict) and not('outgoing' in temp_dict):
-                                            if len(temp_dict["name"].split()) > 1:
-                                                 self.method_input_predicate_list.append(temp_dict)
+                                            self.method_input_predicate_list.append(temp_dict)
+                                            if len(temp_dict["name"].split()) > 1:                                                
                                                  method_input_predicate_list_names.append(temp_dict["name"])
                                                  self.all_predicates_list.append(temp_dict["name"])
                                             if len(temp_dict["name"].split()) <= 1:
@@ -357,7 +363,7 @@ class DomainDefinition():
         for action in self.opaqueAction_list:
             
             # Split the name of the action
-            name = action['name'].split('_')[0]
+            name = action['name']
             final_opaque_action.append(name.lower())
             
         # we want the action to have just one occurance
@@ -368,18 +374,19 @@ class DomainDefinition():
                 if action['name'].lower() == final_action and action['xmi:type'] == 'uml:OpaqueAction':
                     self.final_opaque_action_list.append(action)
                     break
-
+        
+        # Task Parameters for task used as :subtask in a method
         for action in self.opaqueAction_list:
             if action ['xmi:type'] == 'uml:CallBehaviorAction':
                 for task in self.task_list:
-                    if task.get('name') == action .get('name'): 
-                        task["parameters"] = action .get('parameters')
+                    if task.get('name') == action.get('name'): 
+                        task["parameters"] = set(action.get('parameters'))
        
         # Check if the user defined some constraints in UseCase diagram to get the task parameters
         get_param = []
         flag_found = 0
-        for ii in self.b_ownedRules:
-            if ii.parent['name'] == 'DomainDefinition':
+        for ii in self.b_ownedRules:            
+            if ii.parent['name'] == 'DomainDefinition' or ii.parent['name'] == 'UseCase':
                 # check that the parameters have a known type!
                 dummy_string = ii['name']
                 dummy_vector = re.split(' |-', dummy_string)
@@ -402,7 +409,7 @@ class DomainDefinition():
                     if jj['output'] == ii['xmi:id']:
                         get_param_dict['task'] = jj['input']
                         get_param.append(get_param_dict)
-                        get_param_dict ={}
+                        # get_param_dict ={}
                         
                 
             
@@ -416,8 +423,9 @@ class DomainDefinition():
                         if jj['task'] == ii['xmi:id']:
                             task_parameters.append(jj['name'].replace(" ", ""))
             
-            ii["parameters"] = set([x for x in task_parameters])
-            task_parameters.clear()
+            if ii["parameters"] == []:
+                ii["parameters"] = set([x for x in task_parameters])
+                task_parameters.clear()
                 
         # If the tasks have no parameter defined --> Get the minimum or the common parameters out of the methods parameters associated to that task
         task_parameters_matrix = []
@@ -524,7 +532,7 @@ class DomainDefinition():
         # Open/Create the File
         file = open(self.d_now + '//outputs//' + self.domain_name,'w')
         # Start writing on the file
-        file.write('(define (domain {}) \n'.format(self.domain_name.lower()))
+        file.write('(define (domain {}) \n'.format(self.domain_name_simple.lower()))
         # Write requirement
         file.write('\t (:requirements :{}) \n'.format(' :'.join(self.requirement_list_domain_file).lower()))
         #Object Type
@@ -619,7 +627,7 @@ class DomainDefinition():
             if self.flag_ordering_file == 'yes':                            
                 if counter != 0 and counter != 1:
                     file.write('\t\t :subtasks (and \n')
-                    file.write('\t\t\t{}\n'.format('\n\t\t\t'.join(string_vector).lower()))
+                    file.write('\t\t\t{}\n'.format('\n\t\t\t'.join(string_vector)))
                     file.write('\t\t ) \n')
                     file.write('\t\t :ordering (and \n')
                     file.write('\t\t\t{}\n'.format(' \n\t\t\t'.join(order_vector).lower()))
@@ -628,7 +636,7 @@ class DomainDefinition():
                     order_vector.clear()
                 elif counter == 1:
                     file.write('\t\t :subtasks (and \n')
-                    file.write('\t\t\t {}\n'.format(' \n\t\t\t'.join(string_vector).lower()))
+                    file.write('\t\t\t {}\n'.format(' \n\t\t\t'.join(string_vector)))
                     file.write('\t\t ) \n')
                     string_vector.clear()
                     order_vector.clear()
@@ -640,13 +648,13 @@ class DomainDefinition():
             if self.flag_ordering_file == 'no':
                 if counter != 0 and counter != 1:
                     file.write('\t\t :ordered-subtasks (and \n')
-                    file.write('\t\t\t{}\n'.format('\n\t\t\t'.join(string_vector).lower()))
+                    file.write('\t\t\t{}\n'.format('\n\t\t\t'.join(string_vector)))
                     file.write('\t\t ) \n')
                     string_vector.clear()
                     order_vector.clear()
                 elif counter == 1:
                     file.write('\t\t :ordered-subtasks (and \n')
-                    file.write('\t\t\t {}\n'.format(' \n\t\t\t'.join(string_vector).lower()))
+                    file.write('\t\t\t {}\n'.format(' \n\t\t\t'.join(string_vector)))
                     file.write('\t\t ) \n')
                     string_vector.clear()
                     order_vector.clear()
@@ -663,7 +671,7 @@ class DomainDefinition():
         file.write('\n')  #space!
         for ii in self.final_opaque_action_list:
 
-            file.write('\t(:action {} \n'.format(ii.get('name').lower()))     
+            file.write('\t(:action {} \n'.format(ii.get('name')))     
             if ii['parameters'] != set():
                 file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(ii.get('parameters')).lower()))
             else:

@@ -5,29 +5,20 @@
   <!-- The Task parameters can be defined as constraints. If not the user may define them with the flags "min" or "common"!-->
   <!-- Task flag "min" considers as task parameters the minum set of parameters from all the methods of the task. !-->
   <!-- Task flag "common" considers as task parameters the common set of parameters from all the methods of the task. (Default Option)!-->
+  <!-- Considering or not the :subtask preconditions in the associate _method depends on this flag.  method_precondition_from_action = 'no' only the method preconditions are considered, if 'yes' even the task preconditions are explicited in the model. 
   <!-- Parameters ordering or ordered-subtasks? flag_ordering = "yes" to get :task and :ordering, flag_ordering = "no" to get :ordered-subtasks!-->
-  <!-- To the test the Task flag option, please use "benchmark_satellite.uml" !-->
+  <!-- To the test the Task flag option, please use "xml_sample_7.uml" !-->
   <file file_name="benchmark_satellite.uml"   
         map_file_name="plan_final_1m_1_int.txt" 
         feedback_file_name="feedback__domain.hddl"
-        domain_name="igluna_mission"
+        domain_name="sat_mission"
         generate_domain_file="yes"
         generate_problem_file="yes"
         generate_feedback="no"
         flag_ordering="no"
-        task_parameters = 'common'>
+        task_parameters = 'common'
+        method_precondition_from_action = 'no'>
   </file>
-  <!-- Initial Hierarchical Task network -->
-  <htn>
- 
-      <li_htn>task0(TakePicture objective4)</li_htn> 
-      <li_htn>task1(TakePicture objective2)</li_htn>  
-      <li_htn>task2(TakePicture objective1)</li_htn>  
-      <li_htn>task3(TakePicture objective6)</li_htn>  
-      <li_htn>task4(TakePicture objective5)</li_htn>   
-      <li_htn>task5(EvaluateAvailableResources rover)</li_htn> 
-
-  </htn>
   <!-- HDDL Requirements for the domain file! -->
   <!-- The list encompass the main ones from https://planning.wiki/ref/pddl/requirements -->
   <hddl_requirements>

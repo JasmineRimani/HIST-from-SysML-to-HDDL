@@ -219,6 +219,12 @@ def main():
     else:
         generate_feedback_file = 'no'
 
+    if file_parameters[0].has_attr('method_precondition_from_action'):
+        method_precondition_from_action = file_parameters[0]['method_precondition_from_action']
+    else:
+        method_precondition_from_action = 'yes'        
+
+
     if file_parameters[0].has_attr('flag_ordering'):
         flag_ordering_file = file_parameters[0]['flag_ordering']
     else:
@@ -268,7 +274,7 @@ def main():
     if generate_domain_file == 'yes':
         print("Generating Domain File")
         # Take out the element you need for the domain file:
-        DomainFile = DomainDefinition(domain_name, parsed_dictionary, task_parameters, flag_ordering_file)
+        DomainFile = DomainDefinition(domain_name, parsed_dictionary, task_parameters, flag_ordering_file, method_precondition_from_action)
         # Identify the Domain File Elements
         domain_file_elements = DomainFile.DomainFileElements()
         # Write the Domain FIle

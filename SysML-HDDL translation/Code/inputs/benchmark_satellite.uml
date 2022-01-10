@@ -794,7 +794,7 @@
             </node>
             <node xmi:type="uml:InitialNode" xmi:id="_cFpcYHGCEeyI3Puz_5w6Rg" name="" outgoing="_ncgm8HGCEeyI3Puz_5w6Rg"/>
             <node xmi:type="uml:ActivityFinalNode" xmi:id="_c-l2kHGCEeyI3Puz_5w6Rg" incoming="_qHj38HGCEeyI3Puz_5w6Rg"/>
-            <node xmi:type="uml:OpaqueAction" xmi:id="_eDRmsHGCEeyI3Puz_5w6Rg" name="Turn_to" incoming="_ncgm8HGCEeyI3Puz_5w6Rg" outgoing="_qHj38HGCEeyI3Puz_5w6Rg">
+            <node xmi:type="uml:OpaqueAction" xmi:id="_eDRmsHGCEeyI3Puz_5w6Rg" name="TurnTo" incoming="_ncgm8HGCEeyI3Puz_5w6Rg" outgoing="_qHj38HGCEeyI3Puz_5w6Rg">
               <inputValue xmi:type="uml:InputPin" xmi:id="_iKmBYHGCEeyI3Puz_5w6Rg" incoming="_iKkzQHGCEeyI3Puz_5w6Rg">
                 <upperBound xmi:type="uml:LiteralInteger" xmi:id="_iKmBYXGCEeyI3Puz_5w6Rg" value="1"/>
               </inputValue>
