@@ -394,6 +394,7 @@ class DomainDefinition():
                 for uu in self.hddl_type_list:
                     if uu['name'] == dummy_vector[-1]:
                         flag_found = 1
+            
                 
                 if flag_found != 1:
                     self.hddl_type_list.append(dummy_vector[-1].replace(" ", ""))
@@ -528,6 +529,8 @@ class DomainDefinition():
     # Write the Domain File
     def DomainFileWriting (self):
         ###################################################################
+        # Flag to know how to write the domain file
+        flag_type = 0
 
         # Open/Create the File
         file = open(self.d_now + '//outputs//' + self.domain_name,'w')
@@ -538,8 +541,19 @@ class DomainDefinition():
         #Object Type
         file.write('\t (:types  ')
         for ii in self.hddl_type_list:
-            if ii.get('name').strip() != 'predicate':
-                file.write('{} '.format(ii.get('name').lower()))
+            if "parent" in ii.keys():
+                flag_type = 1
+        for ii in self.hddl_type_list:
+            if flag_type == 0:
+                if ii.get('name').strip() != 'predicate':
+                    file.write('{} '.format(ii.get('name').lower()))
+            else:
+                if ii.get('name').strip() != 'predicate':
+                    if "parent" in ii.keys():
+                        file.write('\n\t\t{} - {} '.format(ii.get('name').lower(), ii["parent"]))
+                    else:
+                        file.write('\n\t\t{} - object '.format(ii.get('name').lower()))
+                    
         # End of object type
         file.write(') \n\n')  
         

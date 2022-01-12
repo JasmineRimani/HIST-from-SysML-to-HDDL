@@ -66,6 +66,7 @@ class XML_parsing():
                 # You can divide the packaged elements per Folder - so that you don't have to parse useless information like the ones for the Mission
         
         b_packagedElement = Bs_data.find_all('packagedElement') 
+        b_nestedClassifier = Bs_data.find_all('nestedClassifier') 
         self.xml_parsing_output["b_packagedElement"] = b_packagedElement
         
 
@@ -78,7 +79,7 @@ class XML_parsing():
             # Isolate the classes - ':types' in HDDL
             if ii['xmi:type'] == 'uml:Class' and ii.parent["name"] == 'Types':
                 hddl_type_list.append({"name": ii['name'].replace(" ", ""), "xmi:id":ii['xmi:id']})
-                
+
             # Isolate Actors:
             if ii['xmi:type'] == 'uml:Actor':
                 actor_list.append({"name": ii['name'], "xmi:id":ii['xmi:id']})
@@ -90,6 +91,11 @@ class XML_parsing():
             # Isolate Packaged Constraints:
             if ii['xmi:type'] == 'uml:Constraint':
                 b_ownedRules_from_package.append(ii)                
+
+        for index,ii in enumerate(b_nestedClassifier):
+            if ii['xmi:type'] == 'uml:Class' and ii.parent.parent["name"] == 'Types':
+                hddl_type_list.append({"name": ii['name'].replace(" ", ""), "xmi:id":ii['xmi:id'], "parent": ii.parent["name"]})
+                
 
         self.xml_parsing_output["b_package_list"] = package_list
         self.xml_parsing_output["hddl_type_list"] = hddl_type_list
