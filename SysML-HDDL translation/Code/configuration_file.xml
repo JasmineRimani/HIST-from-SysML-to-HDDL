@@ -8,14 +8,14 @@
   <!-- Considering or not the :subtask preconditions in the associate _method depends on this flag.  method_precondition_from_action = 'no' only the method preconditions are considered, if 'yes' even the task preconditions are explicited in the model. 
   <!-- Parameters ordering or ordered-subtasks? flag_ordering = "yes" to get :task and :ordering, flag_ordering = "no" to get :ordered-subtasks!-->
   <!-- To the test the Task flag option, please use "xml_sample_7.uml" !-->
-  <file file_name="benchmark_transport.uml"   
+  <file file_name="xml_sample_7.uml"   
         map_file_name="plan_final_1m_1_int.txt" 
         feedback_file_name="feedback__domain.hddl"
         domain_name="transport_mission"
         generate_domain_file="yes"
         generate_problem_file="no"
         generate_feedback="no"
-        flag_ordering="no"
+        flag_ordering="yes"
         task_parameters = 'common'
         method_precondition_from_action = 'no'>
   </file>

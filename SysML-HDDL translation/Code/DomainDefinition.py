@@ -100,50 +100,48 @@ class DomainDefinition():
         # The packagedElements are: Packages, Actors, UseCases, Classes
         
         # you can check is the packagedElement has the "Functions" package as parent
-        for uu in self.b_packagedElement:
+        for element in self.b_packagedElement:
             
             # If the packagedElement is a UseCase
             # Just consider the inputs in the DomainDefinition Folder (or any folder that is defined by the Requirements)
             """STILL TO IMPLEMET - REASONING ON THE TAGS BASED ON THE PACKAGE DIAGRAM"""
             
             # We are just considering the Domain File entries here! 
-            if uu['xmi:type'] == 'uml:UseCase' and uu.parent.parent['name'] == 'DomainDefinition':
+            if element['xmi:type'] == 'uml:UseCase' and element.parent.parent['name'] == 'DomainDefinition':
                 
                 # Look at its children and find...
-                for index,ii in enumerate(uu.children):
-                
-                    # Find the methods
-                    # try: 
+                for index,e_child in enumerate(element.children):
+                 
                         # Check the sub-UseCases that can be methods: double check on the type 'uml:UseCase' (considered as attribute) and the tag name 'ownedUseCase'
-                        if not isinstance(ii, str) and ii.has_attr('xmi:type') and ii['xmi:type'] == 'uml:UseCase' and ii.name == 'ownedUseCase':
+                        if not isinstance(e_child, str) and e_child.has_attr('xmi:type') and e_child['xmi:type'] == 'uml:UseCase' and e_child.name == 'ownedUseCase':
                             
-                            self.method_list.append({"name": ii['name'], "xmi:id":ii['xmi:id'], "task":uu.get('xmi:id')})  
+                            self.method_list.append({"name": e_child['name'], "xmi:id":e_child['xmi:id'], "task":element.get('xmi:id')})  
                             
                             # Look at the children of the method to recognize parameters and opaque actions
-                            for jj in ii.descendants:
+                            for descendant in e_child.descendants:
                                 
                                     # Start already dividing predicates(sentences) from the parameters
-                                    if not isinstance(jj, str) and jj.has_attr('xmi:type') and jj['xmi:type'] == 'uml:ActivityParameterNode':
+                                    if not isinstance(descendant, str) and descendant.has_attr('xmi:type') and descendant['xmi:type'] == 'uml:ActivityParameterNode':
                                         
-                                        # Create a temporary dictionary with the paramters characteristics
-                                        if jj.has_attr('type'):
-                                            temp_dict = {"name": jj['name'], "xmi:id":jj['xmi:id'], "type":jj['type'], "method": ii['xmi:id'], "task":uu.get('xmi:id')} 
+                                        # Create a temporary dictionary with the parameters characteristics
+                                        if descendant.has_attr('type'):
+                                            temp_dict = {"name": descendant['name'], "xmi:id":descendant['xmi:id'], "type":descendant['type'], "method": e_child['xmi:id'], "task":element.get('xmi:id')} 
                                         
                                         else:
                                             # if we don't have a type - we can give a type name based on the amount of words 
-                                            temp_dict = {"name": jj['name'], "xmi:id":jj['xmi:id'], "type":" ", "type_name": " ","method": ii['xmi:id'], "task":uu.get('xmi:id')} 
+                                            temp_dict = {"name": descendant['name'], "xmi:id":descendant['xmi:id'], "type":" ", "type_name": " ","method": e_child['xmi:id'], "task":element.get('xmi:id')} 
                                         
                                         # Assign to each ActivityParameter a Type
-                                        for kk in self.hddl_type_list:
-                                            if kk['xmi:id'] == temp_dict['type']:
-                                                temp_dict["type_name"] = kk["name"]    
+                                        for hddl_type in self.hddl_type_list:
+                                            if hddl_type['xmi:id'] == temp_dict['type']:
+                                                temp_dict["type_name"] = hddl_type["name"]    
                                                 
                                         # Check if the attribute has a type! - if it doesn't just assign the name as type!
                                         if 'type_name' in temp_dict and temp_dict['type_name'] == " " and len(temp_dict["name"].split()) <= 1:
-                                            temp_dict["type_name"] = jj['name']
+                                            temp_dict["type_name"] = descendant['name']
                                             id_uuid = str(uuid.uuid1())
-                                            self.hddl_type_list.append({"name": jj['name'], "xmi:id": id_uuid})
-                                            self.hddl_type_feedback.append({"name": jj['name'], "xmi:id": id_uuid})
+                                            self.hddl_type_list.append({"name": descendant['name'], "xmi:id": id_uuid})
+                                            self.hddl_type_feedback.append({"name": descendant['name'], "xmi:id": id_uuid})
                                             if self.debug == 'on':                                            
                                                 print('No predefined type for {}. Add it on Papyrus!'.format(temp_dict.get('name')))
                                             self.log_file_general_entries('\t\t No predefined type for {}. We added as its own type \n'.format(temp_dict.get('name')))
@@ -153,12 +151,12 @@ class DomainDefinition():
                                             temp_dict["type_name"] = 'predicate'
                                             
                                         # Check if the attribute has an incoming edge - output
-                                        if jj.has_attr('incoming'):
-                                            temp_dict["incoming"] = jj["incoming"]   
+                                        if descendant.has_attr('incoming'):
+                                            temp_dict["incoming"] = descendant["incoming"]   
                                         
                                         # Check if the attribute has an outcoming edge - input
-                                        if jj.has_attr('outgoing'):
-                                            temp_dict["outgoing"] = jj["outgoing"] 
+                                        if descendant.has_attr('outgoing'):
+                                            temp_dict["outgoing"] = descendant["outgoing"] 
                                         
                                         # Check if the attribute is a parameters - if yes save it in the method inputs list
                                         if temp_dict["type_name"] != 'predicate' or len(temp_dict["name"].split()) <= 1:
@@ -192,31 +190,36 @@ class DomainDefinition():
                                                 method_input_types_list_names.append((temp_dict["name"]+'-'+temp_dict["type_name"]).replace(" ", ""))
                                             
                                     # Find the atomic actions and Find the tasks in the main task
-                                    if not isinstance(jj, str) and jj.has_attr('xmi:type') and (jj['xmi:type'] == 'uml:OpaqueAction' or jj['xmi:type'] == 'uml:CallBehaviorAction') :
+                                    if not isinstance(descendant, str) and descendant.has_attr('xmi:type') and (descendant['xmi:type'] == 'uml:OpaqueAction' or descendant['xmi:type'] == 'uml:CallBehaviorAction') :
                                         # Initialize the ordered tasks in the Method
                                         self.method_list[-1]['ordered_tasks'] = []
                                         # An Opaque action should always have an input and an output! 
-                                        self.opaqueAction_list.append({"name": jj['name'], "xmi:type": jj['xmi:type'], "xmi:id":jj['xmi:id'], "incoming_link": jj['incoming'],  "outcoming_link": jj['outgoing'], "method": ii['xmi:id'], "task":uu.get('xmi:id')})  
-                                        for kk in jj.children:
+                                        self.opaqueAction_list.append({"name": descendant['name'], "xmi:type": descendant['xmi:type'], "xmi:id":descendant['xmi:id'], "incoming_link": descendant['incoming'],  "outcoming_link": descendant['outgoing'], "method": e_child['xmi:id'], "task":element.get('xmi:id')}) 
+                                        # if the action is a compound action - a task we should add its behavior to avoid to the important information in opaqueAction
+                                        if descendant['xmi:type'] == 'uml:CallBehaviorAction':
+                                            self.opaqueAction_list[-1]['behavior'] = descendant['behavior']
+                                        
+                                        for d_child in descendant.children:
                                             # Each Opaque Action has input and outputs defined by xmi:type="uml:InputPin" or xmi:type="uml:OutputPin"
                                             # try:
                                                 # If it is an input save it into an input data structure associated to the Action name and ID
-                                                if not isinstance(kk, str) and kk.has_attr('xmi:type') and kk['xmi:type'] == 'uml:InputPin':
-                                                    self.opaqueAction_input_list.append({"xmi:id":kk['xmi:id'], "action": jj['xmi:id'], "incoming_edge": kk['incoming'], "method": ii['xmi:id'], "task":uu.get('xmi:id')})  
+                                                if not isinstance(d_child, str) and d_child.has_attr('xmi:type') and d_child['xmi:type'] == 'uml:InputPin':
+                                                    self.opaqueAction_input_list.append({"xmi:id":d_child['xmi:id'], "action": descendant['xmi:id'], "incoming_edge": d_child['incoming'], "method": e_child['xmi:id'], "task":element.get('xmi:id')})  
                                                 
                                                 # If it is an output save it into an output  data structure associated to the Action name and ID
-                                                if not isinstance(kk, str) and kk.has_attr('xmi:type') and kk['xmi:type'] == 'uml:OutputPin':
-                                                    self.opaqueAction_output_list.append({ "xmi:id":kk['xmi:id'], "action": jj['xmi:id'], "outgoing_edge": kk['outgoing'], "method": ii['xmi:id'], "task":uu.get('xmi:id')}) 
+                                                if not isinstance(d_child, str) and d_child.has_attr('xmi:type') and d_child['xmi:type'] == 'uml:OutputPin':
+                                                    self.opaqueAction_output_list.append({ "xmi:id":d_child['xmi:id'], "action": descendant['xmi:id'], "outgoing_edge": d_child['outgoing'], "method": e_child['xmi:id'], "task":element.get('xmi:id')}) 
                                                     
                                                     # Check if the outcoming edge has a name or not - Names are used to define the orders of the output
-                                                    if (kk.has_attr('name')):
-                                                        self.opaqueAction_output_list[-1]["name"] = kk['name']
-                                                        # the number of the output is the end value of the string
-                                                        self.opaqueAction_output_list[-1]["number"] = ''.join((filter(str.isdigit, self.opaqueAction_output_list[-1].get('name')))) 
+                                                    # In HDDL the order of the oputput doesn't matter!!!!
+                                                    # if (kk.has_attr('name')):
+                                                    #     self.opaqueAction_output_list[-1]["name"] = kk['name']
+                                                    #     # the number of the output is the end value of the string
+                                                    #     self.opaqueAction_output_list[-1]["number"] = ''.join((filter(str.isdigit, self.opaqueAction_output_list[-1].get('name')))) 
                                                 
                                     
                                         # self.method_Actions.append(jj['xmi:id'])
-                                        self.method_Actions.append({"name": jj['name'], "xmi:type": jj['xmi:type'], "xmi:id":jj['xmi:id'], "incoming_link": jj['incoming'],  "outcoming_link": jj['outgoing']})
+                                        self.method_Actions.append({"name": descendant['name'], "xmi:type": descendant['xmi:type'], "xmi:id":descendant['xmi:id'], "incoming_link": descendant['incoming'],  "outcoming_link": descendant['outgoing']})
 
      
                             self.method_list[-1]['parameters'] = set(method_input_types_list_names)
@@ -233,147 +236,371 @@ class DomainDefinition():
                             
                                 functions_with_incoming_edge = [] 
                                 functions_with_outcoming_edge= []
-                                for bb in self.method_Actions:
-                                    for kk in self.edge_list:
-                                        if 'incoming_link' in bb and bb['incoming_link'] == kk['xmi:id']:
+                                # For each action in the method_Actions
+                                for action_init in self.method_Actions:
+                                    # For each edge in the edge_list check if the action has in incoming link
+                                    for edge in self.edge_list:
+                                        #check if the action has in incoming link
+                                        if 'incoming_link' in action_init and action_init['incoming_link'] == edge['xmi:id']:
+                                            # If the action has an incoming link - check which is the previous action
                                             for action in self.method_Actions:
-                                                if action['xmi:id'] == kk['input']:
-                                                    functions_with_incoming_edge.append(bb)
-                                                    bb['previous_action'] = kk['input']
-                                        if 'outcoming_link' in bb and bb['outcoming_link'] == kk['xmi:id']:
+                                                if action['xmi:id'] == edge['input']:
+                                                    # if the incoming link is an action, add the initial action to the list functions_with_incoming_edge
+                                                    functions_with_incoming_edge.append(action_init)
+                                                    action_init['previous_action'] = edge['input']
+                                        #check if the action has in outcoming link
+                                        if 'outcoming_link' in action_init and action_init['outcoming_link'] == edge['xmi:id']:
+                                            # If the action has an outcoming link - check which is the next action
                                             for action in self.method_Actions:
-                                                if action['xmi:id'] == kk['output']:
-                                                  functions_with_outcoming_edge.append(bb)
-                                                  bb['following_action'] = kk['output']  
-                                for yy in self.method_Actions:
-                                    if yy not in functions_with_incoming_edge and yy in functions_with_outcoming_edge:
-                                        yy['order'] = 0
-                                    elif yy in functions_with_incoming_edge and yy not in functions_with_outcoming_edge:
-                                        yy['order'] = len(self.method_Actions) - 1
-                                    elif yy not in functions_with_incoming_edge and yy not in functions_with_outcoming_edge:
-                                        yy['order'] = 0
+                                                if action['xmi:id'] == edge['output']:
+                                                    # if the outcoming link is an action, add the initial action to the list functions_with_outcoming_edge
+                                                  functions_with_outcoming_edge.append(action_init)
+                                                  action_init['following_action'] = edge['output']  
+                                for m_action in self.method_Actions:
+                                    # Initial action
+                                    if m_action not in functions_with_incoming_edge and m_action in functions_with_outcoming_edge:
+                                        m_action['order'] = 0
+                                    # End action
+                                    elif m_action in functions_with_incoming_edge and m_action not in functions_with_outcoming_edge:
+                                        m_action['order'] = len(self.method_Actions) - 1
+                                    # Just one action in the method
+                                    elif m_action not in functions_with_incoming_edge and m_action not in functions_with_outcoming_edge:
+                                        m_action['order'] = 0
                                 
                                 flag = 0
                                 counter = 0
                                 counter_while = 0
+                                M_big = 50 # M_big is used just to exist the while in the wrost conditions
                                 
                                 while flag == 0:
                                     counter_while = counter_while +1
-                                    for yy in self.method_Actions:
-                                        if 'order' in yy and yy['order'] != len(self.method_Actions):
-                                            # check the next element that should be there
+                                    # Check you action
+                                    for action_init in self.method_Actions:
+                                        # if this is this an element that have been already ordered
+                                        if 'order' in action_init and action_init['order'] != len(self.method_Actions):
+                                            # check the next element that should be there to get the order
                                             for action in self.method_Actions:
-                                                if'previous_action'in action and action['previous_action'] == yy['xmi:id']:
-                                                    action['order'] = yy['order'] + 1 
-                                        elif 'order' in yy and yy['order'] == len(self.method_Actions):
+                                                if'previous_action'in action and action['previous_action'] == action_init['xmi:id']:
+                                                    action['order'] = action_init['order'] + 1 
+                                        # For now, we don't care about the last action - we know that is the last
+                                        elif 'order' in action_init and action_init['order'] == len(self.method_Actions):
                                             pass
                                         
-                                        if 'order' in yy:
+                                        # if the action has been ordered count it 
+                                        if 'order' in action_init:
                                             counter = counter + 1
 
-                                    
+                                    # if all teh actions have been ordered we are good to go!
                                     if counter == len(self.method_Actions):
                                         flag = 1
                                     else:
                                         counter = 0
                                     
-                                    if counter_while > 50:
+                                    # Additional out of while condition to avoid infinite loop
+                                    if counter_while > M_big:
                                         flag = 1
                                 
-                                # Sort actions based on the ordering 
+                                # Sort actions based on the ordering number you gave them 
                                 self.method_Actions.sort(key = DomainDefinition.get_order)             
                                                             
                             self.method_list[-1]['ordered_tasks'] = [x['xmi:id'] for x in self.method_Actions]
                             self.method_Actions.clear()
-                                
+
+        # Analyse the predicates - so you can check if the action preconditions and effect of the actions are considered or not
+        temporary_predicate = []
+        self.predicate_list = []
+
+        for predicates in self.all_predicates_list:
+            # First remove brankets 
+            cleaned_predicate = predicates.replace('(',' ')
+            cleaned_predicate = cleaned_predicate.replace(')',' ')
+            # Remove negations  
+            cleaned_predicate = cleaned_predicate.replace('not',' ')   
+            # Remove random copy or similar -- if you copy and pasted an element on papyrus this can happen!
+            cleaned_predicate = cleaned_predicate.replace('_copy',' ')   
+            # Take the predicate and open it:
+            cleaned_predicate = cleaned_predicate.split()
+            #get the first word of the predicate - this can be a equal sign! 
+            temporary_predicate.append(cleaned_predicate[0])
+            # analyse all other words - therefore you should have them in input_types
+            for index, predicate_atom in enumerate(cleaned_predicate[1::]):
+                predicate_atom = predicate_atom.replace('?',' ').strip()
+                flag = 0
+                
+                for index,input_types in enumerate(self.method_input_types_list):
+                    # if you found a match - break free. Try to find a better way to define this 
+                    if flag == 0 and predicate_atom == input_types.get('name'):
+                        temporary_predicate.append('?arg{}-{}'.format(index,input_types.get('type_name')))
+                        flag = 1
+                    if index == (len(self.method_input_types_list)-1) and flag != 1:
+                        # This entry is missing from the method inputs --> probably an error while writing the domain in Papyrus
+                        temporary_predicate.append('?arg{}-{}'.format(index,predicate_atom))
+                        self.log_file_general_entries.append('\t\t The {} is not define in any method input!!!! Probably you need to check the Activity Parameters in Papyrus'.format(predicate_atom))
+                        print('The {} is not define in any method input!!!! Probably you need to check the Activity Parameters in Papyrus'.format(predicate_atom))
+                        # add this to the methods inputs [method parameters]
+                        # First check at which method it is related: 
+                        for method_input in self.method_input_predicate_list:
+                            if method_input.get("name") == predicates:
+                                # then associate the new parameter to the method inputs
+                                method_selected = method_input.get("method")
+                                for method in self.method_list:
+                                    if method.get("xmi:id") ==  method_selected:
+                                        method.get("parameters").add(predicate_atom)
+                                        self.log_file_general_entries.append('\t\t the {} has been added to the parameters of method {}. Please check if that is correct'.format(predicate_atom, method["name"]))
+                                        print('\t\t the {} has been added to the parameters of method {}. Please check if that is correct'.format(predicate_atom, method["name"]))
+                                        self.method_list[-1]['parameters'] = set(method_input_types_list_names)
+                        # We need to check if this input already exist in the hddl_type list and if it does not exist we add it to the list and have the pop up for the user
+                        found_flag = 0 
+                        for hddl_type in self.hddl_type_list:
+                            if hddl_type["name"] == predicate_atom:
+                                temporary_predicate.append('?arg{}-{}'.format(index,predicate_atom))
+                                found_flag = 1
+                        if found_flag == 0:
+                            id_uuid = str(uuid.uuid1())
+                            self.hddl_type_list.append({"name":predicate_atom, "xmi:id": id_uuid})
+                            self.hddl_type_feedback.append({"name":predicate_atom, "xmi:id": id_uuid})
+                            self.log_file_general_entries.append('\t\t the {} is not in the HDDL type list - it has been added to it. Please check if that was your expected result'.format(predicate_atom))
+                            print('\t\t the {} is not in the HDDL type list - it has been added to it. Please check if that was your expected result'.format(predicate_atom))
+                        
+            
+            #create the predicate final version
+            final_predicate = ' '.join(temporary_predicate)
+
+            # We don't consider equality constraints in the predicates
+            if not(final_predicate in self.predicate_list) and not('=' in final_predicate):
+                self.predicate_list.append(('{}').format(final_predicate))
+
+                
+            temporary_predicate.clear()                                
 
         # For each method go back to the opaque action and associate the inputs/outputs and the parameters as well as the types
         temporary_input_list = []
         temporary_output_list = []
         temporary_parameter_list = []
         
-        # Look at all the Actions
-        for ii in self.opaqueAction_list:
-            
-            # Look at the inputs' and paramaters predicate to the actions
-            for jj in self.opaqueAction_input_list:
+        # Slip the action and the tasks
+        simple_actions_list = []
+        compound_actions_list = []
+        
+        # Split Actions and Tasks of the method avoiding doubles name - this first analysis is only based on names
+        for entity in self.opaqueAction_list:
+
+            flag_double = 0
+            if entity['xmi:type'] != 'uml:CallBehaviorAction':
+                if simple_actions_list == []:
+                    simple_actions_list.append(entity)
+                # the doubles here are linked to same name associated to the same task
+                for action in simple_actions_list:
+                    if action["name"] == entity['name'] and action["task"] == entity['task']:
+                        flag_double = 1
+                # If no doubles are there
+                if flag_double == 0:
+                    simple_actions_list.append(entity)
+            else:
+                if compound_actions_list == []:
+                    compound_actions_list.append(entity)
+                for task in compound_actions_list:
+                    # Check for doubles --> the check is based on the behavior link that action to a precise task
+                    if entity['behavior'] == task['behavior']:
+                        flag_double = 1
+                    # If no doubles are there
+                if flag_double == 0:
+                    compound_actions_list.append(entity)
+                
+        
+        # Now let's define the inputs to the simple actions
+        for action in simple_actions_list:
+            for action_input in self.opaqueAction_input_list:
                 # check the action id
-                if jj.get('action') == ii.get('xmi:id'):
+                if action_input.get('action') == action.get('xmi:id'):
                     # Get the incoming edge ID
-                    get_Edge_id = jj.get('incoming_edge')
-                    for kk in self.edge_list:
-                        # check the edges id
-                        if kk.get('xmi:id') == get_Edge_id:
+                    get_Edge_id = action_input.get('incoming_edge')
+                    for edge in self.edge_list:
+                        if edge['xmi:id'] == get_Edge_id:
                             # get the source of the edge
-                            input_edge = kk.get('input')
-                            
-                            for gg in self.method_input_predicate_list :
+                            input_edge = edge.get('input')
+
+                            # Look at the method inputs to find the edge's source name
+                            for source in self.method_input_types_list :
                                 # in the method predicate list get the name of the predicate
-                                if ii['method'] == gg['method'] and gg['xmi:id'] == input_edge:
-                                    # Inputs
-                                    temporary_input_list.append(gg['name'])
+                                if action['method'] == source['method'] and source['xmi:id'] == input_edge:
+                                    # before this - check if the input is in the predicate list?
+                                    temporary_parameter_list.append(source.get('name')+'-'+source.get('type_name'))  
                                     
-                            for gg in self.method_input_types_list :
+                            # Look at the method inputs to find the edge's source name
+                            for source in self.method_input_predicate_list :
                                 # in the method predicate list get the name of the predicate
-                                if ii['method'] == gg['method'] and gg['xmi:id'] == input_edge:
-                                    # Inputs
-                                    temporary_parameter_list.append(gg.get('name')+'-'+gg.get('type_name'))
-                    
-                    
-            # Look at the outputs' predicate to the actions
-            for jj in self.opaqueAction_output_list:
+                                if action['method'] == source['method'] and source['xmi:id'] == input_edge:
+                                    # before this - check if the input is in the predicate list?
+                                    temporary_input_list.append(source['name'])
+                                    
+            for action_output in self.opaqueAction_output_list:
                 # check the action id
-                if jj.get('action') == ii.get('xmi:id'):
+                if action_output.get('action') == action.get('xmi:id'):
                     # Get the incoming edge ID
-                    get_Edge_id = jj.get('outgoing_edge')
-                    for kk in self.edge_list:
-                        # check the edges id
-                        if kk.get('xmi:id') == get_Edge_id:
-                            # get the source of the edge
-                            output_edge = kk.get('output')
-                            
-                            for gg in self.method_output_predicate_list :
+                    get_Edge_id = action_output.get('outgoing_edge')
+                    for edge in self.edge_list:
+                        if edge['xmi:id'] == get_Edge_id:
+                            output_edge = edge.get('output')
+                            for method_output in self.method_output_predicate_list :
                                 # in the method predicate list get the name of the predicate
-                                if ii['method'] == gg['method'] and gg['xmi:id'] == output_edge:
+                                if action['method'] == method_output['method'] and method_output['xmi:id'] == output_edge:
                                     # Inputs
-                                    temporary_output_list.append(gg.get('name'))           
+                                    temporary_output_list.append(method_output.get('name'))                            
+
+            # The predicates have been all analysed therefore, what you need to analyse is that all the parameters of the task are 
+            # First remove brankets 
             
+            for input_action in temporary_input_list:
+                pass
+                # take the input predicate - open it
+                
+                # check that that all the parameters of the predicate are taken into consideration in the action parameters
+                
+                # check that the actions preconditions are considered in the predicate list
+                    # you need to clean the predicate as for the predicate list
+                    # you need to compare the predicate to the one in the lists
+                    # you need to define as strategy on how to act. 
+                
+                
+                
+                
+                # cleaned_predicate = input_action.replace('(',' ')
+                # cleaned_predicate = cleaned_predicate.replace(')',' ')
+                # # Remove negations  
+                # cleaned_predicate = cleaned_predicate.replace('not',' ')   
+                # # Take the predicate and open it:
+                # cleaned_predicate = cleaned_predicate.split()
+                # # analyse all other words - therefore you should have them in input_types
+                # for index, predicate_atom in enumerate(cleaned_predicate[1::]):
+                #     predicate_atom = predicate_atom.replace('?',' ').strip()
+                #     flag = 0
+                    
+                #     for index,input_types in enumerate(self.method_input_types_list):
+                #         # if you found a match - break free. Try to find a better way to define this       
+                #         pass
+
+                                    
             # if the action has no effect or no parameters print a warning!
-            if temporary_output_list == [] and ii['xmi:type'] != 'uml:CallBehaviorAction':
+            if temporary_output_list == [] and action['xmi:type'] != 'uml:CallBehaviorAction':
                 if self.debug == 'on':
-                    print('The action {} has no effects - is there something wrong in the model?'.format(ii['name']))
-                self.log_file_general_entries.append('\t\t The action {} has no effects - is there something wrong in the model? \n'.format(ii['name']))
+                    print('The action {} has no effects - is there something wrong in the model?'.format(action['name']))
+                self.log_file_general_entries.append('\t\t The action {} has no effects - is there something wrong in the model? \n'.format(action['name']))
             # if the action has no effect or no parameters print a warning!
             if temporary_parameter_list == []:
                 if self.debug == 'on':
-                    print('The action {} has no parameters - is there something wrong in the model?'.format(ii['name']))
-                self.log_file_general_entries.append('\t\t The action {} has no parameters - is there something wrong in the model? \n'.format(ii['name']))
+                    print('The action {} has no parameters - is there something wrong in the model?'.format(action['name']))
+                self.log_file_general_entries.append('\t\t The action {} has no parameters - is there something wrong in the model? \n'.format(action['name']))
             # Associate inputs and outputs to the action 
-            ii["preconditions"] = [x for x in temporary_input_list]
-            ii["effects"] = [x for x in temporary_output_list]
-            ii["parameters"] = set([x for x in temporary_parameter_list])
+            action["preconditions"] = [x for x in temporary_input_list]
+            action["effects"] = [x for x in temporary_output_list]
+            action["parameters"] = set([x for x in temporary_parameter_list])
             # Clear the lists
             temporary_input_list.clear() 
             temporary_output_list.clear()
             temporary_parameter_list.clear()
+                                            
+                                    
+
+
+                                    
+                                    
+                                    
+                                    
+        # We really need to check the grammar and if the order of parameters is respected for the action and tasks. For the methods we don't have this problem!!
+        # YOU ARRIVED HERE WITH THE NEW TASK CODING!! 
+        # You need to 
+        
+        
+        
+        
+        # # Look at all the Actions
+        # for ii in self.opaqueAction_list:
+            
+        #     # Look at the inputs' and paramaters predicate to the actions
+        #     for jj in self.opaqueAction_input_list:
+        #         # check the action id
+        #         if jj.get('action') == ii.get('xmi:id'):
+        #             # Get the incoming edge ID
+        #             get_Edge_id = jj.get('incoming_edge')
+        #             for kk in self.edge_list:
+        #                 # check the edges id
+        #                 if kk.get('xmi:id') == get_Edge_id:
+        #                     # get the source of the edge
+        #                     input_edge = kk.get('input')
+                            
+        #                     for gg in self.method_input_predicate_list :
+        #                         # in the method predicate list get the name of the predicate
+        #                         if ii['method'] == gg['method'] and gg['xmi:id'] == input_edge:
+        #                             # Inputs
+        #                             temporary_input_list.append(gg['name'])
+                                    
+        #                     for gg in self.method_input_types_list :
+        #                         # in the method predicate list get the name of the predicate
+        #                         if ii['method'] == gg['method'] and gg['xmi:id'] == input_edge:
+        #                             # Inputs
+        #                             temporary_parameter_list.append(gg.get('name')+'-'+gg.get('type_name'))
+
+                    
+                    
+        #     # Look at the outputs' predicate to the actions
+        #     for jj in self.opaqueAction_output_list:
+        #         # check the action id
+        #         if jj.get('action') == ii.get('xmi:id'):
+        #             # Get the incoming edge ID
+        #             get_Edge_id = jj.get('outgoing_edge')
+        #             for kk in self.edge_list:
+        #                 # check the edges id
+        #                 if kk.get('xmi:id') == get_Edge_id:
+        #                     # get the source of the edge
+        #                     output_edge = kk.get('output')
+                            
+        #                     for gg in self.method_output_predicate_list :
+        #                         # in the method predicate list get the name of the predicate
+        #                         if ii['method'] == gg['method'] and gg['xmi:id'] == output_edge:
+        #                             # Inputs
+        #                             temporary_output_list.append(gg.get('name'))           
+            
+        #     # if the action has no effect or no parameters print a warning!
+        #     if temporary_output_list == [] and ii['xmi:type'] != 'uml:CallBehaviorAction':
+        #         if self.debug == 'on':
+        #             print('The action {} has no effects - is there something wrong in the model?'.format(ii['name']))
+        #         self.log_file_general_entries.append('\t\t The action {} has no effects - is there something wrong in the model? \n'.format(ii['name']))
+        #     # if the action has no effect or no parameters print a warning!
+        #     if temporary_parameter_list == []:
+        #         if self.debug == 'on':
+        #             print('The action {} has no parameters - is there something wrong in the model?'.format(ii['name']))
+        #         self.log_file_general_entries.append('\t\t The action {} has no parameters - is there something wrong in the model? \n'.format(ii['name']))
+        #     # Associate inputs and outputs to the action 
+        #     ii["preconditions"] = [x for x in temporary_input_list]
+        #     ii["effects"] = [x for x in temporary_output_list]
+        #     ii["parameters"] = set([x for x in temporary_parameter_list])
+        #     # Clear the lists
+        #     temporary_input_list.clear() 
+        #     temporary_output_list.clear()
+        #     temporary_parameter_list.clear()
         
         # Check the tasks - if they all have the initial name and the same parameters, inputs and effects then they are one function
+        # Indeed the actions with same name should be poped - the may have similar parameters but different name of the parameter
+        
         final_opaque_action = []
         # Look at all the Actions
         for action in self.opaqueAction_list:
-            
-            # Split the name of the action
-            name = action['name']
-            final_opaque_action.append(name.lower())
-            
-        # we want the action to have just one occurance
-        final_opaque_action_set = set(final_opaque_action)  
+            if action['xmi:type'] != 'uml:CallBehaviorAction':
+                for (index,action_next) in enumerate(self.opaqueAction_list):
+                    if action["name"] == action_next["name"]:
+                        self.opaqueAction_list.pop(index)
+                    # if action["preconditions"] == action_next["preconditions"] and action["effects"] == action_next["effects"] and action["parameters"] == action_next["parameters"]:
+                    #     self.opaqueAction_list.pop(index)
+                    
+        # # we want the action to have just one occurance
+        # final_opaque_action_set = set(final_opaque_action)  
         
-        for final_action in final_opaque_action_set:
-            for action in self.opaqueAction_list:
-                if action['name'].lower() == final_action and action['xmi:type'] == 'uml:OpaqueAction':
-                    self.final_opaque_action_list.append(action)
-                    break
+        # for final_action in final_opaque_action_set:
+        #     for action in self.opaqueAction_list:
+        #         if action['name'].lower() == final_action and action['xmi:type'] == 'uml:OpaqueAction':
+        #             self.final_opaque_action_list.append(action)
+        #             break
         
         # Task Parameters for task used as :subtask in a method
         for action in self.opaqueAction_list:
@@ -470,46 +697,45 @@ class DomainDefinition():
             # write the predicate on the predicate list
             # always check for duplicates
         
-        temporary_predicate = []
-        self.predicate_list = []
+        # temporary_predicate = []
+        # self.predicate_list = []
 
         
-        for ii in self.all_predicates_list:
-            # First remove brankets 
-            cleaned_predicate = ii.replace('(',' ')
-            cleaned_predicate = cleaned_predicate.replace(')',' ')
-            # Remove negations  
-            cleaned_predicate = cleaned_predicate.replace('not',' ')   
-            # Take the predicate and open it:
-            cleaned_predicate = cleaned_predicate.split()
-            #get the first word of the predicate
-            temporary_predicate.append(cleaned_predicate[0])
-            # analyse all other words
-            for index,jj in enumerate(cleaned_predicate[1::]):
-                jj = jj.replace('?',' ').strip()
-                flag = 0
+        # for ii in self.all_predicates_list:
+        #     # First remove brankets 
+        #     cleaned_predicate = ii.replace('(',' ')
+        #     cleaned_predicate = cleaned_predicate.replace(')',' ')
+        #     # Remove negations  
+        #     cleaned_predicate = cleaned_predicate.replace('not',' ')   
+        #     # Take the predicate and open it:
+        #     cleaned_predicate = cleaned_predicate.split()
+        #     #get the first word of the predicate
+        #     temporary_predicate.append(cleaned_predicate[0])
+        #     # analyse all other words
+        #     for index,jj in enumerate(cleaned_predicate[1::]):
+        #         jj = jj.replace('?',' ').strip()
+        #         flag = 0
                 
-                for kk in self.method_input_types_list:
-                    # if you found a match - break free. Try to find a better way to define this 
-                    if jj == kk.get('name') and flag == 0:
-                        temporary_predicate.append('?arg{} - {}'.format(index,kk.get('type_name')))
-                        flag = 1
+        #         for kk in self.method_input_types_list:
+        #             # if you found a match - break free. Try to find a better way to define this 
+        #             if jj == kk.get('name') and flag == 0:
+        #                 temporary_predicate.append('?arg{} - {}'.format(index,kk.get('type_name')))
+        #                 flag = 1
             
-            #create the predicate final version
-            final_predicate= ' '.join(temporary_predicate)
-            if len(final_predicate) <= 1:
+        #     #create the predicate final version
+        #     final_predicate= ' '.join(temporary_predicate)
+        #     if len(final_predicate) <= 1:
                 
-                print('\t\t The predicate {} has no parameters - it has been inserted as it was written - please check it!'.format(jj))
-                self.log_file_general_entries.append('\t\t The predicate {} has no parameters - it has been inserted as it was written - please check it!'.format(jj))
-                # Final predicate in its original form - there is an error in the format - inform the user
-                final_predicate = kk
+        #         print('\t\t The predicate {} has no parameters - it has been inserted as it was written - please check it!'.format(jj))
+        #         self.log_file_general_entries.append('\t\t The predicate {} has no parameters - it has been inserted as it was written - please check it!'.format(jj))
+        #         # Final predicate in its original form - there is an error in the format - inform the user
+        #         final_predicate = kk
             
-            # We don't consider equality constraints in the predicates
-            if not(final_predicate in self.predicate_list) and not('=' in final_predicate):
-                self.predicate_list.append(('{}').format(final_predicate))
-
+        #     # We don't consider equality constraints in the predicates in the initial predicate list
+        #     if not(final_predicate in self.predicate_list) and not('=' in final_predicate):
+        #         self.predicate_list.append(('{}').format(final_predicate))
                 
-            temporary_predicate.clear()
+        #     temporary_predicate.clear()
             
         self.domain_definition_output["domain_name"] = self.domain_name
         self.domain_definition_output["problem_name"] = self.problem_name
