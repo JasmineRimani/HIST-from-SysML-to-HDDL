@@ -340,7 +340,7 @@ class DomainDefinition():
                     if index == (len(self.method_input_types_list)-1) and flag != 1:
                         # This entry is missing from the method inputs --> probably an error while writing the domain in Papyrus
                         temporary_predicate.append('?arg{}-{}'.format(index_predicate,predicate_atom))
-                        self.log_file_general_entries.append('\t\t The {} is not define in any method input!!!! Probably you need to check the Activity Parameters in Papyrus'.format(predicate_atom))
+                        self.log_file_general_entries.append('\t\t The {} is not define in any method input!!!! Probably you need to check the Activity Parameters in Papyrus \n'.format(predicate_atom))
                         if self.debug == 'on':
                             print('The {} is not define in any method input!!!! Probably you need to check the Activity Parameters in Papyrus'.format(predicate_atom))
                         # add this to the methods inputs [method parameters]
@@ -353,7 +353,7 @@ class DomainDefinition():
                                     if method.get("xmi:id") ==  method_selected:
                                         # You add the predicate_atom to the method parameters
                                         method.get("parameters").append(predicate_atom)
-                                        self.log_file_general_entries.append('\t\t The {} has been added to the parameters of method {}. Please check if that is correct'.format(predicate_atom, method["name"]))
+                                        self.log_file_general_entries.append('\t\t The {} has been added to the parameters of method {}. Please check if that is correct \n'.format(predicate_atom, method["name"]))
                                         if self.debug == 'on':
                                             print('The {} has been added to the parameters of method {}. Please check if that is correct'.format(predicate_atom, method["name"]))
                                         # self.method_list[-1]['parameters'] = set(method_input_types_list_names)
@@ -368,7 +368,7 @@ class DomainDefinition():
                             id_uuid = str(uuid.uuid1())
                             self.hddl_type_list.append({"name":predicate_atom, "xmi:id": id_uuid})
                             self.hddl_type_feedback.append({"name":predicate_atom, "xmi:id": id_uuid})
-                            self.log_file_general_entries.append('t\t The {} is not in the HDDL type list - it has been added to it. Please check if that was your expected result'.format(predicate_atom))
+                            self.log_file_general_entries.append('t\t The {} is not in the HDDL type list - it has been added to it. Please check if that was your expected result \n'.format(predicate_atom))
                             if self.debug == 'on':
                                 print('The {} is not in the HDDL type list - it has been added to it. Please check if that was your expected result'.format(predicate_atom))
                         
@@ -482,8 +482,8 @@ class DomainDefinition():
                             if self.debug == 'on':
                                 print("The input {} of your predicate {} is not considered in the action. It has been added".format(input_action,input_type))
                                 print("Check Action {} and associated method {}".format(action.get("name"), first_method))
-                            self.log_file_general_entries.append('\t\t The input {} of your predicate {} is not considered in the action. It has been added'.format(input_action,input_type))
-                            self.log_file_general_entries.append('\t\t Check Action {} and associated method {}'.format(action.get("name"), first_method))
+                            self.log_file_general_entries.append('\t\t The input {} of your predicate {} is not considered in the action. It has been added \n'.format(input_action,input_type))
+                            self.log_file_general_entries.append('\t\t Check Action {} and associated method {} \n'.format(action.get("name"), first_method))
                             # Add this parameter to the action parameters
                             # Check if the parameter is already associate to a HDDL type or not 
                             # If it is not in action parameters it was not listed in the method Activity Parameter so 
@@ -498,7 +498,7 @@ class DomainDefinition():
                                 id_uuid = str(uuid.uuid1())
                                 self.hddl_type_list.append({"name":predicate_atom, "xmi:id": id_uuid})
                                 self.hddl_type_feedback.append({"name":predicate_atom, "xmi:id": id_uuid})
-                                self.log_file_general_entries.append('\t\t The {} is not in the HDDL type list - it has been added to it. Please check if that was your expected result'.format(predicate_atom))
+                                self.log_file_general_entries.append('\t\t The {} is not in the HDDL type list - it has been added to it. Please check if that was your expected result \n'.format(predicate_atom))
                                 if self.debug == 'on':
                                     print('The {} is not in the HDDL type list - it has been added to it. Please check if that was your expected result'.format(predicate_atom))
                                 temporary_parameter_list.append(predicate_atom+'-'+predicate_atom)                      
@@ -545,8 +545,8 @@ class DomainDefinition():
                                         if self.debug == 'on':
                                             print('action {} and {} have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain'.format(action["name"], next_action["name"]))
                                             print('action {} is associate to method {}, while action {} is associated to method {}'.format(action["name"], next_action["name"], first_method, second_method))
-                                        self.log_file_general_entries.append('action {} and {} have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain'.format(action["name"], next_action["name"]))
-                                        self.log_file_general_entries.append('action {} is associate to method{}, while action {} is associated to method {}'.format(action["name"], next_action["name"], first_method, second_method))
+                                        self.log_file_general_entries.append(' \t\t action {} and {} have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain \n'.format(action["name"], next_action["name"]))
+                                        self.log_file_general_entries.append(' \t\t action {} is associate to method {}, while action {} is associated to method {} \n'.format(action["name"], next_action["name"], first_method, second_method))
                                         # Flag the action as double!! 
                                         next_action["double_action"] = action['xmi:id']
         # Check if you have duplicate actions with the same name - if the action has the same name it is going to be removed from the actions
@@ -573,8 +573,8 @@ class DomainDefinition():
                             if self.debug == 'on':
                                 print('action {} and {} have similar names - are they two different actions? Action {} has been removed from the domain'.format(action["name"], next_action["name"], next_action["name"]))
                                 print('action {} is associate to method{}, while action {} is associated to method {}'.format(action["name"], next_action["name"], first_method, second_method))
-                            self.log_file_general_entries.append('action {} and {} have similar names - are they two different actions? Action {} has been removed from the domain'.format(action["name"], next_action["name"], next_action["name"]))
-                            self.log_file_general_entries.append('action {} is associate to method{}, while action {} is associated to method {}'.format(action["name"], next_action["name"], first_method, second_method))
+                            self.log_file_general_entries.append('\t\t action {} and {} have similar names - are they two different actions? Action {} has been removed from the domain \n'.format(action["name"], next_action["name"], next_action["name"]))
+                            self.log_file_general_entries.append('\t\t action {} is associate to method{}, while action {} is associated to method {} \n'.format(action["name"], next_action["name"], first_method, second_method))
 
         no_duplicate_actions = []
         if duplicate_actions != []:
