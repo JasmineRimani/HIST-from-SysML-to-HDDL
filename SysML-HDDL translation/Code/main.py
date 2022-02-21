@@ -19,6 +19,7 @@ from DomainDefinition import DomainDefinition
 from ProblemDefinition import ProblemDefinition
 # Feedback Definition
 from FeedbackDefinition import FeedbackDefinition
+from Partial_FeedbackDefinition import Simple_FeedbackDefinition
 
 
 
@@ -280,6 +281,10 @@ def main():
         # Write the Domain FIle
         DomainFile.DomainFileWriting()    
         print("Domain File Generated under the name of ", domain_name)
+        print("Generating Simple Feedback File")
+        FeedbackFile = Simple_FeedbackDefinition(domain_name, parsed_dictionary, domain_file_elements)
+        FeedbackFile.Simple_FeedbackLogFileWriting()
+        print("Feedback File Generated")    
         
     if generate_problem_file == 'yes':
         print("Generating Problem File/s")
@@ -294,6 +299,8 @@ def main():
         feedback_file_elements = FeedbackFile.FeedbackFile()
         FeedbackFile.FeedbackLogFileWriting()
         print("Feedback File Generated under the name of ", feedback_file_elements["feedback_file_name"])
+
+    
     x = 1
 
 if __name__ == "__main__":
