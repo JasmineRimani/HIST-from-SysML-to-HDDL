@@ -7,6 +7,11 @@
     <packagedElement xmi:type="uml:Dependency" xmi:id="_O9WgUEVXEeykYNpZ1N6_Cw" name="Define" client="_rfy78C2DEeylqPZKkKN_nQ" supplier="_uVrj8C2DEeylqPZKkKN_nQ"/>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_uVrj8C2DEeylqPZKkKN_nQ" name="DomainDefinition">
+    <ownedComment xmi:type="uml:Comment" xmi:id="_9u16QLUSEeyx46yc-4v3BQ">
+      <body>High level functions are &#xD;
+modelled as &quot;use cases&quot;&#xD;
+</body>
+    </ownedComment>
     <packagedElement xmi:type="uml:Package" xmi:id="_ofkRIHFbEeyI3Puz_5w6Rg" name="UseCase">
       <ownedComment xmi:type="uml:Comment" xmi:id="__CD7wHFdEeyI3Puz_5w6Rg">
         <body>Requirements HDDL:&#xD;
@@ -38,26 +43,14 @@
 &#xD;
 </body>
       </ownedComment>
-      <ownedComment xmi:type="uml:Comment" xmi:id="_j6i_EHFhEeyI3Puz_5w6Rg">
-        <body>Already Calibrated&#xD;
-</body>
-      </ownedComment>
       <ownedComment xmi:type="uml:Comment" xmi:id="_nsyhoHFhEeyI3Puz_5w6Rg">
         <body>To calibrate&#xD;
-</body>
-      </ownedComment>
-      <ownedComment xmi:type="uml:Comment" xmi:id="_tqoZEHFhEeyI3Puz_5w6Rg">
-        <body>Poiting in different directions&#xD;
-</body>
-      </ownedComment>
-      <ownedComment xmi:type="uml:Comment" xmi:id="_v-w-4HFhEeyI3Puz_5w6Rg">
-        <body>Already Good Pointing&#xD;
 </body>
       </ownedComment>
       <packagedElement xmi:type="uml:Actor" xmi:id="_4LW0kHFbEeyI3Puz_5w6Rg" name="Satellite"/>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_C-wswHFcEeyI3Puz_5w6Rg" name="DoMission">
         <ownedUseCase xmi:type="uml:UseCase" xmi:id="_X6Q5gHFgEeyI3Puz_5w6Rg" name="DoMission_method1" classifierBehavior="_1rzdYHFlEeyI3Puz_5w6Rg">
-          <ownedBehavior xmi:type="uml:Activity" xmi:id="_1rzdYHFlEeyI3Puz_5w6Rg" name="DoMission_method1" node="_WXnMQHFmEeyI3Puz_5w6Rg _sQKM4HFmEeyI3Puz_5w6Rg _t0xaQHFmEeyI3Puz_5w6Rg _u8lW4HFmEeyI3Puz_5w6Rg _aHDdAHFnEeyI3Puz_5w6Rg _oxa_sHFnEeyI3Puz_5w6Rg _8_ATUHFnEeyI3Puz_5w6Rg _aRU94HFoEeyI3Puz_5w6Rg _geWEUHFpEeyI3Puz_5w6Rg _kBGZYHFpEeyI3Puz_5w6Rg _nXxaQHFpEeyI3Puz_5w6Rg _rbNagHFpEeyI3Puz_5w6Rg _tLMKYHFpEeyI3Puz_5w6Rg _1zYIMHFpEeyI3Puz_5w6Rg">
+          <ownedBehavior xmi:type="uml:Activity" xmi:id="_1rzdYHFlEeyI3Puz_5w6Rg" name="DoMission_method1" node="_1zYIMHFpEeyI3Puz_5w6Rg _tLMKYHFpEeyI3Puz_5w6Rg _rbNagHFpEeyI3Puz_5w6Rg _nXxaQHFpEeyI3Puz_5w6Rg _kBGZYHFpEeyI3Puz_5w6Rg _geWEUHFpEeyI3Puz_5w6Rg _aRU94HFoEeyI3Puz_5w6Rg _8_ATUHFnEeyI3Puz_5w6Rg _oxa_sHFnEeyI3Puz_5w6Rg _aHDdAHFnEeyI3Puz_5w6Rg _u8lW4HFmEeyI3Puz_5w6Rg _t0xaQHFmEeyI3Puz_5w6Rg _sQKM4HFmEeyI3Puz_5w6Rg _WXnMQHFmEeyI3Puz_5w6Rg">
             <edge xmi:type="uml:ObjectFlow" xmi:id="_EvXRQHFoEeyI3Puz_5w6Rg" target="_EvhCQHFoEeyI3Puz_5w6Rg" source="_WXnMQHFmEeyI3Puz_5w6Rg">
               <guard xmi:type="uml:LiteralBoolean" xmi:id="_EvqMMHFoEeyI3Puz_5w6Rg" value="true"/>
               <weight xmi:type="uml:LiteralInteger" xmi:id="_EvqMMXFoEeyI3Puz_5w6Rg" value="1"/>
@@ -196,7 +189,7 @@
       </packagedElement>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_D1A_UHFcEeyI3Puz_5w6Rg" name="PrepareMission">
         <ownedUseCase xmi:type="uml:UseCase" xmi:id="_bmZNAHFgEeyI3Puz_5w6Rg" name="PrepareMission_method1" classifierBehavior="_EIi28HFqEeyI3Puz_5w6Rg">
-          <ownedBehavior xmi:type="uml:Activity" xmi:id="_EIi28HFqEeyI3Puz_5w6Rg" name="PrepareMission_method1" node="_VXDxYHFqEeyI3Puz_5w6Rg _VXE_gHFqEeyI3Puz_5w6Rg _VXGNoHFqEeyI3Puz_5w6Rg _lQB1MHFqEeyI3Puz_5w6Rg _pEJnEHFqEeyI3Puz_5w6Rg _sGSiYHFqEeyI3Puz_5w6Rg _swJ-wHFqEeyI3Puz_5w6Rg">
+          <ownedBehavior xmi:type="uml:Activity" xmi:id="_EIi28HFqEeyI3Puz_5w6Rg" name="PrepareMission_method1" node="_swJ-wHFqEeyI3Puz_5w6Rg _sGSiYHFqEeyI3Puz_5w6Rg _pEJnEHFqEeyI3Puz_5w6Rg _lQB1MHFqEeyI3Puz_5w6Rg _VXGNoHFqEeyI3Puz_5w6Rg _VXE_gHFqEeyI3Puz_5w6Rg _VXDxYHFqEeyI3Puz_5w6Rg">
             <edge xmi:type="uml:ControlFlow" xmi:id="_tgG1AHFqEeyI3Puz_5w6Rg" target="_lQB1MHFqEeyI3Puz_5w6Rg" source="_sGSiYHFqEeyI3Puz_5w6Rg"/>
             <edge xmi:type="uml:ControlFlow" xmi:id="_u45z8HFqEeyI3Puz_5w6Rg" target="_pEJnEHFqEeyI3Puz_5w6Rg" source="_lQB1MHFqEeyI3Puz_5w6Rg"/>
             <edge xmi:type="uml:ControlFlow" xmi:id="_viC3kHFqEeyI3Puz_5w6Rg" target="_swJ-wHFqEeyI3Puz_5w6Rg" source="_pEJnEHFqEeyI3Puz_5w6Rg"/>
@@ -251,7 +244,7 @@
       </packagedElement>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_GXZcgHFcEeyI3Puz_5w6Rg" name="DoSwitching">
         <ownedUseCase xmi:type="uml:UseCase" xmi:id="_d7AT8HFgEeyI3Puz_5w6Rg" name="DoSwitching_method1" classifierBehavior="_GOFxsHFrEeyI3Puz_5w6Rg">
-          <ownedBehavior xmi:type="uml:Activity" xmi:id="_GOFxsHFrEeyI3Puz_5w6Rg" name="DoSwitching_method1" visibility="package" node="_hJN7YHFrEeyI3Puz_5w6Rg _hJPwkHFrEeyI3Puz_5w6Rg _hJQXoHFrEeyI3Puz_5w6Rg _HV2m0HFyEeyI3Puz_5w6Rg _J6XyAHFyEeyI3Puz_5w6Rg _oWhHMHF5EeyI3Puz_5w6Rg _tyHNMHF5EeyI3Puz_5w6Rg _xVLrUHF5EeyI3Puz_5w6Rg _00rRAHF5EeyI3Puz_5w6Rg _2arlgHF5EeyI3Puz_5w6Rg _3pe68HF5EeyI3Puz_5w6Rg _5_o6AHF5EeyI3Puz_5w6Rg _loqH4HF7EeyI3Puz_5w6Rg _B1QggHF8EeyI3Puz_5w6Rg _DUT4cHF8EeyI3Puz_5w6Rg _F9BAEHF8EeyI3Puz_5w6Rg">
+          <ownedBehavior xmi:type="uml:Activity" xmi:id="_GOFxsHFrEeyI3Puz_5w6Rg" name="DoSwitching_method1" visibility="package" node="_F9BAEHF8EeyI3Puz_5w6Rg _DUT4cHF8EeyI3Puz_5w6Rg _B1QggHF8EeyI3Puz_5w6Rg _loqH4HF7EeyI3Puz_5w6Rg _5_o6AHF5EeyI3Puz_5w6Rg _3pe68HF5EeyI3Puz_5w6Rg _2arlgHF5EeyI3Puz_5w6Rg _00rRAHF5EeyI3Puz_5w6Rg _xVLrUHF5EeyI3Puz_5w6Rg _tyHNMHF5EeyI3Puz_5w6Rg _oWhHMHF5EeyI3Puz_5w6Rg _J6XyAHFyEeyI3Puz_5w6Rg _HV2m0HFyEeyI3Puz_5w6Rg _hJQXoHFrEeyI3Puz_5w6Rg _hJPwkHFrEeyI3Puz_5w6Rg _hJN7YHFrEeyI3Puz_5w6Rg">
             <edge xmi:type="uml:ControlFlow" xmi:id="_7G3AwHF5EeyI3Puz_5w6Rg" target="_xVLrUHF5EeyI3Puz_5w6Rg" source="_3pe68HF5EeyI3Puz_5w6Rg"/>
             <edge xmi:type="uml:ControlFlow" xmi:id="_7ohjYHF5EeyI3Puz_5w6Rg" target="_00rRAHF5EeyI3Puz_5w6Rg" source="_xVLrUHF5EeyI3Puz_5w6Rg"/>
             <edge xmi:type="uml:ControlFlow" xmi:id="_9gVZkHF5EeyI3Puz_5w6Rg" target="_2arlgHF5EeyI3Puz_5w6Rg" source="_00rRAHF5EeyI3Puz_5w6Rg"/>
@@ -396,7 +389,7 @@
           <extend xmi:type="uml:Extend" xmi:id="_5zOYAHFgEeyI3Puz_5w6Rg" extendedCase="_GXZcgHFcEeyI3Puz_5w6Rg" extensionLocation="_5zOYAXFgEeyI3Puz_5w6Rg"/>
         </ownedUseCase>
         <ownedUseCase xmi:type="uml:UseCase" xmi:id="_gkF2EHFgEeyI3Puz_5w6Rg" name="DoSwitching_method2" classifierBehavior="_PF4CAHF8EeyI3Puz_5w6Rg">
-          <ownedBehavior xmi:type="uml:Activity" xmi:id="_PF4CAHF8EeyI3Puz_5w6Rg" name="DoSwitching_method2" node="_1KxVcHF8EeyI3Puz_5w6Rg _1KzxsHF8EeyI3Puz_5w6Rg _1K0_0HF8EeyI3Puz_5w6Rg _BdHQ0HF9EeyI3Puz_5w6Rg _Dn_M8HF9EeyI3Puz_5w6Rg _KgG7UHF9EeyI3Puz_5w6Rg _P4sJkHF9EeyI3Puz_5w6Rg _UltSUHF9EeyI3Puz_5w6Rg _ZY8X0HF9EeyI3Puz_5w6Rg _1LpCsHF9EeyI3Puz_5w6Rg _1Lre8HF9EeyI3Puz_5w6Rg _1LtUIHF9EeyI3Puz_5w6Rg">
+          <ownedBehavior xmi:type="uml:Activity" xmi:id="_PF4CAHF8EeyI3Puz_5w6Rg" name="DoSwitching_method2" node="_1LtUIHF9EeyI3Puz_5w6Rg _1Lre8HF9EeyI3Puz_5w6Rg _1LpCsHF9EeyI3Puz_5w6Rg _ZY8X0HF9EeyI3Puz_5w6Rg _UltSUHF9EeyI3Puz_5w6Rg _P4sJkHF9EeyI3Puz_5w6Rg _KgG7UHF9EeyI3Puz_5w6Rg _Dn_M8HF9EeyI3Puz_5w6Rg _BdHQ0HF9EeyI3Puz_5w6Rg _1K0_0HF8EeyI3Puz_5w6Rg _1KzxsHF8EeyI3Puz_5w6Rg _1KxVcHF8EeyI3Puz_5w6Rg">
             <edge xmi:type="uml:ControlFlow" xmi:id="_d5aSUHF9EeyI3Puz_5w6Rg" target="_P4sJkHF9EeyI3Puz_5w6Rg" source="_BdHQ0HF9EeyI3Puz_5w6Rg"/>
             <edge xmi:type="uml:ControlFlow" xmi:id="_eTeYIHF9EeyI3Puz_5w6Rg" target="_UltSUHF9EeyI3Puz_5w6Rg" source="_P4sJkHF9EeyI3Puz_5w6Rg"/>
             <edge xmi:type="uml:ControlFlow" xmi:id="_euAYAHF9EeyI3Puz_5w6Rg" target="_ZY8X0HF9EeyI3Puz_5w6Rg" source="_UltSUHF9EeyI3Puz_5w6Rg"/>
@@ -498,7 +491,7 @@
           <extend xmi:type="uml:Extend" xmi:id="_6u_csHFgEeyI3Puz_5w6Rg" extendedCase="_GXZcgHFcEeyI3Puz_5w6Rg" extensionLocation="_6vADwHFgEeyI3Puz_5w6Rg"/>
         </ownedUseCase>
         <ownedUseCase xmi:type="uml:UseCase" xmi:id="_kaSEgHFgEeyI3Puz_5w6Rg" name="DoSwitching_method3" classifierBehavior="_BW_lQHF-EeyI3Puz_5w6Rg">
-          <ownedBehavior xmi:type="uml:Activity" xmi:id="_BW_lQHF-EeyI3Puz_5w6Rg" name="DoSwitching_method3" node="_HTh1IHF-EeyI3Puz_5w6Rg _HTk4cHF-EeyI3Puz_5w6Rg _WQIXUHF-EeyI3Puz_5w6Rg _jawlkHF-EeyI3Puz_5w6Rg _mAB-sHF-EeyI3Puz_5w6Rg _nipoAHF-EeyI3Puz_5w6Rg">
+          <ownedBehavior xmi:type="uml:Activity" xmi:id="_BW_lQHF-EeyI3Puz_5w6Rg" name="DoSwitching_method3" node="_nipoAHF-EeyI3Puz_5w6Rg _mAB-sHF-EeyI3Puz_5w6Rg _jawlkHF-EeyI3Puz_5w6Rg _WQIXUHF-EeyI3Puz_5w6Rg _HTk4cHF-EeyI3Puz_5w6Rg _HTh1IHF-EeyI3Puz_5w6Rg">
             <edge xmi:type="uml:ControlFlow" xmi:id="_rszUQHF-EeyI3Puz_5w6Rg" target="_nipoAHF-EeyI3Puz_5w6Rg" source="_jawlkHF-EeyI3Puz_5w6Rg"/>
             <edge xmi:type="uml:ControlFlow" xmi:id="_s8jr8HF-EeyI3Puz_5w6Rg" target="_mAB-sHF-EeyI3Puz_5w6Rg" source="_nipoAHF-EeyI3Puz_5w6Rg"/>
             <node xmi:type="uml:ActivityParameterNode" xmi:id="_HTh1IHF-EeyI3Puz_5w6Rg" name="satellite" type="_1aNhoHFmEeyI3Puz_5w6Rg">
@@ -523,7 +516,7 @@
       </packagedElement>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_KjLgcHFcEeyI3Puz_5w6Rg" name="DoCalibration">
         <ownedUseCase xmi:type="uml:UseCase" xmi:id="_rUJfUHFgEeyI3Puz_5w6Rg" name="DoCalibration_method1" classifierBehavior="_yoGScHF-EeyI3Puz_5w6Rg">
-          <ownedBehavior xmi:type="uml:Activity" xmi:id="_yoGScHF-EeyI3Puz_5w6Rg" name="DoCalibration_method1" node="_2lGTgHF-EeyI3Puz_5w6Rg _G8_H8HF_EeyI3Puz_5w6Rg _G9CyUHF_EeyI3Puz_5w6Rg _G9EngHF_EeyI3Puz_5w6Rg _OI58EHF_EeyI3Puz_5w6Rg _VOzAsHF_EeyI3Puz_5w6Rg _d7NXMHF_EeyI3Puz_5w6Rg _vRLkgHF_EeyI3Puz_5w6Rg _2_WKEHF_EeyI3Puz_5w6Rg _6GWXQHF_EeyI3Puz_5w6Rg _8nvV8HF_EeyI3Puz_5w6Rg __GdbIHF_EeyI3Puz_5w6Rg _KGTM0HGAEeyI3Puz_5w6Rg">
+          <ownedBehavior xmi:type="uml:Activity" xmi:id="_yoGScHF-EeyI3Puz_5w6Rg" name="DoCalibration_method1" node="_KGTM0HGAEeyI3Puz_5w6Rg __GdbIHF_EeyI3Puz_5w6Rg _8nvV8HF_EeyI3Puz_5w6Rg _6GWXQHF_EeyI3Puz_5w6Rg _2_WKEHF_EeyI3Puz_5w6Rg _vRLkgHF_EeyI3Puz_5w6Rg _d7NXMHF_EeyI3Puz_5w6Rg _VOzAsHF_EeyI3Puz_5w6Rg _OI58EHF_EeyI3Puz_5w6Rg _G9EngHF_EeyI3Puz_5w6Rg _G9CyUHF_EeyI3Puz_5w6Rg _G8_H8HF_EeyI3Puz_5w6Rg _2lGTgHF-EeyI3Puz_5w6Rg">
             <edge xmi:type="uml:ObjectFlow" xmi:id="_nffw4HF_EeyI3Puz_5w6Rg" target="_nfgX8HF_EeyI3Puz_5w6Rg" source="_G8_H8HF_EeyI3Puz_5w6Rg">
               <guard xmi:type="uml:LiteralBoolean" xmi:id="_nfkpYHF_EeyI3Puz_5w6Rg" value="true"/>
               <weight xmi:type="uml:LiteralInteger" xmi:id="_nfkpYXF_EeyI3Puz_5w6Rg" value="1"/>
@@ -641,7 +634,7 @@
           <extend xmi:type="uml:Extend" xmi:id="_-3CQIHFgEeyI3Puz_5w6Rg" extendedCase="_KjLgcHFcEeyI3Puz_5w6Rg" extensionLocation="_-3CQIXFgEeyI3Puz_5w6Rg"/>
         </ownedUseCase>
         <ownedUseCase xmi:type="uml:UseCase" xmi:id="_tZ9VQHFgEeyI3Puz_5w6Rg" name="DoCalibration_method2" classifierBehavior="_QQyZIHGAEeyI3Puz_5w6Rg">
-          <ownedBehavior xmi:type="uml:Activity" xmi:id="_QQyZIHGAEeyI3Puz_5w6Rg" name="DoCalibration_method2" node="_Z6MjYHGAEeyI3Puz_5w6Rg _Z6O_oHGAEeyI3Puz_5w6Rg _Z6Q00HGAEeyI3Puz_5w6Rg _fKJaEHGAEeyI3Puz_5w6Rg _hWiZIHGAEeyI3Puz_5w6Rg _mXbgIHGAEeyI3Puz_5w6Rg _njgRsHGAEeyI3Puz_5w6Rg">
+          <ownedBehavior xmi:type="uml:Activity" xmi:id="_QQyZIHGAEeyI3Puz_5w6Rg" name="DoCalibration_method2" node="_njgRsHGAEeyI3Puz_5w6Rg _mXbgIHGAEeyI3Puz_5w6Rg _hWiZIHGAEeyI3Puz_5w6Rg _fKJaEHGAEeyI3Puz_5w6Rg _Z6Q00HGAEeyI3Puz_5w6Rg _Z6O_oHGAEeyI3Puz_5w6Rg _Z6MjYHGAEeyI3Puz_5w6Rg">
             <edge xmi:type="uml:ControlFlow" xmi:id="_pOFkMHGAEeyI3Puz_5w6Rg" target="_mXbgIHGAEeyI3Puz_5w6Rg" source="_fKJaEHGAEeyI3Puz_5w6Rg"/>
             <edge xmi:type="uml:ControlFlow" xmi:id="_pnXm4HGAEeyI3Puz_5w6Rg" target="_njgRsHGAEeyI3Puz_5w6Rg" source="_mXbgIHGAEeyI3Puz_5w6Rg"/>
             <node xmi:type="uml:ActivityParameterNode" xmi:id="_Z6MjYHGAEeyI3Puz_5w6Rg" name="direction" type="_pu-pkHFmEeyI3Puz_5w6Rg">
@@ -668,7 +661,7 @@
       </packagedElement>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_MJYMwHFdEeyI3Puz_5w6Rg" name="MakePowerAvailable">
         <ownedUseCase xmi:type="uml:UseCase" xmi:id="_v9qBEHFgEeyI3Puz_5w6Rg" name="MakePowerAvailable_method1" classifierBehavior="_4PRrcHGAEeyI3Puz_5w6Rg">
-          <ownedBehavior xmi:type="uml:Activity" xmi:id="_4PRrcHGAEeyI3Puz_5w6Rg" name="MakePowerAvailable_method1" node="_GLFfAHGBEeyI3Puz_5w6Rg _GLHUMHGBEeyI3Puz_5w6Rg _JYAG8HGBEeyI3Puz_5w6Rg _Nqq2AHGBEeyI3Puz_5w6Rg _S80FEHGBEeyI3Puz_5w6Rg _U59uQHGBEeyI3Puz_5w6Rg _ZV3R0HGBEeyI3Puz_5w6Rg _oJWUQHGBEeyI3Puz_5w6Rg _24awwHGBEeyI3Puz_5w6Rg _5Re54HGBEeyI3Puz_5w6Rg">
+          <ownedBehavior xmi:type="uml:Activity" xmi:id="_4PRrcHGAEeyI3Puz_5w6Rg" name="MakePowerAvailable_method1" node="_5Re54HGBEeyI3Puz_5w6Rg _24awwHGBEeyI3Puz_5w6Rg _oJWUQHGBEeyI3Puz_5w6Rg _ZV3R0HGBEeyI3Puz_5w6Rg _U59uQHGBEeyI3Puz_5w6Rg _S80FEHGBEeyI3Puz_5w6Rg _Nqq2AHGBEeyI3Puz_5w6Rg _JYAG8HGBEeyI3Puz_5w6Rg _GLHUMHGBEeyI3Puz_5w6Rg _GLFfAHGBEeyI3Puz_5w6Rg">
             <edge xmi:type="uml:ObjectFlow" xmi:id="_cKhx0HGBEeyI3Puz_5w6Rg" target="_cKiY4HGBEeyI3Puz_5w6Rg" source="_GLFfAHGBEeyI3Puz_5w6Rg">
               <guard xmi:type="uml:LiteralBoolean" xmi:id="_cKmDQHGBEeyI3Puz_5w6Rg" value="true"/>
               <weight xmi:type="uml:LiteralInteger" xmi:id="_cKmDQXGBEeyI3Puz_5w6Rg" value="1"/>
@@ -746,7 +739,7 @@
       </packagedElement>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_W33IsHFdEeyI3Puz_5w6Rg" name="DoTurning">
         <ownedUseCase xmi:type="uml:UseCase" xmi:id="_yr-BcHFgEeyI3Puz_5w6Rg" name="DoTurning_method1" classifierBehavior="_CFoQEHGCEeyI3Puz_5w6Rg">
-          <ownedBehavior xmi:type="uml:Activity" xmi:id="_CFoQEHGCEeyI3Puz_5w6Rg" name="DoTurning_method1" node="_OPHxcHGCEeyI3Puz_5w6Rg _OPKNsHGCEeyI3Puz_5w6Rg _QtdcIHGCEeyI3Puz_5w6Rg _VBHpsHGCEeyI3Puz_5w6Rg _YEBaAHGCEeyI3Puz_5w6Rg _cFpcYHGCEeyI3Puz_5w6Rg _c-l2kHGCEeyI3Puz_5w6Rg _eDRmsHGCEeyI3Puz_5w6Rg _uJGawHGCEeyI3Puz_5w6Rg _2vPKIHGCEeyI3Puz_5w6Rg _X7odkHGDEeyI3Puz_5w6Rg">
+          <ownedBehavior xmi:type="uml:Activity" xmi:id="_CFoQEHGCEeyI3Puz_5w6Rg" name="DoTurning_method1" node="_X7odkHGDEeyI3Puz_5w6Rg _2vPKIHGCEeyI3Puz_5w6Rg _uJGawHGCEeyI3Puz_5w6Rg _eDRmsHGCEeyI3Puz_5w6Rg _c-l2kHGCEeyI3Puz_5w6Rg _cFpcYHGCEeyI3Puz_5w6Rg _YEBaAHGCEeyI3Puz_5w6Rg _VBHpsHGCEeyI3Puz_5w6Rg _QtdcIHGCEeyI3Puz_5w6Rg _OPKNsHGCEeyI3Puz_5w6Rg _OPHxcHGCEeyI3Puz_5w6Rg">
             <edge xmi:type="uml:ObjectFlow" xmi:id="_iKkzQHGCEeyI3Puz_5w6Rg" target="_iKmBYHGCEeyI3Puz_5w6Rg" source="_OPHxcHGCEeyI3Puz_5w6Rg">
               <guard xmi:type="uml:LiteralBoolean" xmi:id="_iKpEsHGCEeyI3Puz_5w6Rg" value="true"/>
               <weight xmi:type="uml:LiteralInteger" xmi:id="_iKpEsXGCEeyI3Puz_5w6Rg" value="1"/>
@@ -830,7 +823,7 @@
           <extend xmi:type="uml:Extend" xmi:id="_CL3d8HFhEeyI3Puz_5w6Rg" extendedCase="_W33IsHFdEeyI3Puz_5w6Rg" extensionLocation="_CL4FAHFhEeyI3Puz_5w6Rg"/>
         </ownedUseCase>
         <ownedUseCase xmi:type="uml:UseCase" xmi:id="_1InDAHFgEeyI3Puz_5w6Rg" name="DoTurning_method2" classifierBehavior="_iBUUIHGDEeyI3Puz_5w6Rg">
-          <ownedBehavior xmi:type="uml:Activity" xmi:id="_iBUUIHGDEeyI3Puz_5w6Rg" name="DoTurning_method2" node="_lXqk4HGDEeyI3Puz_5w6Rg _lXsaEHGDEeyI3Puz_5w6Rg _pqIfoHGDEeyI3Puz_5w6Rg _vDfJ8HGDEeyI3Puz_5w6Rg _v1enkHGDEeyI3Puz_5w6Rg _xeAEkHGDEeyI3Puz_5w6Rg">
+          <ownedBehavior xmi:type="uml:Activity" xmi:id="_iBUUIHGDEeyI3Puz_5w6Rg" name="DoTurning_method2" node="_xeAEkHGDEeyI3Puz_5w6Rg _v1enkHGDEeyI3Puz_5w6Rg _vDfJ8HGDEeyI3Puz_5w6Rg _pqIfoHGDEeyI3Puz_5w6Rg _lXsaEHGDEeyI3Puz_5w6Rg _lXqk4HGDEeyI3Puz_5w6Rg">
             <edge xmi:type="uml:ControlFlow" xmi:id="_zHFiQHGDEeyI3Puz_5w6Rg" target="_v1enkHGDEeyI3Puz_5w6Rg" source="_vDfJ8HGDEeyI3Puz_5w6Rg"/>
             <edge xmi:type="uml:ControlFlow" xmi:id="_0TXIIHGDEeyI3Puz_5w6Rg" target="_xeAEkHGDEeyI3Puz_5w6Rg" source="_v1enkHGDEeyI3Puz_5w6Rg"/>
             <node xmi:type="uml:ActivityParameterNode" xmi:id="_lXqk4HGDEeyI3Puz_5w6Rg" name="direction" type="_pu-pkHFmEeyI3Puz_5w6Rg">
@@ -894,35 +887,34 @@
         <ownedEnd xmi:type="uml:Property" xmi:id="_porjY3FdEeyI3Puz_5w6Rg" name="satellite" type="_4LW0kHFbEeyI3Puz_5w6Rg" association="_porjYHFdEeyI3Puz_5w6Rg"/>
         <ownedEnd xmi:type="uml:Property" xmi:id="_porjZHFdEeyI3Puz_5w6Rg" name="doswitching" type="_GXZcgHFcEeyI3Puz_5w6Rg" association="_porjYHFdEeyI3Puz_5w6Rg"/>
       </packagedElement>
-      <packagedElement xmi:type="uml:Abstraction" xmi:id="_N9UaIHFeEeyI3Puz_5w6Rg" name="Accomplish" client="_ofkRIHFbEeyI3Puz_5w6Rg" supplier="_w3ylgEVXEeykYNpZ1N6_Cw"/>
-      <packagedElement xmi:type="uml:Constraint" xmi:id="_qAl3oHFeEeyI3Puz_5w6Rg" name="direction-direction">
-        <specification xmi:type="uml:OpaqueExpression" xmi:id="_qAnFwHFeEeyI3Puz_5w6Rg" name="constraintSpec">
-          <language>OCL</language>
-          <body>true</body>
+      <packagedElement xmi:type="uml:Constraint" xmi:id="_qAl3oHFeEeyI3Puz_5w6Rg" name="direction">
+        <specification xmi:type="uml:OpaqueExpression" xmi:id="_qAnFwHFeEeyI3Puz_5w6Rg" name="ParamSpec">
+          <language>Param</language>
+          <body>direction</body>
         </specification>
       </packagedElement>
-      <packagedElement xmi:type="uml:Constraint" xmi:id="_t4jnsHFeEeyI3Puz_5w6Rg" name="mode-mode">
-        <specification xmi:type="uml:OpaqueExpression" xmi:id="_t4k10HFeEeyI3Puz_5w6Rg" name="constraintSpec">
-          <language>OCL</language>
-          <body>true</body>
+      <packagedElement xmi:type="uml:Constraint" xmi:id="_t4jnsHFeEeyI3Puz_5w6Rg" name="mode">
+        <specification xmi:type="uml:OpaqueExpression" xmi:id="_t4k10HFeEeyI3Puz_5w6Rg" name="ParamSpec">
+          <language>Param</language>
+          <body>mode</body>
         </specification>
       </packagedElement>
-      <packagedElement xmi:type="uml:Constraint" xmi:id="_3QSzIHFeEeyI3Puz_5w6Rg" name="instrument-instrument">
-        <specification xmi:type="uml:OpaqueExpression" xmi:id="_3QTaMHFeEeyI3Puz_5w6Rg" name="constraintSpec">
-          <language>OCL</language>
-          <body>true</body>
+      <packagedElement xmi:type="uml:Constraint" xmi:id="_3QSzIHFeEeyI3Puz_5w6Rg" name="instrument">
+        <specification xmi:type="uml:OpaqueExpression" xmi:id="_3QTaMHFeEeyI3Puz_5w6Rg" name="ParamSpec">
+          <language>Param</language>
+          <body>instrument</body>
         </specification>
       </packagedElement>
-      <packagedElement xmi:type="uml:Constraint" xmi:id="_02tsoHFeEeyI3Puz_5w6Rg" name="satellite-satellite">
-        <specification xmi:type="uml:OpaqueExpression" xmi:id="_02uTsHFeEeyI3Puz_5w6Rg" name="constraintSpec">
-          <language>OCL</language>
-          <body>true</body>
+      <packagedElement xmi:type="uml:Constraint" xmi:id="_02tsoHFeEeyI3Puz_5w6Rg" name="satellite">
+        <specification xmi:type="uml:OpaqueExpression" xmi:id="_02uTsHFeEeyI3Puz_5w6Rg" name="ParamSpec">
+          <language>Param</language>
+          <body>satellite</body>
         </specification>
       </packagedElement>
-      <packagedElement xmi:type="uml:Constraint" xmi:id="_VMGfkHFfEeyI3Puz_5w6Rg" name="instrument1-instrument">
-        <specification xmi:type="uml:OpaqueExpression" xmi:id="_VMHGoHFfEeyI3Puz_5w6Rg" name="constraintSpec">
-          <language>OCL</language>
-          <body>true</body>
+      <packagedElement xmi:type="uml:Constraint" xmi:id="_VMGfkHFfEeyI3Puz_5w6Rg" name="instrument1">
+        <specification xmi:type="uml:OpaqueExpression" xmi:id="_VMHGoHFfEeyI3Puz_5w6Rg" name="ParamSpec">
+          <language>Param</language>
+          <body>instrument</body>
         </specification>
       </packagedElement>
       <packagedElement xmi:type="uml:Realization" xmi:id="_6YtgIHFfEeyI3Puz_5w6Rg" client="_t4jnsHFeEeyI3Puz_5w6Rg" supplier="_C-wswHFcEeyI3Puz_5w6Rg"/>
@@ -934,24 +926,39 @@
       <packagedElement xmi:type="uml:Realization" xmi:id="_GEt0QHFgEeyI3Puz_5w6Rg" client="_3QSzIHFeEeyI3Puz_5w6Rg" supplier="_GXZcgHFcEeyI3Puz_5w6Rg"/>
       <packagedElement xmi:type="uml:Realization" xmi:id="_IubogHFgEeyI3Puz_5w6Rg" client="_02tsoHFeEeyI3Puz_5w6Rg" supplier="_KjLgcHFcEeyI3Puz_5w6Rg"/>
       <packagedElement xmi:type="uml:Realization" xmi:id="_JodAwHFgEeyI3Puz_5w6Rg" client="_3QSzIHFeEeyI3Puz_5w6Rg" supplier="_KjLgcHFcEeyI3Puz_5w6Rg"/>
-      <packagedElement xmi:type="uml:Realization" xmi:id="_Kp6dwHFgEeyI3Puz_5w6Rg" client="_qAl3oHFeEeyI3Puz_5w6Rg" supplier="_KjLgcHFcEeyI3Puz_5w6Rg"/>
+      <packagedElement xmi:type="uml:Realization" xmi:id="_Kp6dwHFgEeyI3Puz_5w6Rg" client="_ofkRIHFbEeyI3Puz_5w6Rg" supplier="_KjLgcHFcEeyI3Puz_5w6Rg"/>
       <packagedElement xmi:type="uml:Realization" xmi:id="_NOZzwHFgEeyI3Puz_5w6Rg" client="_02tsoHFeEeyI3Puz_5w6Rg" supplier="_MJYMwHFdEeyI3Puz_5w6Rg"/>
       <packagedElement xmi:type="uml:Realization" xmi:id="_OPVFQHFgEeyI3Puz_5w6Rg" client="_VMGfkHFfEeyI3Puz_5w6Rg" supplier="_MJYMwHFdEeyI3Puz_5w6Rg"/>
       <packagedElement xmi:type="uml:Realization" xmi:id="_S_mWUHFgEeyI3Puz_5w6Rg" client="_qAl3oHFeEeyI3Puz_5w6Rg" supplier="_W33IsHFdEeyI3Puz_5w6Rg"/>
       <packagedElement xmi:type="uml:Realization" xmi:id="_TcSSUHFgEeyI3Puz_5w6Rg" client="_02tsoHFeEeyI3Puz_5w6Rg" supplier="_W33IsHFdEeyI3Puz_5w6Rg"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_Shy2sLUREeyx46yc-4v3BQ" name="Planning and Scheduling Software">
+        <ownedComment xmi:type="uml:Comment" xmi:id="_j6i_EHFhEeyI3Puz_5w6Rg">
+          <body>Already Calibrated&#xD;
+</body>
+        </ownedComment>
+        <ownedComment xmi:type="uml:Comment" xmi:id="_tqoZEHFhEeyI3Puz_5w6Rg">
+          <body>Poiting in different directions&#xD;
+</body>
+        </ownedComment>
+        <ownedComment xmi:type="uml:Comment" xmi:id="_v-w-4HFhEeyI3Puz_5w6Rg">
+          <body>Already Good Pointing&#xD;
+</body>
+        </ownedComment>
+      </packagedElement>
     </packagedElement>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_bwlsELUSEeyx46yc-4v3BQ" name="Accomplish" client="_uVrj8C2DEeylqPZKkKN_nQ" supplier="_w3ylgEVXEeykYNpZ1N6_Cw"/>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_wVEBwC2DEeylqPZKkKN_nQ" name="Types">
     <ownedComment xmi:type="uml:Comment" xmi:id="_ggPIQEVXEeykYNpZ1N6_Cw">
       <body>The types categorize &#xD;
 the elements of the UseCase</body>
     </ownedComment>
-    <packagedElement xmi:type="uml:Abstraction" xmi:id="_RZciwHFeEeyI3Puz_5w6Rg" name="Categorize" client="_wVEBwC2DEeylqPZKkKN_nQ" supplier="_ofkRIHFbEeyI3Puz_5w6Rg"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_pu-pkHFmEeyI3Puz_5w6Rg" name="direction"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_yoExMHFmEeyI3Puz_5w6Rg" name="mode"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_1aNhoHFmEeyI3Puz_5w6Rg" name="satellite"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_32pu4HFmEeyI3Puz_5w6Rg" name="instrument"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_yDo8gHFoEeyI3Puz_5w6Rg" name="predicate"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_YBUlALUSEeyx46yc-4v3BQ" name="Categorize Elements" client="_wVEBwC2DEeylqPZKkKN_nQ" supplier="_ofkRIHFbEeyI3Puz_5w6Rg"/>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_w3ylgEVXEeykYNpZ1N6_Cw" name="Mission">
     <packagedElement xmi:type="uml:Dependency" xmi:id="_zL0doEVXEeykYNpZ1N6_Cw" name="Defines" client="_w3ylgEVXEeykYNpZ1N6_Cw" supplier="_rfy78C2DEeylqPZKkKN_nQ"/>
@@ -1040,11 +1047,11 @@ systems under study&#xD;
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_YMamAEVZEeykYNpZ1N6_Cw" name="MissionToAccomplish">
       <ownedComment xmi:type="uml:Comment" xmi:id="_u8Ol0EVZEeykYNpZ1N6_Cw">
-        <body>This package contains the mission&#xD;
-overall activity diagram &#xD;
-to be accomplished.</body>
+        <body>Group of activity diagram &#xD;
+that rationalize an operational&#xD;
+scenario</body>
       </ownedComment>
-      <packagedElement xmi:type="uml:Activity" xmi:id="_ahAScHGFEeyI3Puz_5w6Rg" name="Mission" node="_b5vnAHGFEeyI3Puz_5w6Rg _eRQ4AHGFEeyI3Puz_5w6Rg _f02KoHGFEeyI3Puz_5w6Rg">
+      <packagedElement xmi:type="uml:Activity" xmi:id="_ahAScHGFEeyI3Puz_5w6Rg" name="Mission" node="_f02KoHGFEeyI3Puz_5w6Rg _eRQ4AHGFEeyI3Puz_5w6Rg _b5vnAHGFEeyI3Puz_5w6Rg">
         <ownedComment xmi:type="uml:Comment" xmi:id="_p3RR0HGFEeyI3Puz_5w6Rg">
           <body>Initial ordered HTN: &#xD;
 task1 (DoMission phenomenon4 thermograph0)  &#xD;
@@ -1111,7 +1118,7 @@ task3 (DoMission phenomenon6 thermograph0)</body>
         <node xmi:type="uml:CallBehaviorAction" xmi:id="_eRQ4AHGFEeyI3Puz_5w6Rg" name="DoMission" incoming="_lTDfwHGFEeyI3Puz_5w6Rg" outgoing="_ndtZcHGFEeyI3Puz_5w6Rg" behavior="_JkacAHFlEeyI3Puz_5w6Rg"/>
         <node xmi:type="uml:ActivityFinalNode" xmi:id="_f02KoHGFEeyI3Puz_5w6Rg" name="" incoming="_ndtZcHGFEeyI3Puz_5w6Rg"/>
       </packagedElement>
-      <packagedElement xmi:type="uml:Activity" xmi:id="_QVttsHGGEeyI3Puz_5w6Rg" name="Mission_2" node="_U2ntEHGGEeyI3Puz_5w6Rg _U2rXcHGGEeyI3Puz_5w6Rg _U2tzsHGGEeyI3Puz_5w6Rg _ycIfwHGOEeyI3Puz_5w6Rg">
+      <packagedElement xmi:type="uml:Activity" xmi:id="_QVttsHGGEeyI3Puz_5w6Rg" name="Mission_2" node="_ycIfwHGOEeyI3Puz_5w6Rg _U2tzsHGGEeyI3Puz_5w6Rg _U2rXcHGGEeyI3Puz_5w6Rg _U2ntEHGGEeyI3Puz_5w6Rg">
         <ownedComment xmi:type="uml:Comment" xmi:id="_ZelWsHGGEeyI3Puz_5w6Rg">
           <body>Initial ordered HTN: &#xD;
 task1 (DoMission star3 infrared0) &#xD;
@@ -1259,7 +1266,6 @@ task5 (DoMission satellite0 phenomenon5)</body>
         </specification>
       </packagedElement>
     </packagedElement>
-    <packagedElement xmi:type="uml:Dependency" xmi:id="_tha0sEVZEeykYNpZ1N6_Cw" name="Explained" client="_w3ylgEVXEeykYNpZ1N6_Cw" supplier="_YMamAEVZEeykYNpZ1N6_Cw"/>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_a35SYEXpEeyhYpX6KgufSQ" name="Feedback">
     <ownedComment xmi:type="uml:Comment" xmi:id="_hYdcYEXpEeyhYpX6KgufSQ">
@@ -1268,6 +1274,7 @@ from the HDDL testing in the Feedback folder&#xD;
 The direct implementation of the feedback in the model&#xD;
 is still in modeling</body>
     </ownedComment>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_d-4voLUSEeyx46yc-4v3BQ" name="Corrects and Updates" client="_a35SYEXpEeyhYpX6KgufSQ" supplier="_uVrj8C2DEeylqPZKkKN_nQ"/>
   </packagedElement>
   <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_WfrqEEXrEeyhYpX6KgufSQ">
     <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WfuGUEXrEeyhYpX6KgufSQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
