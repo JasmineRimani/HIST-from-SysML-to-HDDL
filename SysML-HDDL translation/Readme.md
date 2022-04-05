@@ -1,7 +1,7 @@
-## SysML to HDDL automated translation (Still in Development)
+## HIST (HDDL fIles SysML Translation): A SysML to HDDL automated translation (Still in Development)
 
 # Motivation
-The need to exctract useful information from SysML/MBSE models and convert them in usable entities for other disciplines is raising. This code extracts a Papyrus model of "Functinal Analysis" to automatically generate the HDDL domain file. The code can generate a HDDL problem file as well as a feedback file with the differences between the Papyrus model and the HDDL domain file. 
+The need to exctract useful information from SysML/MBSE models and convert them in usable entities for other disciplines is raising. This code extracts a Papyrus model of "Functional Analysis" to automatically generate the HDDL domain file. The code can generate a HDDL problem file as well as a feedback file with the differences between the Papyrus model and the HDDL domain file. 
 
 **Folder and their Languages**
 - SysML-HDDL Traslation Template: Papyrus model that will be used to try the official benchmark of HDDL and to create the step by step tutorial
