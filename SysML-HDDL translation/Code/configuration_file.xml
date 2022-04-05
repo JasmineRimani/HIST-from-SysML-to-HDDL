@@ -5,6 +5,7 @@
   <!-- The Task parameters can be defined as constraints. If not the user may define them with the flags "min" or "common"!-->
   <!-- Task flag "min" considers as task parameters the minum set of parameters from all the methods of the task. !-->
   <!-- Task flag "common" considers as task parameters the common set of parameters from all the methods of the task. (Default Option)!-->
+  <!-- If Task parameters are defined in the model - the flag has no effect!-->
   <!-- Considering or not the :subtask preconditions in the associate _method depends on this flag.  method_precondition_from_action = 'no' only the method preconditions are considered, if 'yes' even the task preconditions are explicited in the model. 
   <!-- Parameters ordering or ordered-subtasks? flag_ordering = "yes" to get :task and :ordering, flag_ordering = "no" to get :ordered-subtasks!-->
   <!-- To the test the Task flag option, please use "xml_sample_7.uml" !-->
