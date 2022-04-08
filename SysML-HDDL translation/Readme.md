@@ -1,14 +1,23 @@
 ## HIST (HDDL fIles SysML Translation): A SysML to HDDL automated translation (Still in Development)
 
 # Motivation
-The need to exctract useful information from SysML/MBSE models and convert them in usable entities for other disciplines is raising. This code extracts a Papyrus model of "Functional Analysis" to automatically generate the HDDL domain file. The code can generate a HDDL problem file as well as a feedback file with the differences between the Papyrus model and the HDDL domain file. 
+The need to extract useful information from SysML/MBSE models and convert them into usable entities for other disciplines is rising. This code extracts from a Papyrus model the information to automatically generate the HDDL domain file. In addition, the code can generate an HDDL problem file and a feedback file with the differences between the Papyrus model and the HDDL domain file. 
 
-**Folder and their Languages**
-- SysML-HDDL Traslation Template: Papyrus model that will be used to try the official benchmark of HDDL and to create the step by step tutorial
-- Code: Folder with all the code developed up until now for the SysML-HDDL trasnlation
+**Files and Folder and their Languages**
+- Igluna_Benchmark: Papyrus model created for the planner of the CoRoDro mission.
+- SysML-HDDL Translation Satellite: Papyrus model used for the validation of HIST in respect to the official HDDL benchmarks.
+- SysML-HDDL Translation Transport: Papyrus model used for the validation of HIST in respect to the official HDDL benchmarks.
+- Template: Papyrus model template to use HIST at its potential
+- Code: Folder with all the code developed up until now for the SysML-HDDL translation
      - inputs: Folder that groups all inputs needed for the translation --> uml model + "map of the environment" + "possible domain feedback file that we want to check"
      - outputs: Folder that groups all outputs domain file + problem file + feedback file 
 - old_files: Folder with the back-up of the old code
+- step_by_step_tutorial.pptx: presentation with step by step tutorial to define the domain instances in Papyrus using SysML
+- Updates MBSE-SysML translation to HDDL.pptx: presentation where I keep track of the advancement of HIST
+
+**In Detail Documentation**
+[TO DO] --> An initial documentation would be soon uploaded to the repository 
+
 
 **Files and their Languages**
 - Papyrus Model --> uml 
@@ -43,39 +52,15 @@ The need to exctract useful information from SysML/MBSE models and convert them 
 ***still to write***
 
 # Still Actively Coding and Polishing:
-- ***Functions***:
-     - def FeedbackDefinition.Feedback_file(self):
-        - Check the methods parsing from the HDDL file [DONE]:
-            - Check that the name, parameters, tasks, preconditions, subtasks and ordering are the same.
-            - If one of them is different add the method to the feedback log with a comment on the different entries 
-        - Check the task and action parsing from the HDDL file [DONE]:
-            - Check that the name, parameters, preconditions, and effects are the same.
-            - If one of them is different add the method to the feedback log with a comment on the different entries  
-     - In def FeedbackDefinition.FeedbackFile(self) [DONE]:
-        - Find a way to clearly state the missing information in ordered sections
-        - Add for each section related to each HDDL "classes" which Papyrus SysML definition counter part should be used in the modeling  [DONE]. 
-     - In def DomainFileWriting (self):
-        - Code a check to match the task's parameters' names with the method's parameters' name when defining a HDDL method  [DONE].
-     - In def ProblemFileElements(self):
-        - Code the multiple problem file generation with common core. [DONE]
-    
+- The initial validation has been performed. Therefore a second cycle of development starts to polish and better define the code, answer the open points and define in detail all the required instances from Papyrus. 
+- Now to focus is on:
+     - Define all the instances of the papyrus model with a brief explaination of their role [DOING]
+     - Polish the parsing, domain and problem modules. [DOING]
+     - Write a clear reference manual on how to use the tool and how to model the instances in Papyrus. [DOING]   
+     - Polish the feedback file generator [TO DO]  
 
-# To Code:
-- ***Functions***:
-     - def FeedbackDefinition.DirectFeedbackXmlFile(self):
-        - Directly add the information from Feedback_file(self) to the Papyrus model in a folder called Feedback. [DONE]
-           - The feedback entries will be already in the final Papyrus model 
 
 # HDDL Benchmarks to try:
 **official repository** : https://github.com/panda-planner-dev/ipc2020-domains
 
 # New comments to implement:
-- Task parameters: They can be (i) defined as constraints, (ii) defined as common parameters between the methods, (iii) defined as minimum set of parameters of the method. You can add an option so that the used can decide which option between (ii) and (iii) to use. [DONE]
-- For the paper and solidity of the model try the official HDDL Benchmark and see if they are (i) easy to model, (ii) if the translated HDDL has differences, (iii) if you need more parameters to better model the domain: domains to try (i) Satellite-GTOHP, (ii) Snake, (iii) Transport. 
--	For the generalization of the problem file - maybe we can model as components the "static data" the data that are always the same in the HDDL problem file, than define some different scenarios as mission and create a problem file for each of them. We aim to build a part of the problem file, not all of it, giving an aid to the developers and leaving them the freedom to add and modify those files. [DONE]
--	In the official effects of the HDDL competition as for now there is no ordering! So no need to add it to Papyrus and the HDDL models. (If you want to create an order you need to directly use a method of target defined subtasks). [DONE]
--	You may have a nested :task/:subtaks methods: e.g. The NavigateToGoal :task with a mid point can be defined as two separate NavigateToGoal :task without mid point (1st method in CoRoDro). That's can help!  
-- Check that the objects are one word in the problem file. [DONE]
-- Some task may have no parameters (from the ipc2020-domains) - find a way to define that! 
-
-
