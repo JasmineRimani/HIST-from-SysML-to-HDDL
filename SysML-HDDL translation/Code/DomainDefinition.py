@@ -602,6 +602,21 @@ class DomainDefinition():
                 # check that the parameters have a known type!
                 dummy_string = constraint['name']
                 dummy_vector = re.split(' |-', dummy_string)
+
+                # # if element.descent
+                # for child in element.children:
+                #     # If the tag has been defined as Parameter Spec
+                #     try:
+                #         if not isinstance(child, str) and child.attrs['name'] == 'ParamSpec':
+                #             element_type = child.body.contents[0]
+                #             b_ownedRules_from_package.append('{} - {}'.format(element['name'], element_type))
+                #         # If the tag has been defined as constraintSpec
+                #         if not isinstance(child, str) and child.attrs['name'] == 'constraintSpec':
+                #             b_ownedRules_from_package.append(element['name']) 
+                #         else:
+                #             pass
+                #     except:
+                #         pass
                 
                 # You check if the input in the constraints exist as a type in your HDDL types
                 for hddl_type in self.hddl_type_list:
