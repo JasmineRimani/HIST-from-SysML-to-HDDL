@@ -18,7 +18,7 @@ You are free re-use the code and change it. However, if you are using it for you
 This work is distributed under the MIT License.
 
 ## Status
-The code is still under development. We try to polish it, test it and add modules as we go. 
+The code is still under development. We try to polish it, test it and add modules as we encounter new challenges in the domain of autonomous systems.
 
 ## What are we implementing
 This code extracts from a model in Papyrus (https://www.eclipse.org/papyrus/) the information to automatically generate an HDDL domain file. 
