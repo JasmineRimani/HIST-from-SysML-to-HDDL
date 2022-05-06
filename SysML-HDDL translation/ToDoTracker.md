@@ -1,4 +1,4 @@
-# HIST: To Dos
+# HIST: To Do
 
 
 ## HDDL Benchmarks to try:
