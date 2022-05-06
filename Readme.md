@@ -1,9 +1,9 @@
-# HIST (HDDL fIles SysML Translation): 
-# A SysML to HDDL automated translation 
+# HIST: A SysML to HDDL Automated Translation 
 
 ## Motivation
-MBSE models are usuful knowledge engineering references that can easily incorporate the knowledge of the designer and make it usable for other disciplines. 
-In our case, we worked with AI planning and specifically HDDL. 
+MBSE models are useful knowledge engineering references that are widely use in System Engineering and Space Mission Analysis. 
+In our case, we worked with AI planning and specifically HDDL.
+We therefore implemented HIST (HDDL fIles SysML Translation) to be able to extract our MBSE model information and directly have it ready to test for our systems.
 The tool has been implemented as a part of the IGLUNA-CoRoDro analogue mission, however, it is still under development to add capabilities and test its robusteness in different modelling context. 
 You are free re-use the code and change it. However, if you are using it for your project, please cite:
 ```
