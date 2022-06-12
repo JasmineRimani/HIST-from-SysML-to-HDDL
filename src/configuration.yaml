@@ -1,0 +1,47 @@
+# HIST INPUTS
+---
+# Name of the file to be analysed
+file_name: "IGLUNA_model_sample_1.uml"
+#---------------------------------------------
+# Additional files to add to the problem file
+additional_files: 
+  - "plan_final_1m_1_int.txt"
+#---------------------------------------------
+# Generate the domain file: yes or no
+generate_domain_file: "yes"
+# Requirements domain file
+domain_requirements:
+  - typing
+  - hierachie
+# Name of the domain
+domain_name: "Igluna_check"
+#---------------------------------------------
+# Generate the problem file: yes or no
+generate_problem_file: "no"
+#---------------------------------------------
+# Generate feedback file: yes or no
+generate_feedback: "no"
+# Name of the feedback file
+feedback_file_name: "IGLUNA_model_sample_1_feedback"
+#---------------------------------------------
+# Parameters ordering or ordered-subtasks? 
+# flag_ordering = "yes" to get the keys :task and :ordering, 
+# flag_ordering = "no" to get :ordered-subtasks!
+flag_ordering: "yes"
+# The task parameters can be defined as constraints in the UML/SysML model
+# If not the user may define them with the flags "min" or "common"!
+# Task flag "min" considers as task parameters the minimum
+# set of parameters from all the methods of the task.
+# Task flag "common" considers as task parameters 
+# the common set of parameters from all the methods of the task. (Default Option)!
+# If Task parameters are defined in the model - the flag has no effect! 
+task_parameters: 'common'
+# Considering or not the :subtask preconditions in the associate _method depends on this flag.  
+# method_precondition_from_action = 'no' only the method preconditions are considered, 
+# if 'yes' even the task preconditions are explicited in the method.
+method_precondition_from_action: 'no'
+#---------------------------------------------
+package_HDDL: ElementsHDDL
+package_domain: DomainDefinition
+package_problem: ProblemDefinition
+package_feedback: Feedback

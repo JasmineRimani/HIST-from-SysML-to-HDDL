@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <!-- Input for the simulation -->
+  <!-- When the software will be completed - this will be command line inputs -->
+  <!-- The Task parameters can be defined as constraints. If not the user may define them with the flags "min" or "common"!-->
+  <!-- Task flag "min" considers as task parameters the minum set of parameters from all the methods of the task. !-->
+  <!-- Task flag "common" considers as task parameters the common set of parameters from all the methods of the task. (Default Option)!-->
+  <!-- If Task parameters are defined in the model - the flag has no effect!-->
+  <!-- Considering or not the :subtask preconditions in the associate _method depends on this flag.  method_precondition_from_action = 'no' only the method preconditions are considered, if 'yes' even the task preconditions are explicited in the model. 
+  <!-- Parameters ordering or ordered-subtasks? flag_ordering = "yes" to get :task and :ordering, flag_ordering = "no" to get :ordered-subtasks!-->
+  <!-- To the test the Task flag option, please use "xml_sample_7.uml" !-->
+  <file file_name="benchmark_satellite.uml"   
+        map_file_name="plan_final_1m_1_int.txt" 
+        feedback_file_name="feedback__domain.hddl"
+        domain_name="satellite_check"
+        generate_domain_file="yes"
+        generate_problem_file="no"
+        generate_feedback="no"
+        flag_ordering="yes"
+        task_parameters = 'common'
+        method_precondition_from_action = 'no'>
+  </file>
+  <!-- HDDL Requirements for the domain file! -->
+  <!-- The list encompass the main ones from https://planning.wiki/ref/pddl/requirements -->
+  <hddl_requirements>
+  <li>typing</li>
+  <li>hierachie</li>
+  <li>fluents</li>
+  <li>STRIPS</li>
+  <li>Disjunctive Preconditions</li>
+  <li>Equality</li>
+  <li>Existential Preconditions</li>
+  <li>Universal Preconditions</li>
+  <li>Quantified Preconditions</li>
+  <li>Conditional Effects</li>
+  <li>Action Expansions</li>
+  <li>Foreach Expansions</li>
+  <li>DAG Expansions</li>
+  <li>Domain Axioms</li>
+  <li>Subgoals Through Axioms</li>
+  <li>Safety Constraints</li>
+  <li>Expression Evaluation</li>
+  <li>Fluents</li>
+  <li>Open World</li>
+  <li>True Negation</li>
+  <li>ADL</li>
+  <li>UCPOP</li>
+  <li>hierarchy</li>
+  <li>method-preconditions</li>
+  <li>negative-preconditions</li>
+  </hddl_requirements>
+
+
+</root>
