@@ -56,8 +56,10 @@ class XML_parsing():
         # get the predicate that are in the tree
         predicate_type = [x for x in domain_types if x['name'] == "predicate"][0]
         # Let's get the list of predicates
-        nodes = domain_elements.find_all('node', attrs={"xmi:type": "uml:ActivityParameterNode", "xmi:type": "uml:CentralBufferNode"})
-        domain_predicates = [x for x in nodes if x['type'] == predicate_type["xmi:id"]]
+        nodes1 = domain_elements.find_all('node', attrs={"xmi:type": "uml:ActivityParameterNode"})
+        nodes2 = domain_elements.find_all('node', attrs={"xmi:type": "uml:CentralBufferNode"})
+        nodes = nodes1 + nodes2
+        domain_predicates = [x for x in nodes if len(x["name"].split()) != 1]
         # We want to extract the task elements - let's look for the useCases without a method
         # tasks are defined as packaged elements and xmi:type="uml:UseCase"
         task_elements = domain_elements.find_all('packagedElement', attrs={"xmi:type": "uml:UseCase"})

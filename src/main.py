@@ -64,7 +64,8 @@ def main():
     if generate_domain_file == 'yes':
         print("Generating Domain File")
         # Take out the element you need for the domain file:
-        DomainFile = Domain(domain_name, SysML_data, domain_dictionary, task_parameters, flag_ordering_file, method_precondition_from_action)
+
+        DomainFile = Domain(domain_name, SysML_data, domain_dictionary, domain_requirements, task_parameters, flag_ordering_file, method_precondition_from_action)
         # Identify the Domain File Elements
         domain_file_elements = DomainFile.DomainFileElements()
         # Write the Domain FIle

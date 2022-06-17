@@ -16,13 +16,15 @@ import os
 
 # MAIN PARSING CLASS!
 class Domain():
-    def __init__(self, domain_name, SysML_data, domain_dictionary, task_parameters = 'common', flag_ordering_file = 'yes', method_precondition_from_action = 'yes', d_now = os.getcwd(),  debug = 'on'):
+    def __init__(self, domain_name, SysML_data, domain_dictionary, domain_requirements, task_parameters = 'common', flag_ordering_file = 'yes', method_precondition_from_action = 'yes', d_now = os.getcwd(),  debug = 'on'):
         # domain file name
         self.domain_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' + domain_name + '_' +'_domain.hddl'
         # all the data from the .uml file
         self.overall_data = SysML_data
         # all the data from the domain definition of the .uml file
         self.domain_dictionary = domain_dictionary
+        # domain requirements
+        self.domain_requirements = domain_requirements
         # Log file general entries
         self.log_file_general_entries = []
         # debug_on
@@ -57,25 +59,46 @@ class Domain():
             a = b_packagedElement[n].children  # --> with n elements in b_packagedElement
             for i in a: print(i) # --> you will see all the subtags
         """
+        # requirements --> self.domain_requirements
         # types in the HDDL file
-        hddl_types = self.domain_dictionary['types']
-        predicate_type = [x for x in hddl_types if x['name'] == "predicate"][0]
+        hddl_types_preprocess = self.domain_dictionary['types']
+        # write the hddl type as a list of dictionary
+        hddl_types = []
+        for type in hddl_types_preprocess:
+            hddl_types.append(type.attrs)
+        # save HDDL tasks
+        tasks_domain_prepocess = self.domain_dictionary['tasks']
+        
+        tasks_domain = []
+        for task in tasks_domain_prepocess:
+            tasks_domain.append(task.attrs)
+            task_owned_behavior = task.find_all('ownedBehavior')
+            for behavior in task_owned_behavior:
+                tasks_domain[-1]["behavior"] = behavior.attrs
+        task_parameters_preprocess = self.domain_dictionary['tasks_param']
+        task_parameters = []
+        for parameter in task_parameters_preprocess:
+            task_parameters.append(parameter.attrs)
+
+        # predicate_type = [x for x in hddl_types if x['name'] == "predicate"][0]
         # Create the HDDL methods
         methods = self.domain_dictionary['methods']
-        methods_dictionary = {}
+        methods_list = []
         for method in methods:
             temporary_dictionary = {}
+            temporary_dictionary["method"] = method.attrs
             # --------------------------------------------------------------------
             # find the parameters
-            nodes = method.find_all('node', attrs={"xmi:type": "uml:ActivityParameterNode"})
-            parameters = [x for x in nodes if len(x["name"].split()) == 1]
-            
+            nodes1 = method.find_all('node', attrs={"xmi:type": "uml:ActivityParameterNode"})
+            nodes2 = method.find_all('node', attrs={"xmi:type": "uml:CentralBufferNode"})
+            nodes = nodes1 + nodes2
+            parameters_preprocess = [x for x in nodes if len(x["name"].split()) == 1]
+            # predicates
+            predicates_preprocess = [x for x in nodes if len(x["name"].split()) != 1]
+
             # if the parameter do not have a type
-            #------------------- 
-            # NOT WORKING - rewrite
-            #-----------------------
-            for param in parameters:
-                if not "type" in param:
+            for param in parameters_preprocess:
+                if not param.has_attr("type"):
                     # look if there is an already defined parameter with the same or similar name 
                     # similar name are name without the possible following numbers
                     flag_param = 0
@@ -83,30 +106,267 @@ class Domain():
                         new_param = ''.join([i for i in param['name'] if not i.isdigit()])
                         if type['name'] == new_param:
                             param['type'] = type['xmi:id']
+                            param["type_name"] = type['name']
                             flag_param = 1
 
                     # creating a parameter with that name and print a warning to the user
                     if flag_param == 0:
                         # create an adhoc name based on the parameter name
-                        param['type'] = param['name']
                         id_uuid = str(uuid.uuid1())
+                        param['type'] = id_uuid
+                        param["type_name"] = param['name']
                         hddl_types.append({"name": param['name'], "xmi:id": id_uuid})
                         if self.debug == 'on': 
                             print('No predefined type for {}. Add it on Papyrus!'.format(param['name']))
                         self.log_file_general_entries('\t\t No predefined type for {}. We added as its own type \n'.format(param['name']))
-            
+
+                if param.has_attr("type"):
+                    for type in hddl_types:
+                        if type["xmi:id"] == param["type"]:
+                            param["type_name"] = type['name']
+
+
+
+            # format parameters as a list of dictionary
+            parameters = []
+            for param in parameters_preprocess:
+                parameters.append(param.attrs)
+                        
             # add parameters to the method temporary dictionary
             temporary_dictionary['parameters'] = parameters
-            x = 0
-
-            
-
 
             # find the associated task
+            task = method.parent.attrs
+            temporary_dictionary['task'] = task
 
             # find the actions
+            opaque_actions_preprocess = method.find_all('node', attrs={"xmi:type": "uml:OpaqueAction"})
+            behavioral_actions_preprocess = method.find_all('node', attrs={"xmi:type": "uml:CallBehaviorAction"})
+            # format the actions as a list of dictionary 
+            actions = []
+            for action in opaque_actions_preprocess:
+                # find input values (action pins)
+                input_values = action.find_all('inputValue')
+                # find all output values
+                output_values = action.find_all('outputValue')
+                actions.append(action.attrs)
+                actions[-1]["inputs"] = input_values
+                actions[-1]["outputs"] = output_values
+            for action in behavioral_actions_preprocess:
+                # find input values (action pins)
+                input_values = action.find_all('argument', attrs={"xmi:type": "uml:InputPin"})
+                # find all output values
+                output_values = action.find_all('argument', attrs={"xmi:type": "uml:OutputPin"})
+                actions.append(action.attrs)
+                actions[-1]["inputs"] = input_values
+                actions[-1]["outputs"] = output_values
 
+            temporary_dictionary['actions'] = actions
             # find the preconditions
+            output_predicates =[]
+            input_predicates = []
+            for predicate in predicates_preprocess:
+                # output of an action of the method
+                if predicate.has_attr('incoming'):
+                    output_predicates.append(predicate.attrs)
+                if predicate.has_attr('outgoing'):
+                    input_predicates.append(predicate.attrs)
 
+            temporary_dictionary['input_predicates'] = input_predicates
+            temporary_dictionary['output_predicates'] = output_predicates
+            # Store the method edge - they give you the action order and the give you the link action/parameters or action/predicates
+            edges_preprocess = method.find_all('edge')
+            edges = []
+            for edge in edges_preprocess:
+                edges.append(edge.attrs)
+
+            temporary_dictionary['edges'] = edges
             # find the order of the action
+            # assumption: actions are linked with control flows
+            actions_order = []
+            actions_partial_order = []
+            for edge in edges:
+                for action in actions:
+                    if edge["target"] == action["xmi:id"]:
+                        for prev_action in actions:
+                            if edge["source"] == prev_action["xmi:id"]:
+                                actions_partial_order.append([prev_action["xmi:id"], action["xmi:id"]])
+            
+            # first order the list so that all the same elements are neighbours
+            for index,list in enumerate(actions_partial_order):
+                for next_list in actions_partial_order[index::]:
+                    if list[-1] == next_list[0]:
+                        index_next_list = actions_partial_order.index(next_list)
+                        new_index_list = actions_partial_order.index(list)
+                        actions_partial_order.pop(index_next_list)
+                        actions_partial_order.insert(new_index_list+1,next_list)
+    
+            # merge list maintaning order
+            for list in actions_partial_order:
+                for element in list:
+                    if element not in actions_order:
+                        actions_order.append(element)
+            
+            temporary_dictionary['actions_order'] = actions_order
+
+            methods_list.append(temporary_dictionary)
+        
+        # Check the predicate list - clean it and make it ready for the domain file
+        predicates = self.domain_dictionary['predicates']
+        temporary_predicate = []
+        final_predicate_list = []
+        for predicate_object in predicates:
+            predicate = predicate_object["name"]
+            # First remove brankets 
+            cleaned_predicate = predicate.replace('(',' ')
+            cleaned_predicate = cleaned_predicate.replace(')',' ')            
+            # Remove negations  
+            cleaned_predicate = cleaned_predicate.replace('not',' ')   
+            # Remove random copy or similar -- if you copy and pasted an element on papyrus this can happen!
+            cleaned_predicate = cleaned_predicate.replace('_copy',' ')   
+            # Take the predicate and open it:
+            cleaned_predicate = cleaned_predicate.split()
+            #get the first word of the predicate - this can be a equal sign! 
+            temporary_predicate.append(cleaned_predicate[0])
+            # analyse all other words in the predicate: you should have them in input_types
+            for index_predicate, predicate_atom in enumerate(cleaned_predicate[1::]):
+                predicate_atom = predicate_atom.replace('?',' ').strip()
+                for method in methods_list:
+                    for method_type in method["parameters"]:
+                        if predicate_atom == method_type['name']:
+                            predicate_input = '?arg{}-{}'.format(index_predicate,method_type['type_name'])
+                            if predicate_input not in temporary_predicate:
+                                temporary_predicate.append(predicate_input)
+
+            if len(temporary_predicate) <= 1:
+                self.log_file_general_entries.append('t\t The {} is not used in any method, therefore it is not in the final domain file \n'.format(predicate))
+                if self.debug == 'on':
+                    print('The {} is not used in any method, therefore it is not in the final domain file'.format(predicate))   
+            else:
+                final_predicate = ' '.join(temporary_predicate)
+                if not(final_predicate in final_predicate_list) and not('=' in final_predicate):
+                    final_predicate_list.append(final_predicate)
+                
+                temporary_predicate.clear() 
+
+        # Identify the HDDL actions, parameters, pre and post conditions
+        final_action_list = []
+        for method in methods_list:
+            for action in method['actions']:
+                # if you have a "xmi:type": "uml:OpaqueAction" --> you need to define parameters and pre and post conditions
+                if action["xmi:type"] == "uml:OpaqueAction":
+                    action_parameters = []
+                    action_preconditions = []
+                    action_postconditions = []
+                    for edge in method["edges"]:
+                        for inputs in action["inputs"]: 
+                            # look at parameters and preconditions
+                            if edge["target"] == inputs["xmi:id"]:
+                                # look for the source
+                                for param in method["parameters"]:
+                                    if edge["source"] == param["xmi:id"]:
+                                        action_parameters.append(param)
+                            # look for the preconditions
+                                for input_predicate in method["input_predicates"]:
+                                    if edge["source"] == input_predicate["xmi:id"]:
+                                        action_preconditions.append(input_predicate)
+                        
+                        # look at post conditions
+                        for outputs in action["outputs"]: 
+                            if "source" in edge and edge["source"] == outputs["xmi:id"]:
+                            # look for the target
+                                for output_predicate in method["output_predicates"]:
+                                    if edge["target"] == output_predicate["xmi:id"]:
+                                        action_postconditions.append(output_predicate)
+
+                    action["parameters"] = action_parameters
+                    action["preconditions"] = action_preconditions
+                    action["effects"] = action_postconditions
+                    final_action_list.append(action)
+        
+        # Identify the HDDL tasks
+        final_tasks_list = []
+        bev_action_list = []
+        # Look at the task used in the methods and check their parameters
+        for method in methods_list:
+            for action in method['actions']:
+                # if you have a "xmi:type": "uml:CallBehaviorAction" --> you can look to the linked parameters
+                if action["xmi:type"] == "uml:CallBehaviorAction":
+                    action_parameters = []
+                    action_predicates = []
+                    for edge in method["edges"]:
+                        for inputs in action["inputs"]: 
+                            # look at parameters and preconditions
+                            if edge["target"] == inputs["xmi:id"]:
+                                # look for the source
+                                for param in method["parameters"]:
+                                    if edge["source"] == param["xmi:id"]:
+                                        action_parameters.append(param)
+                            # look for the preconditions
+                                for input_predicate in method["input_predicates"]:
+                                    if "source" in edge and edge["source"] == input_predicate["xmi:id"]:
+                                        # Print a warning if the task has preconditions! 
+                                        self.log_file_general_entries.append('t\t The {} is a task with precondition. Check if this is intended or not!'.format(action["name"]))
+                                        if self.debug == 'on':
+                                            print('The {} is a task with precondition. Check if this is intended or not!'.format(action["name"]))   
+                                        action_predicates.append(input_predicate)
+
+                    action["parameters"] = action_parameters
+                    action["predicate"] = action_predicates
+                    bev_action_list.append(action)
+
+        # Loot at the tasks that have no parameters defined yet
+        for task in tasks_domain:
+            
+            # check if you have parameters from the methods because of behavioral actions
+            for action in bev_action_list:
+                if action["behavior"] == task["behavior"]["xmi:id"]:
+                    if "parameters" in action and "parameters" not in task:
+                        task["parameters"] = action["parameters"]
+            # check if you have parameters from the main use case
+            if "parameters" not in task:
+                for param in task_parameters:
+                    for constrained_element in param["constrainedElement"].split():
+                        if constrained_element == task["xmi:id"]:
+                            task["parameters"].append(constrained_element)
+
+            # check if you have parameters from the methods (minimum or common)
+            if "parameters" not in task:
+                task["parameters"] = []
+                task_parameters_matrix = []
+                # minum parameters
+                if self.task_parameters == 'min':
+                    for method in methods_list:
+                        if task["xmi:id"] == methods_list[0]["task"]["xmi:id"]:
+                            # for each method check the length of the parameters list -
+                            #  if it longer than the one of the task, leave it like that - if not replace the list
+                            if task["parameters"] != []:
+                                if len(task["parameters"]) >= len(method.get('parameters')):
+                                    task["parameters"] = method['parameters']
+                            else:
+                                task["parameters"] = method['parameters']
+
+                # Common parameters
+                else:
+                    for method in methods_list:
+                        if task["xmi:id"] == methods_list[0]["task"]["xmi:id"]:
+                            task_parameters_matrix.append(method['parameters'])
+                    for index, task_param in enumerate(task_parameters_matrix):
+                        if index == 0:
+                            common_param = task_param
+                        elif index == 1:
+                            common_param = task_param.intersection(task_parameters_matrix[index-1])
+                        else:
+                            common_param = task_param.intersection(common_param)                        
+
+                    task["parameters"] = common_param
+        
+        # write return function and test teh last lines! 
+
+
+
+
+
+
+
 
