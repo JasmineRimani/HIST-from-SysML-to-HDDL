@@ -83,6 +83,34 @@ class Domain():
         task_parameters = []
         for parameter in task_parameters_preprocess:
             task_parameters.append(parameter.attrs)
+            # if ["type_name"] not in parameter:
+            #     if not parameter.has_attr("type"):
+            #         # look if there is an already defined parameter with the same or similar name 
+            #         # similar name are name without the possible following numbers
+            #         flag_param = 0
+            #         for type in hddl_types:
+            #             new_param = ''.join([i for i in parameter['name'] if not i.isdigit()])
+            #             if type['name'] == new_param:
+            #                 parameter['type'] = type['xmi:id']
+            #                 parameter["type_name"] = type['name']
+            #                 flag_param = 1
+
+            #         # creating a parameter with that name and print a warning to the user
+            #         if flag_param == 0:
+            #             # create an adhoc name based on the parameter name
+            #             id_uuid = str(uuid.uuid1())
+            #             parameter['type'] = id_uuid
+            #             parameter["type_name"] = parameter['name']
+            #             hddl_types.append({"name": parameter['name'], "xmi:id": id_uuid})
+            #             if self.debug == 'on': 
+            #                 print('No predefined type for {}. Add it on Papyrus!'.format(parameter['name']))
+            #             self.log_file_general_entries('\t\t No predefined type for {}. We added as its own type \n'.format(parameter['name']))
+
+            #     if parameter.has_attr("type"):
+            #         for type in hddl_types:
+            #             if type["xmi:id"] == parameter["type"]:
+            #                 parameter["type_name"] = type['name']
+
 
         # predicate_type = [x for x in hddl_types if x['name'] == "predicate"][0]
         # Create the HDDL methods
@@ -135,6 +163,9 @@ class Domain():
             parameters = []
             for param in parameters_preprocess:
                 parameters.append(param.attrs)
+                if "type_name" not in param.attrs:
+                   raise ValueError
+                   # You need to add your own errors!!!!! --> to Do
                         
             # add parameters to the method temporary dictionary
             temporary_dictionary['parameters'] = parameters
@@ -323,17 +354,51 @@ class Domain():
         for task in tasks_domain:
             
             # check if you have parameters from the methods because of behavioral actions
+            tmp_parameters = []
             for action in bev_action_list:
+                
                 if action["behavior"] == task["behavior"]["xmi:id"]:
-                    if "parameters" in action and "parameters" not in task:
-                        task["parameters"] = action["parameters"]
+                    if "parameters" in action:
+                        tmp_parameters.append(action["parameters"])
+
+            if tmp_parameters != []:
+                task["parameters"], flag = self.assign_param(tmp_parameters)
+                if flag == 1:
+                    names = [x["name"] for x in task["parameters"]]
+                    if self.debug == 'on': 
+                        print("{} has {} as parameters - please check if that is the desired outcome".format(task['name'], names))
+                    self.log_file_general_entries('\t\t {} has {} as parameters - please check if that is the desired outcome \n'.format(task['name'], names))
             # check if you have parameters from the main use case
             if "parameters" not in task:
+                task["parameters"] = []
                 for param in task_parameters:
-                    task["parameters"] = []
                     for constrained_element in param["constrainedElement"].split():
                         if constrained_element == task["xmi:id"]:
-                            task["parameters"].append(constrained_element)
+                            if "type_name" not in param:
+                                if "type" in param:
+                                    for type in hddl_types:
+                                        if type["xmi:id"] == param["type"]:
+                                            param["type_name"] = type['name']
+                                
+                                flag_param = 0
+                                for type in hddl_types:
+                                    new_param = ''.join([i for i in parameter['name'] if not i.isdigit()])
+                                    if type['name'] == new_param:
+                                        param['type'] = type['xmi:id']
+                                        param["type_name"] = type['name']
+                                        flag_param = 1                               
+
+                                # creating a parameter with that name and print a warning to the user
+                                if flag_param == 0:
+                                    # create an adhoc name based on the parameter name
+                                    id_uuid = str(uuid.uuid1())
+                                    param['type'] = id_uuid
+                                    param["type_name"] = param['name']
+                                    hddl_types.append({"name": param['name'], "xmi:id": id_uuid})
+                                    if self.debug == 'on': 
+                                        print('No predefined type for {}. Add it on Papyrus!'.format(param['name']))
+                                    self.log_file_general_entries('\t\t No predefined type for {}. We added as its own type \n'.format(param['name']))
+                            task["parameters"].append(param)                           
 
             # check if you have parameters from the methods (minimum or common)
             if "parameters" not in task:
@@ -373,9 +438,30 @@ class Domain():
         domain_definition_output["task_list"] = tasks_domain
         domain_definition_output["method_list"] = methods_list
         domain_definition_output["final_action_list"] = final_action_list
+        domain_definition_output["behavioral_actions_list"] = bev_action_list
 
         return domain_definition_output, self.log_file_general_entries
+    
+    # This function needs to be better defined --> it is just adapted to the Igluna case
+    def assign_param(self, tmp_parameters):
+        param_names = []
 
+        # Take the names you have from the methods
+        for params in tmp_parameters:
+            names = [x["name"] for x in params]
+            param_names.append(names)
+        # Check the names are repeated in different methdos for the task parameters
+        if len(param_names) == 1:
+            return tmp_parameters, 1
+        # if the same set of parameters is repeated more than one time - conside that set
+        else:
+            index = [i for i, x in enumerate(param_names) if param_names.count(x) > 1]
+            if index != []:
+                return tmp_parameters[index[0]], 0
+            else:
+                # take the last occurance and print a warning to the user
+                return tmp_parameters[-1], 1
+        
 
     # Write the Domain File
     def DomainFileWriting (self, domain_definition_output):
@@ -384,14 +470,14 @@ class Domain():
         # Open/Create the File
         file = open(self.d_now + '//outputs//' + self.domain_name,'w')
         # Start writing on the file
-        file.write('(define (domain {}) \n'.format(self.domain_name_simple.lower()))
+        file.write('(define (domain {}) \n'.format(self.domain_name.lower()))
         # Write requirement
-        file.write('\t (:requirements :{}) \n'.format(' :'.join(self.requirement_list_domain_file).lower()))
+        file.write('\t (:requirements :{}) \n'.format(' :'.join(self.domain_requirements).lower()))
         #Object Type
         file.write('\t (:types  ')
         for hddl_type in domain_definition_output["hddl_type_list"]:
             # predicates are not type
-            if hddl_type["name"].strip() != 'predicate':
+            if hddl_type["name"].strip() == 'predicate':
                 pass
             # This line consider typing
             elif "parent" in hddl_type:
@@ -415,8 +501,8 @@ class Domain():
             file.write('\t (:task {} \n'.format(task["name"])) 
             parameters = []
             for param in task["parameters"]:
-                parameters.append(param["name"].lower())   
-            file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(parameters)))
+                parameters.append("?{} - {}".format(param["name"].lower(), param["type_name"].lower()))   
+            file.write('\t\t :parameters ({}) \n'.format(' '.join(parameters)))
             file.write('\t\t :precondition ()\n')
             file.write('\t\t :effect ()\n')
             file.write('\t ) \n\n') 
@@ -433,16 +519,16 @@ class Domain():
             # method parameters
             parameters = []
             for param in method["parameters"]:
-                parameters.append(param["name"].lower())  
-            file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(parameters)))
+                parameters.append("?{} - {}".format(param["name"].lower(), param["type_name"].lower()))  
+            file.write('\t\t :parameters ({}) \n'.format(' '.join(parameters)))
             # method task
             for task in domain_definition_output["task_list"]:
                 if task['xmi:id'] == method['task']['xmi:id']:
                     task_name = task['name']
                     task_parameters = []
                     for param in task["parameters"]:
-                        task_parameters.append(param["name"].lower())                         
-            file.write('\t\t :task ({} ?{}) \n'.format(task_name, ' ?'.join(task_parameters).lower()))
+                        task_parameters.append("?{} - {}".format(param["name"].lower(), param["type_name"].lower()))                         
+            file.write('\t\t :task ({} {}) \n'.format(task_name, ' '.join(task_parameters).lower()))
             # method preconditions
             if method["input_predicates"] != []:
                 predicates = []
@@ -461,25 +547,25 @@ class Domain():
                 flag_found = 0
                 # it can be an opaque action
                 for opaque_action in domain_definition_output["final_action_list"]:
-                    if action["xmi:id"] == opaque_action["xmi:id"]:
+                    if action == opaque_action["xmi:id"]:
                         flag_found = flag_found + 1
                         parameters = []
                         for param in opaque_action["parameters"]:
-                            parameters.append(param["name"].lower())  
+                            parameters.append("?{} - {}".format(param["name"].lower(), param["type_name"].lower()))
                         if parameters != [] :
-                            temporary_string.append('task{}({} ?{})'.format(counter,opaque_action['name'], ' ?'.join(parameters) ))
+                            temporary_string.append('task{}({} {})'.format(counter,opaque_action['name'], ' '.join(parameters) ))
                         else:
                             temporary_string.append('task{}({})'.format(counter,opaque_action['name']))
                         counter = counter + 1
                 # it can be a behavioral action
-                for bev_action in domain_definition_output["task_list"]:
-                    if action["xmi:id"] == bev_action["behavior"]["xmi:id"]:
+                for bev_action in domain_definition_output["behavioral_actions_list"]:
+                    if action == bev_action["xmi:id"]:
                         flag_found = flag_found + 1
                         parameters = []
                         for param in bev_action["parameters"]:
-                            parameters.append(param["name"].lower())  
+                            parameters.append("?{} - {}".format(param["name"].lower(), param["type_name"].lower()))  
                         if parameters != [] :
-                            temporary_string.append('task{}({} ?{})'.format(counter,bev_action['name'], ' ?'.join(parameters) ))
+                            temporary_string.append('task{}({} {})'.format(counter,bev_action['name'], ' '.join(parameters) ))
                         else:
                             temporary_string.append('task{}({})'.format(counter,bev_action['name']))
                         counter = counter + 1
@@ -541,9 +627,9 @@ class Domain():
             file.write('\t(:action {} \n'.format(action["name"].lower()))  
             parameters = []
             for param in action["parameters"]:
-                parameters.append(param["name"].lower())    
+                parameters.append("?{} - {}".format(param["name"].lower(), param["type_name"].lower()))    
             if parameters != []:
-                file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(parameters)))
+                file.write('\t\t :parameters ({}) \n'.format(' '.join(parameters)))
             else:
                 file.write('\t\t :parameters () \n')
 
@@ -556,7 +642,7 @@ class Domain():
                 file.write('\t\t :precondition ()\n')
             if action["effects"] != []:
                 effects = []
-                for effect in action["preconditions"]:
+                for effect in action["effects"]:
                     effects.append(effect["name"].lower())
                 file.write('\t\t :effect (and \n\t\t\t{})\n'.format(' \n\t\t\t'.join(effects)))
             else:

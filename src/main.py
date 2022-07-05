@@ -72,7 +72,7 @@ def main():
         DomainFile.DomainFileWriting(domain_file_elements)    
         print("Domain File Generated under the name of ", domain_name)
         print("Generating Simple Feedback File")
-        FeedbackFile = Simple_FeedbackDefinition(domain_name, log_file_general_entries)
+        FeedbackFile = Simple_FeedbackDefinition(log_file_general_entries)
         FeedbackFile.Simple_FeedbackLogFileWriting()
         print("Feedback File Generated")    
         
