@@ -1,0 +1,55 @@
+Feedback Log File 
+This file record all the discrepancy of the Papyrus model and/or the feedback from HDDL Domain File 
+------------------------------------------------- The following information shows discrepancies between the expected input and the real one 
+Log errors and warnings during parsing: 
+------------------------------------------------- 
+------------------------------------------------- 
+Log errors and warnings during the HDDL Domain file element acquisition: 
+------------------------------------------------- 
+		 The action Nop has no effects - is there something wrong in the model? 
+		 The action Nop has no parameters - is there something wrong in the model? 
+		 The action Nop has no effects - is there something wrong in the model? 
+		 The action Nop has no parameters - is there something wrong in the model? 
+		 The action Nop has no effects - is there something wrong in the model? 
+		 The action Nop has no parameters - is there something wrong in the model? 
+ 		 action PrepareMission and DoCalibration have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action PrepareMission is associate to method DoCalibration, while action DoMission_method1 is associated to method DoSwitching_method1 
+ 		 action PrepareMission and DoCalibration have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action PrepareMission is associate to method DoCalibration, while action DoMission_method1 is associated to method DoSwitching_method2 
+ 		 action PrepareMission and PrepareMission have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action PrepareMission is associate to method PrepareMission, while action DoMission_method1 is associated to method DoCalibration_method1 
+ 		 action DoCalibration and PrepareMission have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action DoCalibration is associate to method PrepareMission, while action DoSwitching_method1 is associated to method DoMission_method1 
+ 		 action DoCalibration and DoCalibration have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action DoCalibration is associate to method DoCalibration, while action DoSwitching_method1 is associated to method DoSwitching_method2 
+ 		 action DoCalibration and PrepareMission have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action DoCalibration is associate to method PrepareMission, while action DoSwitching_method1 is associated to method DoCalibration_method1 
+ 		 action DoCalibration and PrepareMission have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action DoCalibration is associate to method PrepareMission, while action DoSwitching_method2 is associated to method DoMission_method1 
+ 		 action DoCalibration and DoCalibration have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action DoCalibration is associate to method DoCalibration, while action DoSwitching_method2 is associated to method DoSwitching_method1 
+ 		 action DoCalibration and PrepareMission have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action DoCalibration is associate to method PrepareMission, while action DoSwitching_method2 is associated to method DoCalibration_method1 
+ 		 action Nop and Nop have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action Nop is associate to method Nop, while action DoSwitching_method3 is associated to method DoCalibration_method2 
+ 		 action Nop and Nop have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action Nop is associate to method Nop, while action DoSwitching_method3 is associated to method DoTurning_method2 
+ 		 action PrepareMission and PrepareMission have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action PrepareMission is associate to method PrepareMission, while action DoCalibration_method1 is associated to method DoMission_method1 
+ 		 action PrepareMission and DoCalibration have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action PrepareMission is associate to method DoCalibration, while action DoCalibration_method1 is associated to method DoSwitching_method1 
+ 		 action PrepareMission and DoCalibration have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action PrepareMission is associate to method DoCalibration, while action DoCalibration_method1 is associated to method DoSwitching_method2 
+ 		 action Nop and Nop have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action Nop is associate to method Nop, while action DoCalibration_method2 is associated to method DoSwitching_method3 
+ 		 action Nop and Nop have same parameters, preconditions and effect - are they two different actions? The are both considered in your domain 
+ 		 action Nop is associate to method Nop, while action DoCalibration_method2 is associated to method DoTurning_method2 
+		 action SwitchOn and SwitchOn have similar names - are they two different actions? Action SwitchOn has been removed from the domain 
+		 action SwitchOn is associate to methodSwitchOn, while action DoSwitching_method1 is associated to method DoSwitching_method2 
+		 action Nop and Nop have similar names - are they two different actions? Action Nop has been removed from the domain 
+		 action Nop is associate to methodNop, while action DoSwitching_method3 is associated to method DoCalibration_method2 
+		 action Nop and Nop have similar names - are they two different actions? Action Nop has been removed from the domain 
+		 action Nop is associate to methodNop, while action DoSwitching_method3 is associated to method DoTurning_method2 
+		 action Nop and Nop have similar names - are they two different actions? Action Nop has been removed from the domain 
+		 action Nop is associate to methodNop, while action DoCalibration_method2 is associated to method DoTurning_method2 
+------------------------------------------------- 

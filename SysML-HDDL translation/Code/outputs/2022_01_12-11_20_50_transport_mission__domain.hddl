@@ -1,0 +1,161 @@
+(define (domain transport_mission) 
+	 (:requirements :typing :hierachie :hierarchy :negative-preconditions) 
+	 (:types  
+		location - object 
+		capacity_number - object 
+		locatable - object 
+		vehicle - locatable 
+		package - locatable ) 
+
+	 (:predicates 
+		 (at ?arg0 - vehicle ?arg1 - location) 
+		 (road ?arg0 - location ?arg1 - location) 
+		 (at ?arg1 - location) 
+		 (in ?arg0 - package ?arg1 - vehicle) 
+		 (capacity_predecessor ?arg0 - capacity_number ?arg1 - capacity_number) 
+		 (capacity ?arg0 - vehicle ?arg1 - capacity_number) 
+		 (at ?arg0 - package ?arg1 - location) 
+	) 
+
+	 (:task Deliver 
+		 :parameters (?package-package ?location-location) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task GetTo 
+		 :parameters (?l2-location ?vehicle-vehicle) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task Load 
+		 :parameters (?pack-package ?l1-location ?vehicle-vehicle) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task Unload 
+		 :parameters (?pack-package ?l2-location ?vehicle-vehicle) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+
+	 (:method Deliver_method0 
+		 :parameters (?pack-package ?l1-location ?l2-location ?vehicle-vehicle) 
+		 :task (Deliver ?package ?location) 
+		 :precondition (and 
+			 
+		) 
+		 :ordered-subtasks (and 
+			task0(GetTo ?l1 ?vehicle)
+			task1(Load ?pack ?l1 ?vehicle)
+			task2(GetTo ?l2 ?vehicle)
+			task3(Unload ?pack ?l2 ?vehicle)
+		 ) 
+	 ) 
+
+	 (:method GetTo_method1 
+		 :parameters (?l1-location ?l2-location ?vehicle-vehicle) 
+		 :task (GetTo ?l2 ?vehicle) 
+		 :precondition (and 
+			 
+		) 
+		 :ordered-subtasks (and 
+			 task0(Drive ?l1 ?l2 ?vehicle)
+		 ) 
+	 ) 
+
+	 (:method GetTo_method2 
+		 :parameters (?l3-location ?l2-location ?vehicle-vehicle) 
+		 :task (GetTo ?l2 ?vehicle) 
+		 :precondition (and 
+			 
+		) 
+		 :ordered-subtasks (and 
+			task0(GetTo ?l2 ?vehicle)
+			task1(Drive ?l3 ?l2 ?vehicle)
+		 ) 
+	 ) 
+
+	 (:method GetTo_method3 
+		 :parameters (?l-location ?vehicle-vehicle) 
+		 :task (GetTo ?l2 ?vehicle) 
+		 :precondition (and 
+			 
+		) 
+		 :ordered-subtasks (and 
+			 task0(Noop ?l ?vehicle)
+		 ) 
+	 ) 
+
+	 (:method Load_method0 
+		 :parameters (?loc-location ?s2-capacity_number ?pack-package ?s1-capacity_number ?vehicle-vehicle) 
+		 :task (Load ?pack ?l1 ?vehicle) 
+		 :precondition (and 
+			 
+		) 
+		 :ordered-subtasks (and 
+			 task0(PickUp ?loc ?s2 ?pack ?s1 ?vehicle)
+		 ) 
+	 ) 
+
+	 (:method Unload_method0 
+		 :parameters (?loc-location ?s2-capacity_number ?pack-package ?s1-capacity_number ?vehicle-vehicle) 
+		 :task (Unload ?pack ?l2 ?vehicle) 
+		 :precondition (and 
+			 
+		) 
+		 :ordered-subtasks (and 
+			 task0(Drop ?loc ?s2 ?pack ?s1 ?vehicle)
+		 ) 
+	 ) 
+
+
+	(:action Drop 
+		 :parameters (?loc-location ?s2-capacity_number ?pack-package ?s1-capacity_number ?vehicle-vehicle) 
+		 :precondition (and 
+			(at ?vehicle ?loc) 
+			(in ?pack ?vehicle) 
+			(capacity_predecessor ?s1 ?s2) 
+			(capacity ?vehicle ?s1))
+		 :effect (and 
+			(not (in ?pack ?vehicle)) 
+			(at ?pack ?loc) 
+			(capacity ?vehicle ?s2) 
+			(not (capacity ?vehicle ?s1)))
+	) 
+
+	(:action Noop 
+		 :parameters (?l-location ?vehicle-vehicle) 
+		 :precondition (and 
+			(at ?v ?l))
+		 :effect ()
+	) 
+
+	(:action Drive 
+		 :parameters (?l1-location ?l2-location ?vehicle-vehicle) 
+		 :precondition (and 
+			(not (at ?vehicle ?l1)) 
+			(road ?l1 ?l2))
+		 :effect (and 
+			(not (at ?vehicle ?l1)) 
+			(at ?vehicle ?l2))
+	) 
+
+	(:action PickUp 
+		 :parameters (?loc-location ?s2-capacity_number ?pack-package ?s1-capacity_number ?vehicle-vehicle) 
+		 :precondition (and 
+			(at ?vehicle ?loc) 
+			(in ?pack ?vehicle) 
+			(capacity_predecessor ?s1 ?s2) 
+			(capacity ?vehicle ?s2))
+		 :effect (and 
+			(not (at ?pack ?loc)) 
+			(in ?pack ?vehicle) 
+			(capacity ?vehicle ?s1) 
+			(not (capacity ?vehicle ?s2)))
+	) 
+
+)
