@@ -20,7 +20,8 @@ This work is distributed under the MIT License.
 ## Status
 The code is still under development. We try to polish it, test it and add modules as we encounter new challenges in the domain of autonomous systems.
   - The master has a stable version of the code
-  - The "new_development_path" branch has an "under development" version that is cleaner, code-wise, and that can manage uml's "buffer nodes". .
+  - The "new_development_path" branch has an "under development" version that is cleaner, code-wise, and that can manage uml's "buffer nodes":
+      - The domain definition is stable and shows better performance than the previous version. It still needs to be re-validated.
 
 ## What are we implementing
 This code extracts from a model in Papyrus (https://www.eclipse.org/papyrus/) the information to automatically generate an HDDL domain file. 
