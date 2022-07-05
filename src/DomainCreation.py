@@ -14,6 +14,8 @@ import uuid
 # https://docs.python.org/3/library/os.html
 import os
 
+from soupsieve import escape
+
 # MAIN PARSING CLASS!
 class Domain():
     def __init__(self, domain_name, SysML_data, domain_dictionary, domain_requirements, task_parameters = 'common', flag_ordering_file = 'yes', method_precondition_from_action = 'yes', d_now = os.getcwd(),  debug = 'on'):
@@ -59,6 +61,8 @@ class Domain():
             a = b_packagedElement[n].children  # --> with n elements in b_packagedElement
             for i in a: print(i) # --> you will see all the subtags
         """
+        # Create a dictionary where you are going to store all instance related to the domain definition
+        domain_definition_output = {}
         # requirements --> self.domain_requirements
         # types in the HDDL file
         hddl_types_preprocess = self.domain_dictionary['types']
@@ -326,6 +330,7 @@ class Domain():
             # check if you have parameters from the main use case
             if "parameters" not in task:
                 for param in task_parameters:
+                    task["parameters"] = []
                     for constrained_element in param["constrainedElement"].split():
                         if constrained_element == task["xmi:id"]:
                             task["parameters"].append(constrained_element)
@@ -361,12 +366,205 @@ class Domain():
 
                     task["parameters"] = common_param
         
-        # write return function and test teh last lines! 
+        # write return function and test the last lines! 
+        domain_definition_output["domain_name"] = self.domain_name
+        domain_definition_output["hddl_type_list"] = hddl_types
+        domain_definition_output["predicate_list"] = final_predicate_list
+        domain_definition_output["task_list"] = tasks_domain
+        domain_definition_output["method_list"] = methods_list
+        domain_definition_output["final_action_list"] = final_action_list
+
+        return domain_definition_output, self.log_file_general_entries
 
 
+    # Write the Domain File
+    def DomainFileWriting (self, domain_definition_output):
+        ###################################################################
+        # Flag to know how to write the domain file
+        # Open/Create the File
+        file = open(self.d_now + '//outputs//' + self.domain_name,'w')
+        # Start writing on the file
+        file.write('(define (domain {}) \n'.format(self.domain_name_simple.lower()))
+        # Write requirement
+        file.write('\t (:requirements :{}) \n'.format(' :'.join(self.requirement_list_domain_file).lower()))
+        #Object Type
+        file.write('\t (:types  ')
+        for hddl_type in domain_definition_output["hddl_type_list"]:
+            # predicates are not type
+            if hddl_type["name"].strip() != 'predicate':
+                pass
+            # This line consider typing
+            elif "parent" in hddl_type:
+                file.write('\n\t\t{} - {} '.format(hddl_type["name"].lower(), hddl_type["parent"]))
+            else:
+                file.write('\n\t\t{} - object '.format(hddl_type["name"].lower()))
+                    
+        # End of object type
+        file.write(') \n\n')  
+        
+        # Predicates
+        file.write('\t (:predicates \n')
+        #Writes Predicates
+        for predicate in domain_definition_output["predicate_list"]:
+            file.write('\t\t ({}) \n'.format(predicate).lower())
+        # End of predicates
+        file.write('\t) \n\n')   
+            
+        #Tasks!
+        for task in domain_definition_output["task_list"]:
+            file.write('\t (:task {} \n'.format(task["name"])) 
+            parameters = []
+            for param in task["parameters"]:
+                parameters.append(param["name"].lower())   
+            file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(parameters)))
+            file.write('\t\t :precondition ()\n')
+            file.write('\t\t :effect ()\n')
+            file.write('\t ) \n\n') 
+            
+        #Methods!
+        # Introduce the order in the tasks
+        # have just the first word of the parameters
+        string_vector = []
+        order_vector = []
+        file.write('\n')  #space!
+        for method in domain_definition_output["method_list"]:
+            # method name
+            file.write('\t (:method {} \n'.format(method["method"]["name"].lower()))
+            # method parameters
+            parameters = []
+            for param in method["parameters"]:
+                parameters.append(param["name"].lower())  
+            file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(parameters)))
+            # method task
+            for task in domain_definition_output["task_list"]:
+                if task['xmi:id'] == method['task']['xmi:id']:
+                    task_name = task['name']
+                    task_parameters = []
+                    for param in task["parameters"]:
+                        task_parameters.append(param["name"].lower())                         
+            file.write('\t\t :task ({} ?{}) \n'.format(task_name, ' ?'.join(task_parameters).lower()))
+            # method preconditions
+            if method["input_predicates"] != []:
+                predicates = []
+                for predicate in method["input_predicates"]:
+                    predicates.append(predicate["name"].lower())
+                file.write('\t\t :precondition (and \n\t\t\t{} \n\t\t) \n'.format(' \n\t\t\t'.join(predicates)))
+            else:
+                file.write('\t\t :precondition ()\n')
+            counter = 0
+            
+            # method actions
+            temporary_string = []
+            ordering = []
+            for action in method["actions_order"]:
+                # You can check if the action have been identified
+                flag_found = 0
+                # it can be an opaque action
+                for opaque_action in domain_definition_output["final_action_list"]:
+                    if action["xmi:id"] == opaque_action["xmi:id"]:
+                        flag_found = flag_found + 1
+                        parameters = []
+                        for param in opaque_action["parameters"]:
+                            parameters.append(param["name"].lower())  
+                        if parameters != [] :
+                            temporary_string.append('task{}({} ?{})'.format(counter,opaque_action['name'], ' ?'.join(parameters) ))
+                        else:
+                            temporary_string.append('task{}({})'.format(counter,opaque_action['name']))
+                        counter = counter + 1
+                # it can be a behavioral action
+                for bev_action in domain_definition_output["task_list"]:
+                    if action["xmi:id"] == bev_action["behavior"]["xmi:id"]:
+                        flag_found = flag_found + 1
+                        parameters = []
+                        for param in bev_action["parameters"]:
+                            parameters.append(param["name"].lower())  
+                        if parameters != [] :
+                            temporary_string.append('task{}({} ?{})'.format(counter,bev_action['name'], ' ?'.join(parameters) ))
+                        else:
+                            temporary_string.append('task{}({})'.format(counter,bev_action['name']))
+                        counter = counter + 1
+                if flag_found == 1:
+                    if counter > 1 and '(< task{} task{})'.format(counter-2, counter-1) not in ordering:
+                            # For each task check incoming and outcoming links
+                            ordering.append('(< task{} task{})'.format(counter-2, counter-1))
+                else:
+                    raise IndexError 
+                    # You need to create an ad-hoc error for clarity!!!!!!!!
+                            
+            if self.flag_ordering_file == 'yes':                            
+                if counter != 0 and counter != 1:
+                    file.write('\t\t :subtasks (and \n')
+                    file.write('\t\t\t{}\n'.format('\n\t\t\t'.join(temporary_string)))
+                    file.write('\t\t ) \n')
+                    file.write('\t\t :ordering (and \n')
+                    file.write('\t\t\t{}\n'.format(' \n\t\t\t'.join(ordering).lower()))
+                    file.write('\t\t ) \n')
+                    string_vector.clear()
+                    order_vector.clear()
+                elif counter == 1:
+                    file.write('\t\t :subtasks (and \n')
+                    file.write('\t\t\t {}\n'.format(' \n\t\t\t'.join(temporary_string)))
+                    file.write('\t\t ) \n')
+                    string_vector.clear()
+                    order_vector.clear()
+                else:
+                    file.write('\t\t :subtasks () \n')
+                    string_vector.clear()
+                    order_vector.clear()
 
+            if self.flag_ordering_file == 'no':
+                if counter != 0 and counter != 1:
+                    file.write('\t\t :ordered-subtasks (and \n')
+                    file.write('\t\t\t{}\n'.format('\n\t\t\t'.join(temporary_string)))
+                    file.write('\t\t ) \n')
+                    string_vector.clear()
+                    order_vector.clear()
+                elif counter == 1:
+                    file.write('\t\t :ordered-subtasks (and \n')
+                    file.write('\t\t\t {}\n'.format(' \n\t\t\t'.join(temporary_string)))
+                    file.write('\t\t ) \n')
+                    string_vector.clear()
+                    order_vector.clear()
+                else:
+                    file.write('\t\t :ordered-subtasks () \n')
+                    string_vector.clear()
+                    order_vector.clear()                
+                
+                
+                
+            file.write('\t ) \n\n') 
 
+        #Actions
+        file.write('\n')  #space!
+        for action in domain_definition_output["final_action_list"]:
+            # Name
+            file.write('\t(:action {} \n'.format(action["name"].lower()))  
+            parameters = []
+            for param in action["parameters"]:
+                parameters.append(param["name"].lower())    
+            if parameters != []:
+                file.write('\t\t :parameters (?{}) \n'.format(' ?'.join(parameters)))
+            else:
+                file.write('\t\t :parameters () \n')
 
-
+            if action["preconditions"] != []:
+                predicates = []
+                for predicate in action["preconditions"]:
+                    predicates.append(predicate["name"].lower())
+                file.write('\t\t :precondition (and \n\t\t\t{})\n'.format(' \n\t\t\t'.join(predicates)))
+            else:
+                file.write('\t\t :precondition ()\n')
+            if action["effects"] != []:
+                effects = []
+                for effect in action["preconditions"]:
+                    effects.append(effect["name"].lower())
+                file.write('\t\t :effect (and \n\t\t\t{})\n'.format(' \n\t\t\t'.join(effects)))
+            else:
+                file.write('\t\t :effect ()\n')
+                        
+            file.write('\t) \n\n') 
+        
+        # end of the file
+        file.write(')')
 
 

@@ -16,43 +16,10 @@ import os
 
 # MAIN PARSING CLASS!
 class Simple_FeedbackDefinition():
-    def __init__(self, domain_name, parsed_dictionary, domain_file_elements, d_now = os.getcwd(),  debug = 'on'):
-        # domain name 
-        self.domain_name = domain_file_elements["domain_name"]
-        # Type list
-        self.hddl_type_list = domain_file_elements["hddl_type_list"]
-        # HighLevel UseCase list - Tasks
-        self.task_list = domain_file_elements["task_list"]
-        # Methods UseCase list - Tasks
-        self.method_list = domain_file_elements["method_list"]
-        # OpaqueAction List
-        self.opaqueAction_list = domain_file_elements["opaqueAction_list"]
-        # Parameters List
-        self.predicate_list = domain_file_elements["predicate_list"]
-        # Final list of action without doubles
-        self.final_opaque_action_list = domain_file_elements["final_opaque_action_list"]
-        # All the packaged elements
-        self.b_packagedElement = parsed_dictionary["b_packagedElement"]
-        # The rules of the XML file are constraints. They are used to define the task parameters
-        self.b_ownedRules = parsed_dictionary["b_ownedRules"]
-        # Edges List 
-        self.edge_list = parsed_dictionary["edge_list"]
-        # Dependencies in the UseCase
-        self.dependencies_list = parsed_dictionary["dependencies_list"]
-        # Get all the nodes
-        self.b_nodes = parsed_dictionary["b_nodes"]   
-        # feedback vector:
-        self.hddl_type_feedback = []
-        # debug_on
-        self.debug = debug
-        # Directory used now:
-        self.d_now = d_now
-        # if not named if as the self.domain_name
-        self.feedback_file_name = domain_file_elements["domain_name"]
-        # General Dictionary with all the output from the Feedback File
-        self.feedback_output = {}
+    def __init__(self, log_file_general_entries, d_now = os.getcwd(),  debug = 'on'):
+
         # Log file general entries
-        self.log_file_general_entries = domain_file_elements["log_file_general_entries"] 
+        self.log_file_general_entries = log_file_general_entries
 
    
     def Simple_FeedbackLogFileWriting(self):

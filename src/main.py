@@ -67,12 +67,12 @@ def main():
 
         DomainFile = Domain(domain_name, SysML_data, domain_dictionary, domain_requirements, task_parameters, flag_ordering_file, method_precondition_from_action)
         # Identify the Domain File Elements
-        domain_file_elements = DomainFile.DomainFileElements()
+        domain_file_elements, log_file_general_entries = DomainFile.DomainFileElements()
         # Write the Domain FIle
-        DomainFile.DomainFileWriting()    
+        DomainFile.DomainFileWriting(domain_file_elements)    
         print("Domain File Generated under the name of ", domain_name)
         print("Generating Simple Feedback File")
-        FeedbackFile = Simple_FeedbackDefinition(domain_name, domain_file_elements)
+        FeedbackFile = Simple_FeedbackDefinition(domain_name, log_file_general_entries)
         FeedbackFile.Simple_FeedbackLogFileWriting()
         print("Feedback File Generated")    
         
