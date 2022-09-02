@@ -4,54 +4,71 @@ Created on Thu Nov 4 16:19:39 2021
 
 @author: Jasmine Rimani
 """
+# https://docs.python.org/3/library/datetime.html
+from datetime import datetime
+# https://docs.python.org/3/library/re.html
+import re
+# https://docs.python.org/3/library/uuid.html
+import uuid
 # https://docs.python.org/3/library/os.html
 import os
 
 
+
 # MAIN PARSING CLASS!
 class ProblemDefinition():
-    def __init__(self, domain_name, parsed_dictionary, domain_file_elements, d_now = os.getcwd(),  debug = 'on'):
+    def __init__(self, domain_name, parsed_dictionary, missions, d_now = os.getcwd(),  debug = 'on'):
         
-        # File with the map data
-        self.map_data = []
-        # domain name
-        self.domain_name = domain_file_elements["domain_name"]
-        # problem name 
-        self.problem_name = domain_file_elements["problem_name"]
-        # Type list
-        self.hddl_type_list = domain_file_elements["hddl_type_list"]
-        # HighLevel UseCase list - Tasks
-        self.task_list = domain_file_elements["task_list"]
-        # Log file general entries
-        self.log_file_general_entries = domain_file_elements["log_file_general_entries"]   
-        # All the packaged elements
-        self.b_packagedElement = parsed_dictionary["b_packagedElement"]
-        # The rules of the XML file are constraints. They are used to define the task parameters
-        self.b_ownedRules = parsed_dictionary["b_ownedRules"]
-        # Edges List 
-        self.edge_list = parsed_dictionary["edge_list"]
-        # Dependencies in the UseCase
-        self.dependencies_list = parsed_dictionary["dependencies_list"]
-        # Get all the nodes
-        self.b_nodes = parsed_dictionary["b_nodes"]
-        # debug_on
-        self.debug = debug
-        # Directory used now:
-        self.d_now = d_now
-        # General Dictionary with all the output from the Problem File Creation 
-        self.problem_definition_output = {}
-        # Initial Task Network
-        self.htn_tasks = [] 
-        # The task to be accomplished during the mission
-        self.mission_tasks_list = []
-        # Initial conditions in the problem file
-        self.initial_conditions_pf = []
-        # Objects in the problem file
-        self.problem_file_object = []
-        # Mission Dictionary: General Dictionary where you put all the mission specific info
-        self.general_mission_dictionary = []
-        # To order or not the initial task network
-        self.flag_ordering = 'yes'
+       # Put an adaptable domain file name
+        # Put an adaptable problem file name
+        if domain_name != 'None':
+            self.domain_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' + domain_name + '_' +'_domain.hddl' 
+            self.domain_name_simple = domain_name
+            self.problem_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' + domain_name + '_' +'_problem.hddl'
+        else:
+           self.domain_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' +'_domain.hddl' 
+           self.domain_name_simple = datetime.now().strftime("%Y_%m_%d-%I_%M_%S")
+           self.problem_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' +'_problem.hddl'
+
+    """ New init code goes here.
+        Most of the element have already been extracted from the parsing module.
+    """
+
+
+        # # Type list
+        # self.hddl_type_list = domain_file_elements["hddl_type_list"]
+        # # HighLevel UseCase list - Tasks
+        # self.task_list = domain_file_elements["task_list"]
+        # # Log file general entries
+        # self.log_file_general_entries = domain_file_elements["log_file_general_entries"]   
+        # # All the packaged elements
+        # self.b_packagedElement = parsed_dictionary["b_packagedElement"]
+        # # The rules of the XML file are constraints. They are used to define the task parameters
+        # self.b_ownedRules = parsed_dictionary["b_ownedRules"]
+        # # Edges List 
+        # self.edge_list = parsed_dictionary["edge_list"]
+        # # Dependencies in the UseCase
+        # self.dependencies_list = parsed_dictionary["dependencies_list"]
+        # # Get all the nodes
+        # self.b_nodes = parsed_dictionary["b_nodes"]
+        # # debug_on
+        # self.debug = debug
+        # # Directory used now:
+        # self.d_now = d_now
+        # # General Dictionary with all the output from the Problem File Creation 
+        # self.problem_definition_output = {}
+        # # Initial Task Network
+        # self.htn_tasks = [] 
+        # # The task to be accomplished during the mission
+        # self.mission_tasks_list = []
+        # # Initial conditions in the problem file
+        # self.initial_conditions_pf = []
+        # # Objects in the problem file
+        # self.problem_file_object = []
+        # # Mission Dictionary: General Dictionary where you put all the mission specific info
+        # self.general_mission_dictionary = []
+        # # To order or not the initial task network
+        # self.flag_ordering = 'yes'
 
 
     # Get out the elements of the Problem File
