@@ -74,6 +74,37 @@ class XML_parsing():
         # -------------------------------------------------------
         # Lets' focus on the problem file...
         # Get the mission folders 
-        missions = problem_elements.find_all('packagedElement', attrs={"xmi:type": "uml:Package"})
+        dummy_package = problem_elements.find_all('packagedElement', attrs={"xmi:type": "uml:Package"})
+        missions = [ii for ii in dummy_package if ii.parent["name"] == "ProblemFilesDefinition"]
+        # Create a dictionary for each mission scenario
+        missions_vector = []
+        for mission in missions:
+            temp_dict = {'name': mission["name"]}
+            # Find the initial conditions
+            temp_initi_cond = mission.find_all('ownedRule', attrs={"xmi:type": "uml:Constraint"})
+            temp_dict['initial_conditions'] = temp_initi_cond
+            # Look if the initial task network is defined
+            temp_task_network = 'None'
+            # Look if there is a map file to add to the initial conditions
+            temp_map_file = 'None'
+            temp_comments = mission.find_all('ownedComment', attrs={"xmi:type": "uml:Comment"})
+            for comment in temp_comments:
+                if "Initial HTN" in comment.body.text:
+                    temp_task_network = comment.body.text
+                if "Map_file" in comment.body.text:
+                    temp_map_file = comment.body.text
+            temp_dict["init_HTN"] = temp_task_network
+            temp_dict["map_File"] = temp_map_file
+            # Save the objects of the problem file
+            temp_components = mission.find_all(attrs={"xmi:type": "uml:Class"})
+            temp_components_list = []
+            for component in temp_components:
+                pass
+                temp_components_list.append("{}-{}".format(component["name"], component.ownedAttribute["name"]))
+            temp_dict["objects"] = temp_components_list
+            # Final mission vector with all the needed elements for the problem definition
+            missions_vector.append(temp_dict)
+        # To each element 
+
 
         return SysML_data, domain_dictionary, missions
