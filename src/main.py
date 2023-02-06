@@ -77,18 +77,18 @@ def main():
         print("Feedback File Generated")    
         
     if generate_problem_file == 'yes':
-        print("Generating Problem File/s")
-        ProblemFile = ProblemDefinition(domain_name, domain_file_elements)
-        problem_file_elements = ProblemFile.ProblemFileElements()
-        ProblemFile.ProblemFileWriting()
-        print("Problem File Generated under the name of ", domain_file_elements["problem_name"])
+        print("Not yet implemented! Please look at the previous version!")
+        # ProblemFile = ProblemDefinition(domain_name, domain_file_elements)
+        # problem_file_elements = ProblemFile.ProblemFileElements()
+        # ProblemFile.ProblemFileWriting()
+        # print("Problem File Generated under the name of ", domain_file_elements["problem_name"])
         
     if generate_feedback_file == 'yes':
-        print("Generating Feedback File")
-        FeedbackFile = FeedbackDefinition(domain_name, domain_file_elements, problem_file_elements, feedback_name)
-        feedback_file_elements = FeedbackFile.FeedbackFile()
-        FeedbackFile.FeedbackLogFileWriting()
-        print("Feedback File Generated under the name of ", feedback_file_elements["feedback_file_name"])
+        print("Not yet implemented! Please look at the previous version!")
+        # FeedbackFile = FeedbackDefinition(domain_name, domain_file_elements, problem_file_elements, feedback_name)
+        # feedback_file_elements = FeedbackFile.FeedbackFile()
+        # FeedbackFile.FeedbackLogFileWriting()
+        # print("Feedback File Generated under the name of ", feedback_file_elements["feedback_file_name"])
 
     
 
