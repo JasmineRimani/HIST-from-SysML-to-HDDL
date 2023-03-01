@@ -20,7 +20,7 @@ from Parsing_module import XML_parsing
 # Domain Problem Definition
 from DomainCreation import Domain
 # Problem Definition
-from ProblemDefinition import ProblemDefinition
+from ProblemCreation import ProblemDefinition
 # Feedback Definition
 from FeedbackDefinition import FeedbackDefinition
 from Partial_FeedbackDefinition import Simple_FeedbackDefinition
@@ -77,7 +77,18 @@ def main():
         print("Feedback File Generated")    
         
     if generate_problem_file == 'yes':
-        print("Not yet implemented! Please look at the previous version!")
+        print("On-going implementation! Please look at the previous version!")
+        print("Definition of the initial task network is being implemented now")
+
+        "Hard coded value just for implementation tests"
+        flag_implementation = 0
+
+        if flag_implementation == 1:
+            problem_file_elements, log_file_general_problem_file = ProblemDefinition
+            print("Generating Simple Feedback File")
+            FeedbackFile = Simple_FeedbackDefinition(log_file_general_problem_file )
+            FeedbackFile.Simple_FeedbackLogFileWriting()
+        print("Feedback File Generated")  
         # ProblemFile = ProblemDefinition(domain_name, domain_file_elements)
         # problem_file_elements = ProblemFile.ProblemFileElements()
         # ProblemFile.ProblemFileWriting()
