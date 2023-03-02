@@ -20,7 +20,7 @@ from Parsing_module import XML_parsing
 # Domain Problem Definition
 from DomainCreation import Domain
 # Problem Definition
-from ProblemDefinition import ProblemDefinition
+from ProblemCreation import ProblemDefinition
 # Feedback Definition
 from FeedbackDefinition import FeedbackDefinition
 from Partial_FeedbackDefinition import Simple_FeedbackDefinition
@@ -77,18 +77,15 @@ def main():
         print("Feedback File Generated")    
         
     if generate_problem_file == 'yes':
-        print("Not yet implemented! Please look at the previous version!")
-        # ProblemFile = ProblemDefinition(domain_name, domain_file_elements)
-        # problem_file_elements = ProblemFile.ProblemFileElements()
-        # ProblemFile.ProblemFileWriting()
-        # print("Problem File Generated under the name of ", domain_file_elements["problem_name"])
+        print("On-going implementation!")
+        print("The problem file provides objects and initial conditions")
+        print("However, we are trying new ways to create the HDDL code form MBSE and graphs")
+        ProblemFile = ProblemDefinition(domain_name, SysML_data, missions)
+        ProblemFile.ProblemFileWriting()
         
     if generate_feedback_file == 'yes':
         print("Not yet implemented! Please look at the previous version!")
-        # FeedbackFile = FeedbackDefinition(domain_name, domain_file_elements, problem_file_elements, feedback_name)
-        # feedback_file_elements = FeedbackFile.FeedbackFile()
-        # FeedbackFile.FeedbackLogFileWriting()
-        # print("Feedback File Generated under the name of ", feedback_file_elements["feedback_file_name"])
+
 
     
 

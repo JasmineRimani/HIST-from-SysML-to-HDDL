@@ -1,0 +1,3 @@
+[] Check domain file integrity
+[] Define problem file from available instances
+[] Define feedback file

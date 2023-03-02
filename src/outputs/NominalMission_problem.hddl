@@ -1,0 +1,41 @@
+(define 
+ (problem nominalmission_1) 
+ (:domain igluna_check) 
+	 (:objects 
+		rover-rover
+		camera1-camera
+		camera2-camera
+		drone-drone
+		camera3-camera
+		camera4-camera
+		controlcenter-controlcenter
+		fisheye-mode
+		depth-mode
+	 )
+
+	 :htn( 
+		 :parameters () 
+		 :subtasks () 
+		 :ordering () 
+	 (:init 
+		(supports camera4 fisheye)
+		(is_dependent drone rover)
+		(available rover)
+		(equipped_for_imaging rover)
+		(equipped_for_imaging drone)
+		(equipped_for_artag_reading rover)
+		(equipped_for_artag_reading drone)
+		(equipped_for_artag_reading drone)
+		(equipped_for_health_monitoring rover)
+		(on_board camera1 rover)
+		(on_board camera2 rover)
+		(on_board camera3 drone)
+		(on_board camera4 drone)
+		(supports camera1 depth)
+		(supports camera3 depth)
+		(supports camera2 fisheye)
+		(at rover waypoint0)
+		(at drone waypoint0)
+	 )
+
+)

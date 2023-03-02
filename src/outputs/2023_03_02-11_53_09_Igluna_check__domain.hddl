@@ -1,0 +1,289 @@
+(define (domain 2023_03_02-11_53_09_igluna_check__domain.hddl) 
+	 (:requirements :typing :hierachie) 
+	 (:types  
+		system - object 
+		waypoint - object 
+		camera - object 
+		objective - object 
+		mode - object 
+		control_center - object 
+		path - object ) 
+
+	 (:predicates 
+		 (at ?arg0-system ?arg1-waypoint) 
+		 (can_traverse ?arg0-system ?arg1-waypoint ?arg2-waypoint) 
+		 (visited ?arg0-waypoint ?arg1-system) 
+		 (equipped_for_health_monitoring ?arg0-system) 
+		 (got_health_data ?arg0-system) 
+		 (available ?arg0-system) 
+		 (communicated_health_data ?arg0-system) 
+		 (equipped_for_imaging ?arg0-system) 
+		 (on_board ?arg0-camera ?arg1-system) 
+		 (visible_from ?arg0-objective ?arg1-waypoint ?arg2-system) 
+		 (communicated_image_data ?arg0-objective) 
+		 (communicated_artag_data ?arg0-objective) 
+		 (is_dependent ?arg0-system ?arg1-system) 
+		 (is_available ?arg0-path) 
+		 (get_artag ?arg0-system ?arg1-objective) 
+		 (have_image ?arg0-system ?arg1-objective) 
+		 (is_active ?arg0-camera) 
+	) 
+
+	 (:task navigate_to_goal 
+		 :parameters (?system - system ?to_wp - waypoint) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task evaluate_available_resources 
+		 :parameters (?system - system) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task take_picture 
+		 :parameters (?system - system ?objective - system) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task go_back 
+		 :parameters (?system1 - system ?system2 - system) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task start_mission 
+		 :parameters (?system1 - system ?system2 - system) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+	 (:task map_environment 
+		 :parameters (?system - system) 
+		 :precondition ()
+		 :effect ()
+	 ) 
+
+
+	 (:method navigate_to_goal_method1 
+		 :parameters (?system - system ?to_wp - waypoint ?from_wp - waypoint) 
+		 :task (navigate_to_goal ?system - system ?to_wp - waypoint) 
+		 :precondition (and 
+			(at ?system ?from_wp) 
+			(can_traverse ?system ?from_wp ?to_wp) 
+			(visited ?from_wp ?system) 
+		) 
+		 :subtasks (and 
+			task0(visit ?system - system ?from_wp - waypoint)
+			task1(navigate ?system - system ?from_wp - waypoint ?to_wp - waypoint)
+			task2(unvisit ?system - system ?from_wp - waypoint)
+		 ) 
+		 :ordering (and 
+			(< task0 task1) 
+			(< task1 task2)
+		 ) 
+	 ) 
+
+	 (:method navigate_to_goal_method2 
+		 :parameters (?system - system ?to_wp  - waypoint) 
+		 :task (navigate_to_goal ?system - system ?to_wp - waypoint) 
+		 :precondition ()
+		 :subtasks () 
+	 ) 
+
+	 (:method navigate_to_goal_method3 
+		 :parameters (?system - system ?to_wp - waypoint ?mid_wp - waypoint) 
+		 :task (navigate_to_goal ?system - system ?to_wp - waypoint) 
+		 :precondition ()
+		 :subtasks (and 
+			task0(navigate_to_goal ?system - system ?mid_wp - waypoint)
+			task1(navigate_to_goal ?system - system ?to_wp - waypoint)
+		 ) 
+		 :ordering (and 
+			(< task0 task1)
+		 ) 
+	 ) 
+
+	 (:method evaluate_available_resources_method1 
+		 :parameters (?system - system) 
+		 :task (evaluate_available_resources ?system - system) 
+		 :precondition (and 
+			(equipped_for_health_monitoring ?system) 
+			(available ?system) 
+		) 
+		 :subtasks (and 
+			task0(get_data_from_sensors ?system - system)
+			task1(send_system_state ?system - system)
+		 ) 
+		 :ordering (and 
+			(< task0 task1)
+		 ) 
+	 ) 
+
+	 (:method take_picture_method1 
+		 :parameters (?system - system ?to_wp - waypoint ?camera - camera ?objective - objective) 
+		 :task (take_picture ?system - system ?objective - system) 
+		 :precondition (and 
+			(equipped_for_imaging ?system) 
+			(on_board ?camera ?system) 
+			(visible_from ?objective ?to_wp ?system) 
+			(get_artag ?system ?objective) 
+			(have_image ?system ?objective) 
+		) 
+		 :subtasks (and 
+			task0(navigate_to_goal ?system - system ?to_wp - waypoint)
+			task1(read_arTag ?system - system ?to_wp - waypoint ?camera - camera ?objective - objective)
+			task2(communicate_arTag_data ?system - system ?objective - objective)
+			task3(take_image ?system - system ?to_wp - waypoint ?camera - camera ?objective - objective)
+			task4(communicate_image_data ?system - system ?objective - objective)
+		 ) 
+		 :ordering (and 
+			(< task0 task1) 
+			(< task1 task2) 
+			(< task2 task3) 
+			(< task3 task4)
+		 ) 
+	 ) 
+
+	 (:method go_back_method1 
+		 :parameters (?system1 - system ?system2 - system ?to_wp - waypoint ?from_wp - waypoint) 
+		 :task (go_back ?system1 - system ?system2 - system) 
+		 :precondition ()
+		 :subtasks () 
+	 ) 
+
+	 (:method start_mission_method1 
+		 :parameters (?system2 - system ?system1 - system) 
+		 :task (start_mission ?system1 - system ?system2 - system) 
+		 :precondition ()
+		 :subtasks () 
+	 ) 
+
+	 (:method map_environment_method1 
+		 :parameters (?system - system ?camera - camera ?path - path) 
+		 :task (map_environment ?system - system) 
+		 :precondition (and 
+			(on_board ?camera ?system) 
+			(is_available ?path) 
+			(is_active ?camera) 
+		) 
+		 :subtasks (and 
+			task0(activate_mapping_algorithm ?system - system ?camera - camera)
+			task1(follow_given_trajectory ?system - system ?path - path)
+			task2(stop_mapping_algorithm ?camera - camera ?system - system)
+		 ) 
+		 :ordering (and 
+			(< task0 task1) 
+			(< task1 task2)
+		 ) 
+	 ) 
+
+
+	(:action visit 
+		 :parameters (?system - system ?from_wp - waypoint) 
+		 :precondition (and 
+			(at ?system ?from_wp))
+		 :effect (and 
+			(visited ?from_wp ?system))
+	) 
+
+	(:action navigate 
+		 :parameters (?system - system ?from_wp - waypoint ?to_wp - waypoint) 
+		 :precondition (and 
+			(can_traverse ?system ?from_wp ?to_wp) 
+			(visited ?from_wp ?system))
+		 :effect (and 
+			(not (at ?system ?from_wp)) 
+			(at ?system ?to_wp))
+	) 
+
+	(:action unvisit 
+		 :parameters (?system - system ?from_wp - waypoint) 
+		 :precondition ()
+		 :effect (and 
+			(not (visited ?from_wp ?system)))
+	) 
+
+	(:action get_data_from_sensors 
+		 :parameters (?system - system) 
+		 :precondition (and 
+			(equipped_for_health_monitoring ?system))
+		 :effect (and 
+			(got_health_data ?system))
+	) 
+
+	(:action send_system_state 
+		 :parameters (?system - system) 
+		 :precondition (and 
+			(available ?system))
+		 :effect (and 
+			(communicated_health_data ?system))
+	) 
+
+	(:action read_artag 
+		 :parameters (?system - system ?to_wp - waypoint ?camera - camera ?objective - objective) 
+		 :precondition (and 
+			(equipped_for_imaging ?system) 
+			(on_board ?camera ?system) 
+			(visible_from ?objective ?to_wp ?system))
+		 :effect (and 
+			(get_artag ?system ?objective))
+	) 
+
+	(:action communicate_artag_data 
+		 :parameters (?system - system ?objective - objective) 
+		 :precondition (and 
+			(get_artag ?system ?objective))
+		 :effect (and 
+			(communicated_artag_data ?objective))
+	) 
+
+	(:action take_image 
+		 :parameters (?system - system ?to_wp - waypoint ?camera - camera ?objective - objective) 
+		 :precondition (and 
+			(on_board ?camera ?system) 
+			(equipped_for_imaging ?system) 
+			(visible_from ?objective ?to_wp ?system))
+		 :effect (and 
+			(have_image ?system ?objective))
+	) 
+
+	(:action communicate_image_data 
+		 :parameters (?system - system ?objective - objective) 
+		 :precondition (and 
+			(have_image ?system ?objective))
+		 :effect (and 
+			(communicated_image_data ?objective))
+	) 
+
+	(:action make_available 
+		 :parameters (?system2 - system) 
+		 :precondition ()
+		 :effect (and 
+			(available ?system2))
+	) 
+
+	(:action activate_mapping_algorithm 
+		 :parameters (?system - system ?camera - camera) 
+		 :precondition (and 
+			(on_board ?camera ?system))
+		 :effect (and 
+			(is_active ?camera))
+	) 
+
+	(:action follow_given_trajectory 
+		 :parameters (?system - system ?path - path) 
+		 :precondition (and 
+			(is_active ?camera) 
+			(is_available ?path))
+		 :effect ()
+	) 
+
+	(:action stop_mapping_algorithm 
+		 :parameters (?camera - camera ?system - system) 
+		 :precondition ()
+		 :effect ()
+	) 
+
+)

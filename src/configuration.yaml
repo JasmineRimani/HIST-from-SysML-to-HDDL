@@ -1,14 +1,14 @@
 # HIST INPUTS
 ---
 # Name of the file to be analysed
-file_name: "IGLUNA_model_sample_1.uml"
+file_name: "IGLUNA_model_sample_2.uml"
 #---------------------------------------------
 # Additional files to add to the problem file
 additional_files: 
   - "plan_final_1m_1_int.txt"
 #---------------------------------------------
 # Generate the domain file: yes or no
-generate_domain_file: "yes"
+generate_domain_file: "no"
 # Requirements domain file
 domain_requirements:
   - typing
@@ -17,7 +17,7 @@ domain_requirements:
 domain_name: "Igluna_check"
 #---------------------------------------------
 # Generate the problem file: yes or no
-generate_problem_file: "no"
+generate_problem_file: "yes"
 #---------------------------------------------
 # Generate feedback file: yes or no
 generate_feedback: "no"

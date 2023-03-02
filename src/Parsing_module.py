@@ -81,13 +81,17 @@ class XML_parsing():
         for mission in missions:
             temp_dict = {'name': mission["name"]}
             # Find the initial conditions
-            temp_initi_cond = mission.find_all('ownedRule', attrs={"xmi:type": "uml:Constraint"})
-            temp_dict['initial_conditions'] = temp_initi_cond
+            temp_initi_cond = mission.find_all(attrs={"xmi:type": "uml:Constraint"})
+            temp_initil_cond_name = []
+            for cond in temp_initi_cond:
+                temp_initil_cond_name.append(cond["name"])
+
+            temp_dict['initial_conditions'] = temp_initil_cond_name
             # Look if the initial task network is defined
             temp_task_network = 'None'
             # Look if there is a map file to add to the initial conditions
             temp_map_file = 'None'
-            temp_comments = mission.find_all('ownedComment', attrs={"xmi:type": "uml:Comment"})
+            temp_comments = mission.find_all(attrs={"xmi:type": "uml:Comment"})
             for comment in temp_comments:
                 if "Initial HTN" in comment.body.text:
                     temp_task_network = comment.body.text
@@ -107,4 +111,4 @@ class XML_parsing():
         # To each element 
 
 
-        return SysML_data, domain_dictionary, missions
+        return SysML_data, domain_dictionary, missions_vector
