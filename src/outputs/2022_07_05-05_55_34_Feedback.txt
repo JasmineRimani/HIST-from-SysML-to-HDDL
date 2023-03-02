@@ -1,7 +1,0 @@
-Feedback Log File 
-This file record all the discrepancy of the Papyrus model and/or the feedback from HDDL Domain File 
-------------------------------------------------- The following information shows discrepancies between the expected input and the real one 
-------------------------------------------------- 
-Log errors and warnings during the HDDL Domain file element acquisition: 
-------------------------------------------------- 
-------------------------------------------------- 
