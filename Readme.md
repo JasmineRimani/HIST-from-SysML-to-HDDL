@@ -19,10 +19,9 @@ This work is distributed under the MIT License.
 
 ## Status
 The code is still under development. We try to polish it, test it and add modules as we encounter new challenges in the domain of autonomous systems.
-  - The master has a stable version of the code
-  - The "new_development_path" branch has an "under development" version that is cleaner, code-wise, and that can manage uml's "buffer nodes". 
-       - The domain definition is stable and shows better performance than the previous version. 
-       - The problem definition is under development.
+  - The "NewDevelopmentPath" branch is a cleaner version of the "PreviousVersion", code-wise, and that can manage uml's "buffer nodes" in SysML:
+      - The domain definition is stable and shows better performance than the previous version. It still needs to be re-validated.
+      - The problem definition is stable. It encodes objects and initial conditions for a specific scenario derived from the MBSE model. 
 
 ## What are we implementing
 This code extracts from a model in Papyrus (https://www.eclipse.org/papyrus/) the information to automatically generate an HDDL domain file. 
@@ -30,5 +29,5 @@ This code extracts from a model in Papyrus (https://www.eclipse.org/papyrus/) th
 In addition, the code can partially generate an HDDL problem files. Because AI planning problem files are domain dependent, they are difficult to generalize. We are still trying to find a way to do so.
 
 The code provides a feedback file:
-  - with the possible problem that may be arised from the translation.
-  - with the differences between the Papyrus model and an externally provided HDDL domain file. However, this last instance can be improved. 
+  - with the possible problem that may be arised from the translation of the domain file from SysML to HDDL.
+
