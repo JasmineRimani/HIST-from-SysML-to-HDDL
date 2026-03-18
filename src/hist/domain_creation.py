@@ -11,14 +11,14 @@ from datetime import datetime
 import re
 # https://docs.python.org/3/library/uuid.html
 import uuid
-# https://docs.python.org/3/library/os.html
-import os
+# https://docs.python.org/3/library/pathlib.html
+from pathlib import Path
 
 from soupsieve import escape
 
 # MAIN PARSING CLASS!
 class Domain():
-    def __init__(self, domain_name, SysML_data, domain_dictionary, domain_requirements, task_parameters = 'common', flag_ordering_file = 'yes', method_precondition_from_action = 'yes', d_now = os.getcwd(),  debug = 'on'):
+    def __init__(self, domain_name, SysML_data, domain_dictionary, domain_requirements, task_parameters = 'common', flag_ordering_file = 'yes', method_precondition_from_action = 'yes', d_now = None,  debug = 'on', output_dir = None):
         # domain file name
         self.domain_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' + domain_name + '_' +'_domain.hddl'
         # all the data from the .uml file
@@ -32,7 +32,8 @@ class Domain():
         # debug_on
         self.debug = debug
         # Directory used now:
-        self.d_now = d_now
+        self.d_now = Path(d_now) if d_now is not None else Path.cwd()
+        self.output_dir = Path(output_dir) if output_dir is not None else self.d_now / 'outputs'
         # Task parameters consideration
         self.task_parameters = task_parameters
         # Parameters Ordering 
@@ -150,7 +151,7 @@ class Domain():
                         hddl_types.append({"name": param['name'], "xmi:id": id_uuid})
                         if self.debug == 'on': 
                             print('No predefined type for {}. Add it on Papyrus!'.format(param['name']))
-                        self.log_file_general_entries('\t\t No predefined type for {}. We added as its own type \n'.format(param['name']))
+                        self.log_file_general_entries.append('\t\t No predefined type for {}. We added as its own type \n'.format(param['name']))
 
                 if param.has_attr("type"):
                     for type in hddl_types:
@@ -367,7 +368,7 @@ class Domain():
                     names = [x["name"] for x in task["parameters"]]
                     if self.debug == 'on': 
                         print("{} has {} as parameters - please check if that is the desired outcome".format(task['name'], names))
-                    self.log_file_general_entries('\t\t {} has {} as parameters - please check if that is the desired outcome \n'.format(task['name'], names))
+                    self.log_file_general_entries.append('\t\t {} has {} as parameters - please check if that is the desired outcome \n'.format(task['name'], names))
             # check if you have parameters from the main use case
             if "parameters" not in task:
                 task["parameters"] = []
@@ -382,7 +383,7 @@ class Domain():
                                 
                                 flag_param = 0
                                 for type in hddl_types:
-                                    new_param = ''.join([i for i in parameter['name'] if not i.isdigit()])
+                                    new_param = ''.join([i for i in param['name'] if not i.isdigit()])
                                     if type['name'] == new_param:
                                         param['type'] = type['xmi:id']
                                         param["type_name"] = type['name']
@@ -397,7 +398,7 @@ class Domain():
                                     hddl_types.append({"name": param['name'], "xmi:id": id_uuid})
                                     if self.debug == 'on': 
                                         print('No predefined type for {}. Add it on Papyrus!'.format(param['name']))
-                                    self.log_file_general_entries('\t\t No predefined type for {}. We added as its own type \n'.format(param['name']))
+                                    self.log_file_general_entries.append('\t\t No predefined type for {}. We added as its own type \n'.format(param['name']))
                             task["parameters"].append(param)                           
 
             # check if you have parameters from the methods (minimum or common)
@@ -468,7 +469,9 @@ class Domain():
         ###################################################################
         # Flag to know how to write the domain file
         # Open/Create the File
-        file = open(self.d_now + '//outputs//' + self.domain_name,'w')
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        output_path = self.output_dir / self.domain_name
+        file = open(output_path, 'w', encoding='utf-8')
         # Start writing on the file
         file.write('(define (domain {}) \n'.format(self.domain_name.lower()))
         # Write requirement
@@ -652,5 +655,7 @@ class Domain():
         
         # end of the file
         file.write(')')
+        file.close()
+        return output_path
 
 

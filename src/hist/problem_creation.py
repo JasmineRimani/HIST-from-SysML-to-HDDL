@@ -10,11 +10,11 @@ from datetime import datetime
 import re
 # https://docs.python.org/3/library/uuid.html
 import uuid
-# https://docs.python.org/3/library/os.html
-import os
+# https://docs.python.org/3/library/pathlib.html
+from pathlib import Path
 
 class ProblemDefinition():
-    def __init__(self, domain_name, SysML_data, missions, d_now = os.getcwd(),  debug = 'on' ):
+    def __init__(self, domain_name, SysML_data, missions, d_now = None,  debug = 'on', output_dir = None ):
         # problem file name
         self.problem_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' + domain_name + '_' +'_problem.hddl'
         self.domain_name = domain_name 
@@ -25,7 +25,9 @@ class ProblemDefinition():
         # debug_on
         self.debug = debug
         # Directory used now:
-        self.d_now = d_now
+        self.d_now = Path(d_now) if d_now is not None else Path.cwd()
+        self.output_dir = Path(output_dir) if output_dir is not None else self.d_now / 'outputs'
+        self.log_file_general_entries = []
     
 
     def get_order(task):
@@ -47,9 +49,11 @@ class ProblemDefinition():
         # Hierarchical Task Network
 
     def ProblemFileWriting (self):
-
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        generated_files = []
         for index,mission in enumerate(self.mission_dictionary):
-            file = open(self.d_now + '//outputs//' + mission["name"]+'_problem.hddl','w')
+            output_path = self.output_dir / f'{mission["name"]}_problem.hddl'
+            file = open(output_path, 'w', encoding='utf-8')
             file.write('(define \n')
             file.write(' (problem {}_{}) \n'.format(mission["name"].lower(), index+1))
             file.write(' (:domain {}) \n'.format(self.domain_name).lower())
@@ -83,12 +87,8 @@ class ProblemDefinition():
             file.write('\t )\n\n')
             # end of the file
             file.write(')') 
+            file.close()
+            generated_files.append(output_path)
 
-            x = 1  
-
-
-            
-
-
-
+        return generated_files
 

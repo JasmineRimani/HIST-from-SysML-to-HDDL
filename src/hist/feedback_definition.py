@@ -11,12 +11,12 @@ from datetime import datetime
 import re
 # https://docs.python.org/3/library/uuid.html
 import uuid
-# https://docs.python.org/3/library/os.html
-import os
+# https://docs.python.org/3/library/pathlib.html
+from pathlib import Path
 
 # MAIN PARSING CLASS!
 class FeedbackDefinition():
-    def __init__(self, domain_name, parsed_dictionary, domain_file_elements, problem_file_elements, feedback_name, d_now = os.getcwd(),  debug = 'on'):
+    def __init__(self, domain_name, parsed_dictionary, domain_file_elements, problem_file_elements, feedback_name, d_now = None,  debug = 'on', input_dir = None, output_dir = None):
         # domain name 
         self.domain_name = domain_file_elements["domain_name"]
         # Type list
@@ -48,7 +48,9 @@ class FeedbackDefinition():
         # debug_on
         self.debug = debug
         # Directory used now:
-        self.d_now = d_now
+        self.d_now = Path(d_now) if d_now is not None else Path.cwd()
+        self.input_dir = Path(input_dir) if input_dir is not None else self.d_now / 'examples' / 'inputs'
+        self.output_dir = Path(output_dir) if output_dir is not None else self.d_now / 'outputs'
         try:
             # see if you have a feedback file
             self.feedback_file_name = feedback_name
@@ -145,7 +147,7 @@ class FeedbackDefinition():
         
         
         # Read the feedback file and start splitting requirements, types, predicates, tasks, methods and actions!
-        with open(self.d_now + '//inputs//' + self.feedback_file_name, 'r') as f:
+        with open(self.input_dir / self.feedback_file_name, 'r', encoding='utf-8') as f:
             feedback_file_lines = f.readlines()
             for index,ii in enumerate(feedback_file_lines):
                 line = ii.replace("\n", '').replace("\t",'').strip()
@@ -439,7 +441,9 @@ class FeedbackDefinition():
             
                 
     def FeedbackLogFileWriting(self):
-        file = open(self.d_now + '//outputs//' + datetime.now().strftime("%Y_%m_%d-%I_%M_%S")+ 'Feedback.txt','w')
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        output_path = self.output_dir / f'{datetime.now().strftime("%Y_%m_%d-%I_%M_%S")}Feedback.txt'
+        file = open(output_path, 'w', encoding='utf-8')
         file.write('Feedback Log File \n')        
         file.write('This file record all the discrepancy of the Papyrus model and/or the feedback from HDDL Domain File \n')
         file.write('------------------------------------------------- ')
@@ -472,3 +476,5 @@ class FeedbackDefinition():
         file.write('\t Possible Missing or Modified Actions: \n')
         for ii in self.opaqueAction_list_feedback:
             file.write('\t\t {} \n'.format(ii[0]))
+        file.close()
+        return output_path

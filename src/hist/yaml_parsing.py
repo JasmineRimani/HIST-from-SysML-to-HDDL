@@ -8,7 +8,7 @@ Created on Thu Apr 4 16:19:39 2022
 import yaml
 
 # Custom modules
-from errors import NotDefinedRequirements
+from .errors import NotDefinedRequirements
 
 class YAML_parsing():
     def __init__(self, file, debug = 'on'):

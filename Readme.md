@@ -1,33 +1,69 @@
-# HIST: A SysML to HDDL Automated Translation 
+# HIST: SysML to HDDL Translation
 
-## Motivation
-MBSE models are useful knowledge engineering models that are widely use in System Engineering and Space Mission Analysis. 
-In our case, we worked with AI planning and specifically HDDL.
-We therefore implemented HIST (HDDL fIles SysML Translation) to be able to extract our MBSE model information and directly have it ready to test for our systems.
-The tool has been implemented as a part of the IGLUNA-CoRoDro analogue mission, however, it is still under development to add capabilities and test its robusteness in different modelling context. 
-You are free re-use the code and change it. However, if you are using it for your project, please cite:
+HIST translates Papyrus MBSE models into HDDL planning artifacts. In this repository, the focus is on rover operations and mission descriptions modeled in Papyrus and exported as UML/XMI files.
+
+The codebase started as a research prototype and is now being cleaned up into a more standard Python project layout so it is easier to test, extend, and maintain.
+
+## Reference
+
+If you use this repository or the underlying workflow, please cite the reference paper:
+
+```bibtex
+@article{rimani2023simulating,
+  title   = {Simulating Operational Concepts for Autonomous Robotic Space Exploration Systems: A Framework for Early Design Validation},
+  author  = {Rimani, Jasmine and Viola, Nicole and Lizy-Destrez, Stephanie},
+  journal = {Aerospace},
+  volume  = {10},
+  number  = {5},
+  pages   = {408},
+  year    = {2023},
+  doi     = {10.3390/aerospace10050408}
+}
 ```
-  @article{rimani2021applicationMBSE,
-    title={Application of MBSE to model Hierarchical AI Planning problems in HDDL},
-    author={Rimani, Jasmine and Lesire, Charles and Lizy-Destrez, Stéphanie and Viola, Nicole},
-    publisher={ International Conference on Automated Planning and Scheduling (ICAPS) 2021, KEPS Workshop},
-    year={2021}
-  }
+
+Paper link: https://www.mdpi.com/2226-4310/10/5/408
+
+## Project Layout
+
+- `src/hist/`: Python source package.
+- `config/`: default YAML configuration.
+- `examples/inputs/`: sample Papyrus UML inputs.
+- `examples/outputs/`: example generated HDDL and feedback artifacts kept for reference.
+- `outputs/`: runtime output directory for newly generated files.
+- `tests/`: baseline regression tests for configuration parsing and XML extraction.
+
+## Installation
+
+```bash
+python3 -m pip install -r requirements.txt
 ```
-## Licence 
-This work is distributed under the MIT License.
+
+## Usage
+
+Run with the default sample configuration:
+
+```bash
+python3 -m hist
+```
+
+Or use the legacy entry point:
+
+```bash
+python3 src/main.py
+```
+
+You can also override the default paths:
+
+```bash
+python3 -m hist --config config/configuration.yaml --input-dir examples/inputs --output-dir outputs
+```
 
 ## Status
-The code is still under development. We try to polish it, test it and add modules as we encounter new challenges in the domain of autonomous systems.
-  - The "NewDevelopmentPath" branch is a cleaner version of the "PreviousVersion", code-wise, and that can manage uml's "buffer nodes" in SysML:
-      - The domain definition is stable and shows better performance than the previous version. It still needs to be re-validated.
-      - The problem definition is stable. It encodes objects and initial conditions for a specific scenario derived from the MBSE model. 
 
-## What are we implementing
-This code extracts from a model in Papyrus (https://www.eclipse.org/papyrus/) the information to automatically generate an HDDL domain file. 
+- Domain generation is the most mature part of the prototype.
+- Problem generation is partial and still contains prototype-era assumptions.
+- Detailed feedback generation remains incomplete in this branch.
 
-In addition, the code can partially generate an HDDL problem files. Because AI planning problem files are domain dependent, they are difficult to generalize. We are still trying to find a way to do so.
+## License
 
-The code provides a feedback file:
-  - with the possible problem that may be arised from the translation of the domain file from SysML to HDDL.
-
+This work is distributed under the MIT License. See `LICENSE.md`.
