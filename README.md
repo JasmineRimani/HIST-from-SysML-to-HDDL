@@ -1,10 +1,10 @@
-# HIST: Translating Papyrus SysML/MBSE Models into HDDL for AI Planning and ConOps Analysis
+# HIST: Translating Papyrus SysML Models into HDDL for AI Planning and ConOps Analysis
 
-HIST, short for `HDDL fIles SysML Translation`, is a research codebase for transforming Papyrus SysML / MBSE models into HDDL planning artifacts. The repository was created to support the study of mission operations and Concept of Operations (ConOps) for autonomous robotic space exploration systems while preserving traceability between systems engineering models and AI planning models.
+HIST, short for `HDDL fIles SysML Translation`, is a research codebase for transforming Papyrus SysML models into HDDL planning artifacts. The repository was created to support the study of mission operations and Concept of Operations (ConOps) for autonomous robotic space exploration systems while preserving traceability between systems engineering MBSE artifacts and AI planning models.
 
 In practice, HIST helps bridge two communities that often work with different abstractions:
 
-- systems engineers who describe functions, architecture, items, and operational logic in MBSE and SysML;
+- systems engineers who describe functions, architecture, items, and operational logic in MBSE using SysML;
 - AI planning researchers and autonomy engineers who need HDDL domain and problem models for hierarchical planning.
 
 This repository focuses on the translation layer between those two worlds.
@@ -32,7 +32,7 @@ The most direct research reference for this repository is the 2021 KEPS paper:
 
 That paper explains the core idea behind HIST: mapping MBSE functional analysis concepts to HDDL constructs such as tasks, methods, actions, predicates, and objects.
 
-### 2. Broader ConOps Validation Framework
+### 2. Broader ConOps Validation in an MBSE Framework
 
 The broader operational motivation is developed in the 2023 Aerospace paper:
 

@@ -1,107 +1,64 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Apr 4 16:19:39 2022
+"""Legacy-compatible YAML parsing helpers for HIST."""
 
-@author: Jasmine Rimani
-"""
-# https://yaml.org/
+from __future__ import annotations
+
 import yaml
 
-# Custom modules
-from .errors import NotDefinedRequirements
+from .config import HistConfig, load_config_from_mapping
 
-class YAML_parsing():
-    def __init__(self, file, debug = 'on'):
-        # File that we need to parse
+
+class YAML_parsing:
+    """Compatibility wrapper around the validated ``HistConfig`` loader."""
+
+    def __init__(self, file, debug='on'):
         self.file = file
-        # debug_on
         self.debug = debug
-        self.input_dictionary = yaml.safe_load(self.file)
+        self.input_dictionary = yaml.safe_load(self.file) or {}
+        self.config: HistConfig = load_config_from_mapping(self.input_dictionary)
         if self.debug == 'on':
             for key, value in self.input_dictionary.items():
-                print (key + " : " + str(value))
+                print(key + " : " + str(value))
 
+    def file_names(self):
+        return (
+            self.config.file_name,
+            self.config.domain_name,
+            self.config.feedback_file_name,
+        )
+
+    def main_flags(self):
+        return (
+            self.config.legacy_generate_problem_file,
+            self.config.legacy_generate_domain_file,
+            self.config.legacy_generate_feedback,
+            list(self.config.domain_requirements),
+        )
+
+    def other_flags(self):
+        return (
+            self.config.legacy_method_precondition_from_action,
+            self.config.legacy_flag_ordering,
+            self.config.task_parameters,
+        )
+
+    def package_names(self):
+        return (
+            self.config.packages.hddl,
+            self.config.packages.domain,
+            self.config.packages.problem,
+            self.config.packages.feedback,
+        )
+
+    # Legacy method names retained for backward compatibility with the original code.
     def YAML_fileNames(self):
-        # Get the name of the Papyrus File
-        file_papyrus = self.input_dictionary["file_name"]
-        # Get the name of the Domain File - if the domain would have the same name of the file_name
-        if "domain_name" in self.input_dictionary:
-            domain_name = self.input_dictionary["domain_name"]
-        else:
-            domain_name = '{}_{}'.format('domain', self.input_dictionary["file_name"])  
-        # Get the name of the Feedback file if any
-        if "feedback_file_name" in self.input_dictionary:
-            feedback_name = self.input_dictionary['feedback_file_name']
-        else:
-            feedback_name = '{}_{}'.format('feedback', self.input_dictionary["file_name"]) 
-        # Get additional files to add to the problem file, if any
-        if "additional_files" in self.input_dictionary:
-            pass
-        
-        return file_papyrus, domain_name, feedback_name
+        return self.file_names()
 
     def YAML_mainFlags(self):
-        # Flags
-        if 'generate_problem_file' in self.input_dictionary:
-            generate_problem_file = self.input_dictionary['generate_problem_file']
-        else:
-            generate_problem_file = 'no'  
-
-        if 'generate_domain_file' in self.input_dictionary:
-            generate_domain_file = self.input_dictionary['generate_domain_file']
-        else:
-            generate_domain_file = 'no'     
-
-        if 'generate_feedback' in self.input_dictionary:
-            generate_feedback_file = self.input_dictionary['generate_feedback']
-        else:
-            generate_feedback_file = 'no'  
-               
-        if 'domain_requirements' in self.input_dictionary:
-            domain_requirements = self.input_dictionary['domain_requirements']
-        else:
-            raise NotDefinedRequirements
-
-        return generate_problem_file, generate_domain_file, generate_feedback_file, domain_requirements
+        return self.main_flags()
 
     def YAML_otherFlags(self):
-        if 'method_precondition_from_action' in self.input_dictionary:
-            method_precondition_from_action = self.input_dictionary['method_precondition_from_action']
-        else:
-            method_precondition_from_action = 'yes'   
+        return self.other_flags()
 
-        if 'flag_ordering' in self.input_dictionary:
-            flag_ordering_file = self.input_dictionary['flag_ordering']
-        else:
-            flag_ordering_file = 'yes'    
-
-        if 'task_parameters' in self.input_dictionary:
-            task_parameters = self.input_dictionary['task_parameters']
-        else:
-            # if nothing is said consider the common task parameters
-            task_parameters = 'common'
-
-        return method_precondition_from_action, flag_ordering_file, task_parameters
-    
     def YAML_PackagesNames(self):
-        if 'package_HDDL' in self.input_dictionary:
-            package_HDDL= self.input_dictionary['package_HDDL']
-        else:
-            package_HDDL = 'ElementsHDDL'   
-
-        if 'package_domain' in self.input_dictionary:
-            package_domain = self.input_dictionary['package_domain']
-        else:
-            package_domain = 'DomainDefinition'    
-
-        if 'package_problem' in self.input_dictionary:
-            package_problem = self.input_dictionary['package_problem']
-        else:
-            package_problem = 'ProblemDefinition'
-
-        if 'package_feedback' in self.input_dictionary:
-            package_feedback = self.input_dictionary['package_feedback']
-        else:
-            package_feedback = 'Feedback'
-
-        return package_HDDL, package_domain, package_problem, package_feedback
+        return self.package_names()

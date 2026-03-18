@@ -1,13 +1,10 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
 from pathlib import Path
 
-from .domain_creation import Domain
-from .partial_feedback_definition import Simple_FeedbackDefinition
-from .problem_creation import ProblemDefinition
-from .xml_parsing import XML_parsing
-from .yaml_parsing import YAML_parsing
+from .config import HistConfig, load_config
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -16,42 +13,66 @@ DEFAULT_INPUT_DIR = PROJECT_ROOT / "examples" / "inputs"
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs"
 
 
+@dataclass(frozen=True)
+class TranslationResult:
+    config: HistConfig
+    input_path: Path
+    output_dir: Path
+    generated_files: tuple[Path, ...]
+
+
+def _print(verbose: bool, message: str) -> None:
+    if verbose:
+        print(message)
+
+
 def run_translation(
     config_path: Path | str = DEFAULT_CONFIG_PATH,
     input_dir: Path | str = DEFAULT_INPUT_DIR,
     output_dir: Path | str = DEFAULT_OUTPUT_DIR,
-) -> dict[str, object]:
+    verbose: bool = False,
+) -> TranslationResult:
     config_path = Path(config_path)
     input_dir = Path(input_dir)
     output_dir = Path(output_dir)
 
-    configuration_file = config_path.read_text(encoding="utf-8")
-    yaml_class = YAML_parsing(configuration_file, debug="off")
+    config = load_config(config_path)
+    papyrus_path = input_dir / config.file_name
+    if not papyrus_path.exists():
+        raise FileNotFoundError(
+            f"Could not find the Papyrus UML input '{papyrus_path}'. "
+            "Check --input-dir and the file_name configured in the YAML file."
+        )
 
-    file_papyrus, domain_name, feedback_name = yaml_class.YAML_fileNames()
-    generate_problem_file, generate_domain_file, generate_feedback_file, domain_requirements = yaml_class.YAML_mainFlags()
-    method_precondition_from_action, flag_ordering_file, task_parameters = yaml_class.YAML_otherFlags()
-    package_hddl, package_domain, package_problem, _package_feedback = yaml_class.YAML_PackagesNames()
+    from .xml_parsing import XML_parsing
 
-    papyrus_path = input_dir / file_papyrus
-    data = papyrus_path.read_text(encoding="utf-8")
+    require_domain = config.generate_domain_file or config.generate_feedback
+    require_problem = config.generate_problem_file
 
-    print(f"Parsing input file: {papyrus_path.name}")
-    initial_dictionary = XML_parsing(data, package_hddl, package_domain, package_problem, debug="off")
-    sysml_data, domain_dictionary, missions = initial_dictionary.Parsing()
+    _print(verbose, f"Parsing input file: {papyrus_path.name}")
+    parsed_model = XML_parsing(
+        papyrus_path.read_text(encoding="utf-8"),
+        config.packages.hddl,
+        config.packages.domain,
+        config.packages.problem,
+        debug="off",
+    ).parse(require_domain=require_domain, require_problem=require_problem)
 
     generated_files: list[Path] = []
 
-    if generate_domain_file == "yes":
-        print("Generating domain file")
+    if config.generate_domain_file:
+        from .domain_creation import Domain
+        from .partial_feedback_definition import Simple_FeedbackDefinition
+
+        _print(verbose, "Generating domain file")
         domain_file = Domain(
-            domain_name,
-            sysml_data,
-            domain_dictionary,
-            domain_requirements,
-            task_parameters,
-            flag_ordering_file,
-            method_precondition_from_action,
+            config.domain_name,
+            parsed_model.sysml_data,
+            parsed_model.domain_dictionary,
+            list(config.domain_requirements),
+            config.task_parameters,
+            config.legacy_flag_ordering,
+            config.legacy_method_precondition_from_action,
             d_now=PROJECT_ROOT,
             debug="off",
             output_dir=output_dir,
@@ -59,7 +80,7 @@ def run_translation(
         domain_file_elements, log_file_general_entries = domain_file.DomainFileElements()
         generated_files.append(domain_file.DomainFileWriting(domain_file_elements))
 
-        print("Generating simple feedback file")
+        _print(verbose, "Generating simple feedback file")
         feedback_file = Simple_FeedbackDefinition(
             log_file_general_entries,
             d_now=PROJECT_ROOT,
@@ -68,28 +89,29 @@ def run_translation(
         )
         generated_files.append(feedback_file.Simple_FeedbackLogFileWriting())
 
-    if generate_problem_file == "yes":
-        print("Generating problem file")
+    if config.generate_problem_file:
+        from .problem_creation import ProblemDefinition
+
+        _print(verbose, "Generating problem file")
         problem_file = ProblemDefinition(
-            domain_name,
-            sysml_data,
-            missions,
+            config.domain_name,
+            parsed_model.sysml_data,
+            parsed_model.missions,
             d_now=PROJECT_ROOT,
             debug="off",
             output_dir=output_dir,
         )
-        generated_files.extend(problem_file.ProblemFileWriting())
+        generated_files.extend(problem_file.write_problem_files())
 
-    if generate_feedback_file == "yes":
-        print("Detailed feedback generation is not yet implemented in this branch.")
+    if config.generate_feedback:
+        _print(verbose, "Detailed feedback generation is not yet implemented in this branch.")
 
-    return {
-        "config_path": config_path,
-        "input_path": papyrus_path,
-        "output_dir": output_dir,
-        "generated_files": generated_files,
-        "feedback_name": feedback_name,
-    }
+    return TranslationResult(
+        config=config,
+        input_path=papyrus_path,
+        output_dir=output_dir,
+        generated_files=tuple(generated_files),
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -109,6 +131,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=str(DEFAULT_OUTPUT_DIR),
         help="Directory where generated HDDL artifacts will be written.",
     )
+    parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="Disable progress messages.",
+    )
     return parser
 
 
@@ -119,11 +146,12 @@ def main() -> None:
         config_path=args.config,
         input_dir=args.input_dir,
         output_dir=args.output_dir,
+        verbose=not args.quiet,
     )
-    generated_files = result["generated_files"]
-    if generated_files:
-        print("Generated files:")
-        for file_path in generated_files:
-            print(f" - {file_path}")
-    else:
-        print("No files were generated.")
+    if not args.quiet:
+        if result.generated_files:
+            print("Generated files:")
+            for file_path in result.generated_files:
+                print(f" - {file_path}")
+        else:
+            print("No files were generated.")

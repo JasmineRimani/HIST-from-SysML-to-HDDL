@@ -1,94 +1,88 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Nov 4 16:19:39 2021
+"""Problem-file generation utilities for HIST."""
 
-@author: Jasmine Rimani
-"""
-# https://docs.python.org/3/library/datetime.html
+from __future__ import annotations
+
 from datetime import datetime
-# https://docs.python.org/3/library/re.html
-import re
-# https://docs.python.org/3/library/uuid.html
-import uuid
-# https://docs.python.org/3/library/pathlib.html
 from pathlib import Path
 
-class ProblemDefinition():
-    def __init__(self, domain_name, SysML_data, missions, d_now = None,  debug = 'on', output_dir = None ):
-        # problem file name
-        self.problem_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' + domain_name + '_' +'_problem.hddl'
-        self.domain_name = domain_name 
-        # all the data from the .uml file
-        self.overall_data = SysML_data 
-        # all the data from the missions defined in the .uml file
+from .errors import UnsupportedFeatureError
+
+
+class ProblemDefinition:
+    def __init__(self, domain_name, SysML_data, missions, d_now=None, debug='on', output_dir=None):
+        self.problem_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' + domain_name + '_' + '_problem.hddl'
+        self.domain_name = domain_name
+        self.overall_data = SysML_data
         self.mission_dictionary = missions
-        # debug_on
         self.debug = debug
-        # Directory used now:
         self.d_now = Path(d_now) if d_now is not None else Path.cwd()
         self.output_dir = Path(output_dir) if output_dir is not None else self.d_now / 'outputs'
         self.log_file_general_entries = []
-    
 
     def get_order(task):
         return task.get('order')
-    
-    def ProblemFileElements(self):
 
-        # Log File init - Initialize the problem file log_file
+    def ProblemFileElements(self):
         self.log_file_general_entries.append('------------------------------------------------- \n')
         self.log_file_general_entries.append('Log errors and warnings during the HDDL Problem file element acquisition: \n')
         self.log_file_general_entries.append('------------------------------------------------- \n')
-        
-        # Create a dictionary where we store all the instances of the problem file
 
-        # Objects
+    def _render_objects(self, mission):
+        lines = ["  (:objects"]
+        for object_name in mission["objects"]:
+            lines.append(f"    {object_name.lower()}")
+        lines.append("  )")
+        return "\n".join(lines)
 
-        # Initial Conditions
+    def _render_htn(self, mission):
+        if mission["init_HTN"] is not None:
+            raise UnsupportedFeatureError(
+                "Problem-file generation for custom 'Initial HTN' comments is not implemented yet."
+            )
+        return "\n".join(
+            [
+                "  (:htn",
+                "    :parameters ()",
+                "    :subtasks ()",
+                "    :ordering ()",
+                "  )",
+            ]
+        )
 
-        # Hierarchical Task Network
+    def _render_init(self, mission):
+        if mission["map_File"] is not None:
+            raise UnsupportedFeatureError(
+                "Problem-file generation using external 'Map_file' comments is not implemented yet."
+            )
 
-    def ProblemFileWriting (self):
+        lines = ["  (:init"]
+        for condition in mission["initial_conditions"]:
+            lines.append(f"    {condition.lower()}")
+        lines.append("  )")
+        return "\n".join(lines)
+
+    def build_problem_text(self, mission, index):
+        sections = [
+            "(define",
+            f"  (problem {mission['name'].lower()}_{index + 1})",
+            f"  (:domain {self.domain_name.lower()})",
+            self._render_objects(mission),
+            self._render_htn(mission),
+            self._render_init(mission),
+            ")",
+        ]
+        return "\n".join(sections) + "\n"
+
+    def write_problem_files(self):
         self.output_dir.mkdir(parents=True, exist_ok=True)
         generated_files = []
-        for index,mission in enumerate(self.mission_dictionary):
+        for index, mission in enumerate(self.mission_dictionary):
             output_path = self.output_dir / f'{mission["name"]}_problem.hddl'
-            file = open(output_path, 'w', encoding='utf-8')
-            file.write('(define \n')
-            file.write(' (problem {}_{}) \n'.format(mission["name"].lower(), index+1))
-            file.write(' (:domain {}) \n'.format(self.domain_name).lower())
-
-            # Objects
-            file.write('\t (:objects \n')
-            for object in mission["objects"]:
-                file.write('\t\t{}\n'.format(object.lower()))
-            file.write('\t )\n\n')
-
-            # Hierarchical Task Network
-            file.write('\t :htn( \n')
-            file.write('\t\t :parameters () \n')
-            if mission["init_HTN"] == 'None':
-                file.write('\t\t :subtasks () \n')
-                file.write('\t\t :ordering () \n')
-            else:
-                # still to implement
-                pass
-            
-            # Initial Conditions
-            # map file reading still to implement - please look at the previous version
-            if mission["map_File"] == None:
-                pass
-            else:
-                pass
-            # Initial conditions 
-            file.write('\t (:init \n')
-            for cond in mission["initial_conditions"]:
-                file.write('\t\t{}\n'.format(cond.lower()))  
-            file.write('\t )\n\n')
-            # end of the file
-            file.write(')') 
-            file.close()
+            with open(output_path, 'w', encoding='utf-8') as file:
+                file.write(self.build_problem_text(mission, index))
             generated_files.append(output_path)
-
         return generated_files
 
+    # Legacy public method retained.
+    def ProblemFileWriting(self):
+        return self.write_problem_files()

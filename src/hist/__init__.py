@@ -1,10 +1,15 @@
-"""HIST package."""
+"""Public package API for HIST."""
+
+from .cli import TranslationResult, run_translation
+from .config import HistConfig, PackageNames, load_config, load_config_from_mapping, load_config_from_text
 
 
-def run_translation(*args, **kwargs):
-    from .cli import run_translation as _run_translation
-
-    return _run_translation(*args, **kwargs)
-
-
-__all__ = ["run_translation"]
+__all__ = [
+    "HistConfig",
+    "PackageNames",
+    "TranslationResult",
+    "load_config",
+    "load_config_from_mapping",
+    "load_config_from_text",
+    "run_translation",
+]

@@ -1,23 +1,44 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 19 10:56:19 2022
+"""Custom exceptions used across the HIST package."""
 
-@author: Jasmine Rimani
 
-The code is a collection of Custom Exception for the HIST Development
-"""
+class HistError(Exception):
+    """Base exception for HIST-specific failures."""
 
-class NotDefinedRequirements(Exception):
-    """Exception raised for modes not in the defined MIRS dictionary.
 
-    Attributes:
-        mode -- input mode which caused the error
-        message -- explanation of the error
-    """
+class ConfigurationError(HistError):
+    """Raised when the YAML configuration is missing fields or uses invalid values."""
 
-    def __init__(self, message="You defined no requirements for your domain!"):
+
+class NotDefinedRequirements(ConfigurationError):
+    """Raised when the config does not define domain requirements."""
+
+    def __init__(self, message: str = "You defined no requirements for your domain!"):
         self.message = message
         super().__init__(self.message)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message
+
+
+class DependencyError(HistError):
+    """Raised when an optional runtime dependency required by a workflow is missing."""
+
+
+class ModelValidationError(HistError):
+    """Raised when the Papyrus model does not match the assumptions of the translator."""
+
+
+class MissingModelPackageError(ModelValidationError):
+    """Raised when a configured package cannot be found in the UML/XMI model."""
+
+    def __init__(self, package_name: str):
+        message = (
+            f"Could not find the package '{package_name}' in the Papyrus UML model. "
+            "Check the package names in the model and in config/configuration.yaml."
+        )
+        super().__init__(message)
+        self.package_name = package_name
+
+
+class UnsupportedFeatureError(HistError):
+    """Raised when a code path is intentionally not implemented yet."""
