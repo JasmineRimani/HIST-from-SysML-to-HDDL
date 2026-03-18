@@ -2,6 +2,10 @@
 
 HIST, short for `HDDL fIles SysML Translation`, is a research codebase for transforming Papyrus SysML models into HDDL planning artifacts. The repository was created to support the study of mission operations and Concept of Operations (ConOps) for autonomous robotic space exploration systems while preserving traceability between systems engineering MBSE artifacts and AI planning models.
 
+## Disclaimer
+
+This repository is research code. It was originally developed to bridge MBSE work quickly into the testing of operational scenarios for planetary exploration systems, especially rover- and drone-oriented mission studies. As a result, the implementation reflects the needs of that research workflow first: it is useful, tested on the included examples, and grounded in published work, but it should not be read as a fully general-purpose Papyrus-to-HDDL compiler.
+
 In practice, HIST helps bridge two communities that often work with different abstractions:
 
 - systems engineers who describe functions, architecture, items, and operational logic in MBSE using SysML;
