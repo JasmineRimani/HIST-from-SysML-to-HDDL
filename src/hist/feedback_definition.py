@@ -16,7 +16,11 @@ from pathlib import Path
 
 # MAIN PARSING CLASS!
 class FeedbackDefinition():
+    """Compare a generated HDDL domain with the Papyrus-derived model data."""
+
     def __init__(self, domain_name, parsed_dictionary, domain_file_elements, problem_file_elements, feedback_name, d_now = None,  debug = 'on', input_dir = None, output_dir = None):
+        """Store the parsed model, generated artifacts, and feedback paths."""
+
         # domain name 
         self.domain_name = domain_file_elements["domain_name"]
         # Type list
@@ -61,6 +65,8 @@ class FeedbackDefinition():
         self.feedback_output = {}
 
     def FeedbackFile(self): 
+        """Analyze a feedback file and extract discrepancies from the model."""
+
         self.log_file_general_entries.append('------------------------------------------------- \n')
         self.log_file_general_entries.append('Log errors and warnings during the Feedback generation: \n')
         self.log_file_general_entries.append('------------------------------------------------- \n')
@@ -441,6 +447,8 @@ class FeedbackDefinition():
             
                 
     def FeedbackLogFileWriting(self):
+        """Write the detailed feedback analysis to a text file."""
+
         self.output_dir.mkdir(parents=True, exist_ok=True)
         output_path = self.output_dir / f'{datetime.now().strftime("%Y_%m_%d-%I_%M_%S")}Feedback.txt'
         file = open(output_path, 'w', encoding='utf-8')

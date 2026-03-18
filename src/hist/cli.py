@@ -15,6 +15,8 @@ DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs"
 
 @dataclass(frozen=True)
 class TranslationResult:
+    """Summary of a translation run and the files it produced."""
+
     config: HistConfig
     input_path: Path
     output_dir: Path
@@ -22,6 +24,8 @@ class TranslationResult:
 
 
 def _print(verbose: bool, message: str) -> None:
+    """Print a progress message only when verbose mode is enabled."""
+
     if verbose:
         print(message)
 
@@ -32,6 +36,8 @@ def run_translation(
     output_dir: Path | str = DEFAULT_OUTPUT_DIR,
     verbose: bool = False,
 ) -> TranslationResult:
+    """Translate a Papyrus UML model into the configured HDDL artifacts."""
+
     config_path = Path(config_path)
     input_dir = Path(input_dir)
     output_dir = Path(output_dir)
@@ -115,6 +121,8 @@ def run_translation(
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Build the command-line parser for the HIST entry point."""
+
     parser = argparse.ArgumentParser(description="Translate Papyrus SysML MBSE files into HDDL artifacts.")
     parser.add_argument(
         "--config",
@@ -140,6 +148,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> None:
+    """Run the HIST command-line interface."""
+
     parser = build_parser()
     args = parser.parse_args()
     result = run_translation(

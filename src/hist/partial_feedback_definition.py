@@ -16,7 +16,11 @@ from pathlib import Path
 
 # MAIN PARSING CLASS!
 class Simple_FeedbackDefinition():
+    """Write a lightweight text log with translation warnings."""
+
     def __init__(self, log_file_general_entries, d_now = None,  debug = 'on', output_dir = None):
+        """Store the collected warnings and where to write the feedback log."""
+
         # directory
         self.d_now = Path(d_now) if d_now is not None else Path.cwd()
         self.output_dir = Path(output_dir) if output_dir is not None else self.d_now / 'outputs'
@@ -25,6 +29,8 @@ class Simple_FeedbackDefinition():
 
    
     def Simple_FeedbackLogFileWriting(self):
+        """Write the simplified feedback log file to the output directory."""
+
         self.output_dir.mkdir(parents=True, exist_ok=True)
         output_path = self.output_dir / f'{datetime.now().strftime("%Y_%m_%d-%I_%M_%S")}_Feedback.txt'
         file = open(output_path, 'w', encoding='utf-8')

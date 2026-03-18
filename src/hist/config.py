@@ -16,6 +16,8 @@ TASK_PARAMETER_MODES = {"common", "min"}
 
 @dataclass(frozen=True)
 class PackageNames:
+    """Configured Papyrus package names used by the translator."""
+
     hddl: str = "ElementsHDDL"
     domain: str = "DomainDefinition"
     problem: str = "ProblemDefinition"
@@ -24,6 +26,8 @@ class PackageNames:
 
 @dataclass(frozen=True)
 class HistConfig:
+    """Validated runtime configuration for a HIST translation run."""
+
     file_name: str
     domain_name: str
     feedback_file_name: str
@@ -39,38 +43,54 @@ class HistConfig:
 
     @property
     def legacy_generate_problem_file(self) -> str:
+        """Return the legacy yes/no representation for problem generation."""
+
         return "yes" if self.generate_problem_file else "no"
 
     @property
     def legacy_generate_domain_file(self) -> str:
+        """Return the legacy yes/no representation for domain generation."""
+
         return "yes" if self.generate_domain_file else "no"
 
     @property
     def legacy_generate_feedback(self) -> str:
+        """Return the legacy yes/no representation for detailed feedback generation."""
+
         return "yes" if self.generate_feedback else "no"
 
     @property
     def legacy_method_precondition_from_action(self) -> str:
+        """Return the legacy yes/no representation for method precondition extraction."""
+
         return "yes" if self.method_precondition_from_action else "no"
 
     @property
     def legacy_flag_ordering(self) -> str:
+        """Return the legacy yes/no representation for HDDL ordering style."""
+
         return "yes" if self.use_ordering else "no"
 
 
 def _coerce_mapping(data: Any) -> Mapping[str, Any]:
+    """Ensure that the parsed YAML document is a mapping."""
+
     if not isinstance(data, Mapping):
         raise ConfigurationError("The YAML configuration must define a mapping at the top level.")
     return data
 
 
 def _coerce_string(value: Any, field_name: str) -> str:
+    """Validate and normalize a required string configuration value."""
+
     if not isinstance(value, str) or not value.strip():
         raise ConfigurationError(f"'{field_name}' must be a non-empty string.")
     return value.strip()
 
 
 def _coerce_string_sequence(value: Any, field_name: str) -> tuple[str, ...]:
+    """Validate and normalize a list of strings from the configuration."""
+
     if value is None:
         return ()
     if not isinstance(value, list):
@@ -82,6 +102,8 @@ def _coerce_string_sequence(value: Any, field_name: str) -> tuple[str, ...]:
 
 
 def _coerce_bool(value: Any, field_name: str, default: bool) -> bool:
+    """Normalize boolean-like configuration values."""
+
     if value is None:
         return default
     if isinstance(value, bool):
@@ -98,6 +120,8 @@ def _coerce_bool(value: Any, field_name: str, default: bool) -> bool:
 
 
 def load_config_from_mapping(data: Mapping[str, Any]) -> HistConfig:
+    """Build a validated ``HistConfig`` object from a parsed YAML mapping."""
+
     data = _coerce_mapping(data)
 
     file_name = _coerce_string(data.get("file_name"), "file_name")
@@ -148,9 +172,13 @@ def load_config_from_mapping(data: Mapping[str, Any]) -> HistConfig:
 
 
 def load_config_from_text(text: str) -> HistConfig:
+    """Parse YAML text and return a validated HIST configuration."""
+
     return load_config_from_mapping(yaml.safe_load(text) or {})
 
 
 def load_config(config_path: str | Path) -> HistConfig:
+    """Load and validate the HIST configuration file from disk."""
+
     config_path = Path(config_path)
     return load_config_from_text(config_path.read_text(encoding="utf-8"))

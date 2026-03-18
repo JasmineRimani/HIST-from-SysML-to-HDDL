@@ -13,10 +13,14 @@ class NotDefinedRequirements(ConfigurationError):
     """Raised when the config does not define domain requirements."""
 
     def __init__(self, message: str = "You defined no requirements for your domain!"):
+        """Store the validation message for missing domain requirements."""
+
         self.message = message
         super().__init__(self.message)
 
     def __str__(self) -> str:
+        """Return the user-facing validation message."""
+
         return self.message
 
 
@@ -32,6 +36,8 @@ class MissingModelPackageError(ModelValidationError):
     """Raised when a configured package cannot be found in the UML/XMI model."""
 
     def __init__(self, package_name: str):
+        """Build a clear error message for a missing configured package."""
+
         message = (
             f"Could not find the package '{package_name}' in the Papyrus UML model. "
             "Check the package names in the model and in config/configuration.yaml."

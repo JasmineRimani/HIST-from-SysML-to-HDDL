@@ -10,6 +10,8 @@ from .errors import DependencyError, MissingModelPackageError, ModelValidationEr
 
 @dataclass(frozen=True)
 class ParsedModel:
+    """Structured output returned by the validated XML parser."""
+
     sysml_data: Any
     domain_dictionary: dict[str, Any]
     missions: list[dict[str, Any]]
@@ -19,6 +21,8 @@ class XML_parsing:
     """Legacy-compatible XML parser for Papyrus-exported UML models."""
 
     def __init__(self, file, package_HDDL, package_domain, package_problem, d_now=None, debug='on'):
+        """Store the XML payload and package names required for parsing."""
+
         self.file = file
         self.debug = debug
         self.d_now = d_now
@@ -27,6 +31,8 @@ class XML_parsing:
         self.package_problem = package_problem
 
     def _load_parser(self):
+        """Import and return BeautifulSoup, or raise a helpful dependency error."""
+
         try:
             from bs4 import BeautifulSoup
         except ImportError as exc:
@@ -38,12 +44,16 @@ class XML_parsing:
         return BeautifulSoup
 
     def _get_required_package(self, sysml_data, package_name):
+        """Return a required package node or raise a model validation error."""
+
         package = sysml_data.find(attrs={"name": package_name})
         if package is None:
             raise MissingModelPackageError(package_name)
         return package
 
     def _extract_domain_dictionary(self, domain_elements):
+        """Collect the domain-specific XML elements used for HDDL generation."""
+
         domain_types = domain_elements.find_all('packagedElement', attrs={"xmi:type": "uml:Class"})
         if not any(item.get("name") == "predicate" for item in domain_types):
             raise ModelValidationError(
@@ -72,6 +82,8 @@ class XML_parsing:
         }
 
     def _extract_missions(self, problem_elements):
+        """Extract mission objects and initial state data from the problem package."""
+
         problem_files_definition = problem_elements.find(
             'packagedElement',
             attrs={"xmi:type": "uml:Package", "name": "ProblemFilesDefinition"},
@@ -125,6 +137,8 @@ class XML_parsing:
         return missions_vector
 
     def parse(self, require_domain: bool = True, require_problem: bool = True) -> ParsedModel:
+        """Parse the XML model and return the requested structured outputs."""
+
         BeautifulSoup = self._load_parser()
         sysml_data = BeautifulSoup(self.file, "xml")
 
@@ -157,5 +171,7 @@ class XML_parsing:
         )
 
     def Parsing(self):
+        """Backward-compatible tuple-based wrapper around :meth:`parse`."""
+
         parsed = self.parse()
         return parsed.sysml_data, parsed.domain_dictionary, parsed.missions

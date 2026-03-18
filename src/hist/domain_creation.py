@@ -11,6 +11,8 @@ from .errors import ModelValidationError
 
 
 class Domain:
+    """Generate HDDL domain content from parsed Papyrus domain data."""
+
     def __init__(
         self,
         domain_name,
@@ -24,6 +26,8 @@ class Domain:
         debug='on',
         output_dir=None,
     ):
+        """Store the parsed domain data and rendering options."""
+
         self.domain_name = datetime.now().strftime("%Y_%m_%d-%I_%M_%S") + '_' + domain_name + '_' + '_domain.hddl'
         self.overall_data = SysML_data
         self.domain_dictionary = domain_dictionary
@@ -37,18 +41,26 @@ class Domain:
         self.method_precondition_from_action = method_precondition_from_action
 
     def get_order(task):
+        """Return the optional ordering key used by older code paths."""
+
         return task.get('order')
 
     def Diff(li1, li2):
+        """Return the symmetric difference between two lists."""
+
         li_dif = [i for i in li1 + li2 if i not in li1 or i not in li2]
         return li_dif
 
     def _warn(self, message):
+        """Record a warning and optionally print it in debug mode."""
+
         self.log_file_general_entries.append(message + '\n')
         if self.debug == 'on':
             print(message)
 
     def _intersect_parameter_lists(self, parameter_lists):
+        """Return parameters shared by all candidate parameter lists."""
+
         if not parameter_lists:
             return []
 
@@ -71,6 +83,8 @@ class Domain:
         return ordered_parameters
 
     def _infer_parameter_type(self, param, hddl_types):
+        """Populate a parameter type from existing types or create a new one."""
+
         if "type_name" in param:
             return
 
@@ -94,9 +108,13 @@ class Domain:
         self._warn('\t\t No predefined type for {}. We added as its own type '.format(param['name']))
 
     def _collect_hddl_types(self):
+        """Collect HDDL type dictionaries from the parsed domain package."""
+
         return [hddl_type.attrs for hddl_type in self.domain_dictionary['types']]
 
     def _collect_tasks(self):
+        """Collect task dictionaries and attach their owned behaviors."""
+
         tasks_domain = []
         for task in self.domain_dictionary['tasks']:
             task_data = task.attrs
@@ -106,9 +124,13 @@ class Domain:
         return tasks_domain
 
     def _collect_task_parameters(self):
+        """Collect task parameter constraints from the parsed domain package."""
+
         return [parameter.attrs for parameter in self.domain_dictionary['tasks_param']]
 
     def _build_method_parameters(self, parameter_nodes, hddl_types):
+        """Build normalized method parameter dictionaries from XML nodes."""
+
         parameters = []
         for param in parameter_nodes:
             if not param.has_attr("type"):
@@ -125,6 +147,8 @@ class Domain:
         return parameters
 
     def _extract_actions(self, method):
+        """Extract opaque and behavioral actions from a method node."""
+
         actions = []
         opaque_actions = method.find_all('node', attrs={"xmi:type": "uml:OpaqueAction"})
         behavioral_actions = method.find_all('node', attrs={"xmi:type": "uml:CallBehaviorAction"})
@@ -144,6 +168,8 @@ class Domain:
         return actions
 
     def _extract_method_predicates(self, predicate_nodes):
+        """Split predicate nodes into method inputs and outputs."""
+
         input_predicates = []
         output_predicates = []
         for predicate in predicate_nodes:
@@ -154,6 +180,8 @@ class Domain:
         return input_predicates, output_predicates
 
     def _infer_actions_order(self, actions, edges):
+        """Infer a linear subtask order from control-flow edges."""
+
         actions_order = []
         actions_partial_order = []
         for edge in edges:
@@ -178,6 +206,8 @@ class Domain:
         return actions_order
 
     def _build_method_dictionary(self, method, hddl_types):
+        """Build the normalized representation used for one HDDL method."""
+
         method_data = {"method": method.attrs}
         nodes = (
             method.find_all('node', attrs={"xmi:type": "uml:ActivityParameterNode"})
@@ -197,12 +227,16 @@ class Domain:
         return method_data
 
     def _collect_methods(self, hddl_types):
+        """Collect and normalize all methods from the parsed domain package."""
+
         methods_list = []
         for method in self.domain_dictionary['methods']:
             methods_list.append(self._build_method_dictionary(method, hddl_types))
         return methods_list
 
     def _build_predicate_list(self, methods_list):
+        """Build the HDDL predicate signatures referenced by the methods."""
+
         final_predicate_list = []
         for predicate_object in self.domain_dictionary['predicates']:
             predicate = predicate_object["name"]
@@ -237,6 +271,8 @@ class Domain:
         return final_predicate_list
 
     def _build_opaque_actions(self, methods_list):
+        """Build normalized opaque actions with parameters and predicates."""
+
         final_action_list = []
         for method in methods_list:
             for action in method['actions']:
@@ -269,6 +305,8 @@ class Domain:
         return final_action_list
 
     def _build_behavioral_actions(self, methods_list):
+        """Build normalized behavioral subtasks referenced by methods."""
+
         behavioral_actions = []
         for method in methods_list:
             for action in method['actions']:
@@ -299,6 +337,8 @@ class Domain:
         return behavioral_actions
 
     def _assign_task_parameters_from_behavior(self, task, behavioral_actions):
+        """Infer task parameters from behavioral action calls when available."""
+
         candidate_parameters = []
         for action in behavioral_actions:
             if action["behavior"] == task["behavior"]["xmi:id"] and "parameters" in action:
@@ -316,6 +356,8 @@ class Domain:
                 )
 
     def _assign_task_parameters_from_constraints(self, task, task_parameters, hddl_types):
+        """Infer task parameters from explicit SysML constraint definitions."""
+
         if "parameters" in task:
             return
 
@@ -332,6 +374,8 @@ class Domain:
             task["parameters"] = collected_parameters
 
     def _assign_task_parameters_from_methods(self, task, methods_list):
+        """Infer task parameters from related methods when no explicit data exists."""
+
         if "parameters" in task:
             return
 
@@ -346,12 +390,16 @@ class Domain:
             task["parameters"] = self._intersect_parameter_lists(task_parameter_matrix)
 
     def _resolve_task_parameters(self, tasks_domain, behavioral_actions, task_parameters, hddl_types, methods_list):
+        """Apply the task-parameter inference strategy to every task."""
+
         for task in tasks_domain:
             self._assign_task_parameters_from_behavior(task, behavioral_actions)
             self._assign_task_parameters_from_constraints(task, task_parameters, hddl_types)
             self._assign_task_parameters_from_methods(task, methods_list)
 
     def DomainFileElements(self):
+        """Build the normalized domain structure used for HDDL rendering."""
+
         self.log_file_general_entries.append('------------------------------------------------- \n')
         self.log_file_general_entries.append('Log errors and warnings during the HDDL Domain file element acquisition: \n')
         self.log_file_general_entries.append('------------------------------------------------- \n')
@@ -377,6 +425,8 @@ class Domain:
         return domain_definition_output, self.log_file_general_entries
 
     def assign_param(self, tmp_parameters):
+        """Choose the most representative parameter list for a task."""
+
         param_names = []
         for params in tmp_parameters:
             param_names.append([param["name"] for param in params])
@@ -391,12 +441,16 @@ class Domain:
         return tmp_parameters[-1], 1
 
     def _format_typed_parameters(self, parameters):
+        """Format typed parameters in HDDL syntax."""
+
         return " ".join(
             "?{} - {}".format(param["name"].lower(), param["type_name"].lower())
             for param in parameters
         )
 
     def _render_types_section(self, hddl_type_list):
+        """Render the HDDL ``:types`` section."""
+
         lines = ['\t (:types  ']
         for hddl_type in hddl_type_list:
             if hddl_type["name"].strip() == 'predicate':
@@ -409,6 +463,8 @@ class Domain:
         return "".join(lines)
 
     def _render_predicates_section(self, predicates):
+        """Render the HDDL ``:predicates`` section."""
+
         lines = ['\t (:predicates \n']
         for predicate in predicates:
             lines.append('\t\t ({}) \n'.format(predicate).lower())
@@ -416,6 +472,8 @@ class Domain:
         return "".join(lines)
 
     def _render_tasks_section(self, tasks):
+        """Render the HDDL task declarations."""
+
         lines = []
         for task in tasks:
             lines.append('\t (:task {} \n'.format(task["name"]))
@@ -426,12 +484,16 @@ class Domain:
         return "".join(lines)
 
     def _lookup_task_signature(self, task_list, task_id):
+        """Return the task name and typed parameters for a method reference."""
+
         for task in task_list:
             if task['xmi:id'] == task_id:
                 return task['name'], self._format_typed_parameters(task["parameters"])
         raise ModelValidationError("Could not find the task referenced by a method while rendering the domain file.")
 
     def _lookup_subtask_definition(self, action_id, domain_definition_output):
+        """Resolve a subtask id to its rendered action or task signature."""
+
         for opaque_action in domain_definition_output["final_action_list"]:
             if action_id == opaque_action["xmi:id"]:
                 return opaque_action['name'], self._format_typed_parameters(opaque_action["parameters"])
@@ -444,6 +506,8 @@ class Domain:
         )
 
     def _render_method_subtasks(self, method, domain_definition_output):
+        """Render a method's subtasks and derived ordering constraints."""
+
         subtasks = []
         ordering = []
         for index, action_id in enumerate(method["actions_order"]):
@@ -461,6 +525,8 @@ class Domain:
         return subtasks, ordering
 
     def _render_methods_section(self, domain_definition_output):
+        """Render the HDDL method declarations."""
+
         lines = ['\n']
         for method in domain_definition_output["method_list"]:
             lines.append('\t (:method {} \n'.format(method["method"]["name"].lower()))
@@ -509,6 +575,8 @@ class Domain:
         return "".join(lines)
 
     def _render_actions_section(self, final_action_list):
+        """Render the HDDL action declarations."""
+
         lines = ['\n']
         for action in final_action_list:
             lines.append('\t(:action {} \n'.format(action["name"].lower()))
@@ -534,6 +602,8 @@ class Domain:
         return "".join(lines)
 
     def build_domain_text(self, domain_definition_output):
+        """Build the full HDDL domain file text."""
+
         sections = [
             '(define (domain {}) \n'.format(self.domain_name.lower()),
             '\t (:requirements :{}) \n'.format(' :'.join(self.domain_requirements).lower()),
@@ -547,6 +617,8 @@ class Domain:
         return "".join(sections)
 
     def DomainFileWriting(self, domain_definition_output):
+        """Write the rendered HDDL domain text to disk."""
+
         self.output_dir.mkdir(parents=True, exist_ok=True)
         output_path = self.output_dir / self.domain_name
         with open(output_path, 'w', encoding='utf-8') as file:
